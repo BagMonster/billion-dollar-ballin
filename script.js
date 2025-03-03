@@ -28,7 +28,8 @@ let imagesLoaded = 0;
 function checkImagesLoaded() {
     imagesLoaded++;
     if (imagesLoaded === 4) {
-        console.log('All images loaded, ready to start game');
+        console.log('All images loaded, starting game loop');
+        gameLoop();
     }
 }
 ballImg.onload = checkImagesLoaded;
@@ -114,6 +115,65 @@ async function chargeFee() {
 }
 
 function startGame() {
-    if (!ballImg.complete || !hoopTopImg.complete || !hoopBotImg.complete || !bgImg.complete) {
-        console.log('Images
-                    
+    ball.y = 300; ball.velocity = 0;
+    hoop = { x: 400, height: 200, passed: false };
+    score = 0;
+    timeLeft = 60;
+    gameRunning = true;
+    restartButton.style.display = 'none';
+    playButton.style.display = 'none';
+    scoreDisplay.textContent = `Score: ${score}`;
+    timerDisplay.textContent = `Time: ${timeLeft}s`;
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `Time: ${timeLeft}s`;
+        if (timeLeft <= 0) gameOver();
+    }, 1000);
+}
+
+function gameLoop() {
+    if (!gameRunning) return;
+    ctx.drawImage(bgImg, 0, 0, 400, 600);
+    ball.velocity += ball.gravity;
+    ball.y += ball.velocity;
+    ctx.drawImage(ballImg, ball.x, ball.y, 30, 30);
+
+    hoop.x -= 2;
+    ctx.drawImage(hoopTopImg, hoop.x, 0, 50, hoop.height);
+    ctx.drawImage(hoopBotImg, hoop.x, hoop.height + 150, 50, 600 - hoop.height - 150);
+
+    if (hoop.x + 50 < ball.x && !hoop.passed) {
+        score++;
+        scoreDisplay.textContent = `Score: ${score}`;
+        hoop = { x: 400, height: Math.random() * 300 + 50, passed: false };
+    }
+
+    if (ball.x + 30 > hoop.x && ball.x < hoop.x + 50 &&
+        (ball.y < hoop.height || ball.y + 30 > hoop.height + 150)) {
+        gameOver();
+        return;
+    }
+
+    if (hoop.x < -50) hoop = { x: 400, height: Math.random() * 300 + 50, passed: false };
+
+    if (ball.y > 600 || ball.y < 0) gameOver();
+
+    requestAnimationFrame(gameLoop);
+}
+
+function gameOver() {
+    gameRunning = false;
+    clearInterval(timerInterval);
+    alert(`Game Over! Score: ${score}`);
+    if (score > dailyHighScore) {
+        dailyHighScore = score;
+        highScoreDisplay.textContent = `Daily High: ${dailyHighScore}`;
+    }
+    restartButton.style.display = 'block';
+    playButton.style.display = 'block';
+}
+
+document.addEventListener('keydown', () => {
+    if (gameRunning) ball.velocity = ball.jump;
+});
