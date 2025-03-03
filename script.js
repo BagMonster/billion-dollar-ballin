@@ -24,20 +24,7 @@ const scoreDisplay = document.getElementById('score');
 const highScoreDisplay = document.getElementById('highScore');
 const potDisplay = document.getElementById('pot');
 
-let imagesLoaded = 0;
-const totalImages = 4;
-
-function checkImagesLoaded() {
-    imagesLoaded++;
-    if (imagesLoaded === totalImages) {
-        console.log('All images loaded successfully');
-    }
-}
-
-ballImg.onload = checkImagesLoaded;
-hoopTopImg.onload = checkImagesLoaded;
-hoopBotImg.onload = checkImagesLoaded;
-bgImg.onload = checkImagesLoaded;
+// Log errors if images fail to load
 ballImg.onerror = () => console.error('Failed to load assets/sprites/ball.png');
 hoopTopImg.onerror = () => console.error('Failed to load assets/sprites/hoop-top.png');
 hoopBotImg.onerror = () => console.error('Failed to load assets/sprites/hoop-bot.png');
@@ -117,17 +104,10 @@ async function chargeFee() {
 }
 
 function startGame() {
-    // Check if all images are loaded
+    // Wait for all images to load
     if (!ballImg.complete || !hoopTopImg.complete || !hoopBotImg.complete || !bgImg.complete) {
         console.log('Waiting for images to load');
         setTimeout(startGame, 100);
-        return;
-    }
-
-    // Verify all images triggered onload (no errors)
-    if (imagesLoaded !== totalImages) {
-        console.error('Not all images loaded successfully. Check console for errors.');
-        alert('Game assets failed to load. Please refresh and try again.');
         return;
     }
 
@@ -150,6 +130,7 @@ function startGame() {
         if (timeLeft <= 0) gameOver();
     }, 1000);
 
+    console.log('Starting game loop');
     gameLoop();
 }
 
