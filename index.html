@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billion Dollar Ballin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <h1>Billion Dollar Ballin</h1>
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+        <div id="controls">
+            <button id="connectWallet">Connect Wallet</button>
+            <button id="playButton">Play (0.0025 SOL)</button>
+            <button id="restartButton">Restart</button>
+        </div>
+        <div id="stats">
+            <p id="walletStatus">Wallet: Not connected</p>
+            <p id="timer">Time: 60s</p>
+            <p id="score">Score: 0</p>
+            <p id="highScore">High Score: 0</p>
+            <p id="pot">Pot: 0 SOL</p>
+        </div>
+    </div>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

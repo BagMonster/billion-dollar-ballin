@@ -1,0 +1,37 @@
+#gameContainer {
+    text-align: center;
+    background: #70c5ce;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+h1 {
+    color: #fff;
+    margin: 10px 0;
+}
+#gameCanvas {
+    display: block;
+    margin: 0 auto;
+    border: 2px solid #fff;
+}
+#controls, #stats {
+    margin: 10px 0;
+}
+#connectWallet, #playButton, #restartButton {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background: #fff;
+    border: none;
+    border-radius: 5px;
+}
+#restartButton {
+    display: none;
+}
+#walletStatus, #timer, #score, #highScore, #pot {
+    text-align: center;
+    color: #fff;
+    margin: 5px 0;
+    font-size: 18px;
+}
