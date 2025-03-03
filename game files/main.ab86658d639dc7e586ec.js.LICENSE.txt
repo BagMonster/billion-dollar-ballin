@@ -1,0 +1,21 @@
+/*! ./app/main.ts */
+
+/*! @babel/polyfill */
+
+/*! ModuleConcatenation bailout: Cannot concat with ../node_modules/jquery/dist/jquery.js (<- Module is not an ECMAScript module) */
+
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+
+/*! all exports used */
+
+/*! no exports provided */
+
+/*! no static exports found */
+
+/*!*********************************!*\
+  !*** ./app/main.ts + 8 modules ***!
+  \*********************************/
+
+/*!*******************************************!*\
+  !*** multi @babel/polyfill ./app/main.ts ***!
+  \*******************************************/
