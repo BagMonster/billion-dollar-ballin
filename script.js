@@ -25,13 +25,12 @@ const highScoreDisplay = document.getElementById('highScore');
 const potDisplay = document.getElementById('pot');
 
 let imagesLoaded = 0;
-const totalImages = 4; // Number of images to load
+const totalImages = 4;
 
 function checkImagesLoaded() {
     imagesLoaded++;
     if (imagesLoaded === totalImages) {
-        console.log('All images loaded, ready to start game');
-        // Don’t start gameLoop here; let startGame() handle it
+        console.log('All images loaded successfully');
     }
 }
 
@@ -40,7 +39,7 @@ hoopTopImg.onload = checkImagesLoaded;
 hoopBotImg.onload = checkImagesLoaded;
 bgImg.onload = checkImagesLoaded;
 ballImg.onerror = () => console.error('Failed to load assets/sprites/ball.png');
-hoopTopImg.onerror.ZERO_WIDTH_SPACE = () => console.error('Failed to load assets/sprites/hoop-top.png');
+hoopTopImg.onerror = () => console.error('Failed to load assets/sprites/hoop-top.png');
 hoopBotImg.onerror = () => console.error('Failed to load assets/sprites/hoop-bot.png');
 bgImg.onerror = () => console.error('Failed to load assets/background.png');
 
@@ -121,12 +120,19 @@ function startGame() {
     // Check if all images are loaded
     if (!ballImg.complete || !hoopTopImg.complete || !hoopBotImg.complete || !bgImg.complete) {
         console.log('Waiting for images to load');
-        setTimeout(startGame, 100); // Retry after 100ms
+        setTimeout(startGame, 100);
+        return;
+    }
+
+    // Verify all images triggered onload (no errors)
+    if (imagesLoaded !== totalImages) {
+        console.error('Not all images loaded successfully. Check console for errors.');
+        alert('Game assets failed to load. Please refresh and try again.');
         return;
     }
 
     // Reset game state
-    ball.y = 300; 
+    ball.y = 300;
     ball.velocity = 0;
     hoop = { x: 400, height: 200, passed: false };
     score = 0;
@@ -136,8 +142,7 @@ function startGame() {
     playButton.style.display = 'none';
     scoreDisplay.textContent = `Score: ${score}`;
     timerDisplay.textContent = `Time: ${timeLeft}s`;
-    
-    // Clear any existing timer and start a new one
+
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
         timeLeft--;
@@ -145,7 +150,6 @@ function startGame() {
         if (timeLeft <= 0) gameOver();
     }, 1000);
 
-    // Start the game loop
     gameLoop();
 }
 
