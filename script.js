@@ -25,19 +25,22 @@ const highScoreDisplay = document.getElementById('highScore');
 const potDisplay = document.getElementById('pot');
 
 let imagesLoaded = 0;
+const totalImages = 4; // Number of images to load
+
 function checkImagesLoaded() {
     imagesLoaded++;
-    if (imagesLoaded === 4) {
-        console.log('All images loaded, starting game loop');
-        gameLoop();
+    if (imagesLoaded === totalImages) {
+        console.log('All images loaded, ready to start game');
+        // Don’t start gameLoop here; let startGame() handle it
     }
 }
+
 ballImg.onload = checkImagesLoaded;
 hoopTopImg.onload = checkImagesLoaded;
 hoopBotImg.onload = checkImagesLoaded;
 bgImg.onload = checkImagesLoaded;
 ballImg.onerror = () => console.error('Failed to load assets/sprites/ball.png');
-hoopTopImg.onerror = () => console.error('Failed to load assets/sprites/hoop-top.png');
+hoopTopImg.onerror.ZERO_WIDTH_SPACE = () => console.error('Failed to load assets/sprites/hoop-top.png');
 hoopBotImg.onerror = () => console.error('Failed to load assets/sprites/hoop-bot.png');
 bgImg.onerror = () => console.error('Failed to load assets/background.png');
 
@@ -115,7 +118,16 @@ async function chargeFee() {
 }
 
 function startGame() {
-    ball.y = 300; ball.velocity = 0;
+    // Check if all images are loaded
+    if (!ballImg.complete || !hoopTopImg.complete || !hoopBotImg.complete || !bgImg.complete) {
+        console.log('Waiting for images to load');
+        setTimeout(startGame, 100); // Retry after 100ms
+        return;
+    }
+
+    // Reset game state
+    ball.y = 300; 
+    ball.velocity = 0;
     hoop = { x: 400, height: 200, passed: false };
     score = 0;
     timeLeft = 60;
@@ -124,16 +136,22 @@ function startGame() {
     playButton.style.display = 'none';
     scoreDisplay.textContent = `Score: ${score}`;
     timerDisplay.textContent = `Time: ${timeLeft}s`;
+    
+    // Clear any existing timer and start a new one
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
         timeLeft--;
         timerDisplay.textContent = `Time: ${timeLeft}s`;
         if (timeLeft <= 0) gameOver();
     }, 1000);
+
+    // Start the game loop
+    gameLoop();
 }
 
 function gameLoop() {
     if (!gameRunning) return;
+
     ctx.drawImage(bgImg, 0, 0, 400, 600);
     ball.velocity += ball.gravity;
     ball.y += ball.velocity;
