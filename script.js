@@ -1,7 +1,8 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const ballImg = new Image(); ballImg.src = 'assets/bird.png';
-const hoopImg = new Image(); hoopImg.src = 'assets/pipe.png';
+const ballImg = new Image(); ballImg.src = 'assets/sprites/ball.png';
+const hoopTopImg = new Image(); hoopTopImg.src = 'assets/sprites/hoop-top.png';
+const hoopBotImg = new Image(); hoopBotImg.src = 'assets/sprites/hoop-bot.png';
 const bgImg = new Image(); bgImg.src = 'assets/background.png';
 
 let ball = { x: 50, y: 300, velocity: 0, gravity: 0.5, jump: -10 };
@@ -22,6 +23,23 @@ const timerDisplay = document.getElementById('timer');
 const scoreDisplay = document.getElementById('score');
 const highScoreDisplay = document.getElementById('highScore');
 const potDisplay = document.getElementById('pot');
+
+let imagesLoaded = 0;
+function checkImagesLoaded() {
+    imagesLoaded++;
+    if (imagesLoaded === 4) {
+        console.log('All images loaded, starting game loop');
+        gameLoop();
+    }
+}
+ballImg.onload = checkImagesLoaded;
+hoopTopImg.onload = checkImagesLoaded;
+hoopBotImg.onload = checkImagesLoaded;
+bgImg.onload = checkImagesLoaded;
+ballImg.onerror = () => console.error('Failed to load assets/sprites/ball.png');
+hoopTopImg.onerror = () => console.error('Failed to load assets/sprites/hoop-top.png');
+hoopBotImg.onerror = () => console.error('Failed to load assets/sprites/hoop-bot.png');
+bgImg.onerror = () => console.error('Failed to load assets/background.png');
 
 connectButton.addEventListener('click', async () => {
     if (window.solana && window.solana.isPhantom) {
@@ -112,7 +130,6 @@ function startGame() {
         timerDisplay.textContent = `Time: ${timeLeft}s`;
         if (timeLeft <= 0) gameOver();
     }, 1000);
-    gameLoop();
 }
 
 function gameLoop() {
@@ -123,8 +140,8 @@ function gameLoop() {
     ctx.drawImage(ballImg, ball.x, ball.y, 30, 30);
 
     hoop.x -= 2;
-    ctx.drawImage(hoopImg, hoop.x, 0, 50, hoop.height);
-    ctx.drawImage(hoopImg, hoop.x, hoop.height + 150, 50, 600 - hoop.height - 150);
+    ctx.drawImage(hoopTopImg, hoop.x, 0, 50, hoop.height);
+    ctx.drawImage(hoopBotImg, hoop.x, hoop.height + 150, 50, 600 - hoop.height - 150);
 
     if (hoop.x + 50 < ball.x && !hoop.passed) {
         score++;
