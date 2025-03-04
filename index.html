@@ -1,26 +1,178 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><title>Game</title><style>*, html, body {
-        margin: 0px;
-        padding: 0px;
-        overflow: hidden;
-      }
-
-      body {
-        /* background-image: url(./assets/sprites/bg.png);
-        background-repeat: no-repeat;
-        background-size: cover; */
-        background-color: #1d273c;
-      }
-
-      @font-face {
-          font-family: 'font';
-          src: url('./assets/font/square-deal.woff2') format('woff2');
-          font-weight: normal;
-          font-style: normal;
-          
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <title>Billion Dollar Ballin</title>
+    <style>
+        *, html, body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
         }
-  
-        .fontload{
-          visibility:hidden;
-          position: absolute;
-          left: -9999px;
-        }</style></head><body><div class="fontload" style="font-family: 'font';">.</div><script type="text/javascript" src="vendors~main.ab86658d639dc7e586ec.js"></script><script type="text/javascript" src="main.ab86658d639dc7e586ec.js"></script></body></html>
+        body {
+            background-image: url('./assets/sprites/bg.png');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: #1d273c;
+        }
+        @font-face {
+            font-family: 'font';
+            src: url('./assets/font/square-deal.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        .fontload {
+            visibility: hidden;
+            position: absolute;
+            left: -9999px;
+        }
+        #walletUI {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            font-family: 'font', sans-serif;
+            z-index: 10; /* Above Phaser canvas */
+        }
+        #connectWallet, #playButton, #practiceButton {
+            padding: 15px 30px;
+            margin: 10px;
+            background: #ffcc00;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-family: 'font', sans-serif;
+            display: block;
+        }
+        #playButton {
+            display: none; /* Hidden until wallet connects */
+        }
+        #walletStatus, #pot, #highScore {
+            margin: 10px;
+            font-size: 16px;
+        }
+    </style>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+</head>
+<body>
+    <div class="fontload" style="font-family: 'font';">.</div>
+    <div id="walletUI">
+        <button id="connectWallet">Connect Wallet</button>
+        <button id="playButton">Play (0.0025 SOL)</button>
+        <button id="practiceButton">Practice Offline</button>
+        <p id="walletStatus">Wallet not connected</p>
+        <p id="pot">Pot: 0 SOL</p>
+        <p id="highScore">Daily High: 0</p>
+    </div>
+    <script type="text/javascript" src="vendors~main.ab86658d639dc7e586ec.js"></script>
+    <script type="text/javascript" src="main.ab86658d639dc7e586ec.js"></script>
+    <script>
+        let walletPublicKey = null;
+        let pot = 0;
+        let dailyHighScore = 0;
+
+        const connectButton = document.getElementById('connectWallet');
+        const playButton = document.getElementById('playButton');
+        const practiceButton = document.getElementById('practiceButton');
+        const walletStatus = document.getElementById('walletStatus');
+        const potDisplay = document.getElementById('pot');
+        const highScoreDisplay = document.getElementById('highScore');
+
+        connectButton.addEventListener('click', async () => {
+            if (window.solana && window.solana.isPhantom) {
+                try {
+                    const response = await window.solana.connect();
+                    walletPublicKey = response.publicKey.toString();
+                    walletStatus.textContent = `Connected: ${walletPublicKey.slice(0, 6)}...`;
+                    connectButton.style.display = 'none'; // Hide connect button
+                    practiceButton.style.display = 'none'; // Hide practice button
+                    playButton.style.display = 'block'; // Show play button
+                } catch (err) {
+                    walletStatus.textContent = 'Connection failed!';
+                    console.error(err);
+                }
+            } else {
+                walletStatus.textContent = 'Install Phantom Wallet!';
+            }
+        });
+
+        playButton.addEventListener('click', async () => {
+            if (!walletPublicKey) {
+                alert('Connect your wallet first!');
+                return;
+            }
+            await chargeFee();
+        });
+
+        practiceButton.addEventListener('click', () => {
+            document.getElementById('walletUI').style.display = 'none'; // Hide UI
+            alert('Starting practice mode...');
+            window.dispatchEvent(new Event('startGame')); // Trigger game start
+        });
+
+        async function chargeFee() {
+            const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+            const ownerPublicKey = new solanaWeb3.PublicKey('YOUR_OWNER_WALLET_PUBLIC_KEY');
+            const potPublicKey = new solanaWeb3.PublicKey('YOUR_POT_WALLET_PUBLIC_KEY');
+
+            const ownerCut = 0.00025 * solanaWeb3.LAMPORTS_PER_SOL; // 10%
+            const potAmount = 0.00225 * solanaWeb3.LAMPORTS_PER_SOL; // 90%
+
+            const ownerTx = new solanaWeb3.Transaction().add(
+                solanaWeb3.SystemProgram.transfer({
+                    fromPubkey: new solanaWeb3.PublicKey(walletPublicKey),
+                    toPubkey: ownerPublicKey,
+                    lamports: ownerCut,
+                })
+            );
+
+            const potTx = new solanaWeb3.Transaction().add(
+                solanaWeb3.SystemProgram.transfer({
+                    fromPubkey: new solanaWeb3.PublicKey(walletPublicKey),
+                    toPubkey: potPublicKey,
+                    lamports: potAmount,
+                })
+            );
+
+            try {
+                const { blockhash } = await connection.getLatestBlockhash();
+                ownerTx.recentBlockhash = blockhash;
+                ownerTx.feePayer = new solanaWeb3.PublicKey(walletPublicKey);
+                potTx.recentBlockhash = blockhash;
+                potTx.feePayer = new solanaWeb3.PublicKey(walletPublicKey);
+
+                const signedOwner = await window.solana.signTransaction(ownerTx);
+                const signedPot = await window.solana.signTransaction(potTx);
+
+                await connection.sendRawTransaction(signedOwner.serialize());
+                const potSignature = await connection.sendRawTransaction(signedPot.serialize());
+                await connection.confirmTransaction(potSignature);
+
+                pot += 0.00225;
+                potDisplay.textContent = `Pot: ${pot.toFixed(5)} SOL`;
+                document.getElementById('walletUI').style.display = 'none'; // Hide UI
+                alert('Fee paid! Game starting...');
+                window.dispatchEvent(new Event('startGame')); // Trigger game start
+            } catch (err) {
+                console.error('Fee payment failed:', err);
+                alert('Fee payment failed!');
+            }
+        }
+
+        // Daily payout simulation (needs backend for real use)
+        setInterval(() => {
+            if (pot > 0) {
+                console.log(`Daily payout: 95% (${(pot * 0.95).toFixed(5)} SOL) to high scorer, 5% (${(pot * 0.05).toFixed(5)} SOL) to owner`);
+                pot = 0;
+                dailyHighScore = 0;
+                potDisplay.textContent = `Pot: 0 SOL`;
+                highScoreDisplay.textContent = `Daily High: 0`;
+            }
+        }, 24 * 60 * 60 * 1000); // Every 24 hours
+    </script>
+</body>
+</html>
