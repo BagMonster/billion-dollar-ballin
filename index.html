@@ -11,16 +11,11 @@
             overflow: hidden;
         }
         body {
-            /* background-image: url('./assets/sprites/bg.png');
-            background-repeat: no-repeat;
-            background-size: cover; */
             background-color: #1d273c;
         }
         @font-face {
             font-family: 'font';
-            src: url('./assets/font/square-deal.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
+            src: url('./assets/font/FFFFORWA.TTF') format('truetype');
         }
         .fontload {
             visibility: hidden;
@@ -37,10 +32,17 @@
             font-family: 'font', sans-serif;
             z-index: 10;
         }
+        #gameCanvas {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+        }
         #connectWallet {
             background: url('./assets/sprites/btn-home.png') no-repeat center;
             background-size: contain;
-            width: 200px; /* Match sprite size */
+            width: 200px;
             height: 60px;
             padding: 0;
             border: none;
@@ -64,13 +66,10 @@
             font-family: 'font', sans-serif;
             color: white;
             text-shadow: 1px 1px 2px #000;
-            display: none; /* Hidden initially */
+            display: none;
             margin: 10px auto;
         }
-        #playButton {
-            display: none; /* Ensure Play stays hidden until wallet connects */
-        }
-        #walletStatus, #pot, #highScore {
+        #walletStatus, #pot, #highScore, #score, #timer {
             margin: 10px;
             font-size: 16px;
             text-shadow: 1px 1px 1px #000;
@@ -80,6 +79,7 @@
 </head>
 <body>
     <div class="fontload" style="font-family: 'font';">.</div>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
     <div id="walletUI">
         <button id="connectWallet">Connect Wallet</button>
         <button id="playButton">Play (0.0025 SOL)</button>
@@ -87,13 +87,30 @@
         <p id="walletStatus">Wallet not connected</p>
         <p id="pot">Pot: 0 SOL</p>
         <p id="highScore">Daily High: 0</p>
+        <p id="score">Score: 0</p>
+        <p id="timer">Time: 60s</p>
     </div>
+    <!-- Uncomment if using Fiverr's Phaser bundle -->
     <script type="text/javascript" src="vendors~main.ab86658d639dc7e586ec.js"></script>
     <script type="text/javascript" src="main.ab86658d639dc7e586ec.js"></script>
     <script>
+        // Canvas logic (use if not Phaser-based)
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const ballImg = new Image(); ballImg.src = './assets/sprites/ball.png';
+        const hoopTopImg = new Image(); hoopTopImg.src = './assets/sprites/hoop-top.png';
+        const hoopBotImg = new Image(); hoopBotImg.src = './assets/sprites/hoop-bot.png';
+        const bgImg = new Image(); bgImg.src = './assets/background.png';
+
+        let ball = { x: 50, y: 300, velocity: 0, gravity: 0.5, jump: -10 };
+        let hoop = null;
+        let score = 0;
+        let gameRunning = false;
         let walletPublicKey = null;
-        let pot = 0;
+        let timeLeft = 60;
+        let timerInterval = null;
         let dailyHighScore = 0;
+        let pot = 0;
 
         const connectButton = document.getElementById('connectWallet');
         const playButton = document.getElementById('playButton');
@@ -101,6 +118,8 @@
         const walletStatus = document.getElementById('walletStatus');
         const potDisplay = document.getElementById('pot');
         const highScoreDisplay = document.getElementById('highScore');
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
 
         connectButton.addEventListener('click', async () => {
             if (window.solana && window.solana.isPhantom) {
@@ -131,7 +150,7 @@
         practiceButton.addEventListener('click', () => {
             document.getElementById('walletUI').style.display = 'none';
             alert('Starting practice mode...');
-            window.dispatchEvent(new Event('startGame'));
+            startGame();
         });
 
         async function chargeFee() {
@@ -176,12 +195,82 @@
                 potDisplay.textContent = `Pot: ${pot.toFixed(5)} SOL`;
                 document.getElementById('walletUI').style.display = 'none';
                 alert('Fee paid! Game starting...');
-                window.dispatchEvent(new Event('startGame'));
+                startGame();
             } catch (err) {
                 console.error('Fee payment failed:', err);
                 alert('Fee payment failed!');
             }
         }
+
+        function startGame() {
+            if (!ballImg.complete || !hoopTopImg.complete || !hoopBotImg.complete || !bgImg.complete) {
+                console.log('Images not loaded yet');
+                setTimeout(startGame, 100);
+                return;
+            }
+            ball.y = 300; ball.velocity = 0;
+            hoop = { x: 400, height: 200, passed: false };
+            score = 0;
+            timeLeft = 60;
+            gameRunning = true;
+            scoreDisplay.textContent = `Score: ${score}`;
+            timerDisplay.textContent = `Time: ${timeLeft}s`;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `Time: ${timeLeft}s`;
+                if (timeLeft <= 0) gameOver();
+            }, 1000);
+            gameLoop();
+        }
+
+        function gameLoop() {
+            if (!gameRunning) return;
+            ctx.drawImage(bgImg, 0, 0, 400, 600);
+            ball.velocity += ball.gravity;
+            ball.y += ball.velocity;
+            ctx.drawImage(ballImg, ball.x, ball.y, 30, 30);
+
+            hoop.x -= 2;
+            ctx.drawImage(hoopTopImg, hoop.x, 0, 50, hoop.height);
+            ctx.drawImage(hoopBotImg, hoop.x, hoop.height + 150, 50, 600 - hoop.height - 150);
+
+            if (hoop.x + 50 < ball.x && !hoop.passed) {
+                score++;
+                scoreDisplay.textContent = `Score: ${score}`;
+                hoop = { x: 400, height: Math.random() * 300 + 50, passed: false };
+            }
+
+            if (ball.x + 30 > hoop.x && ball.x < hoop.x + 50 &&
+                (ball.y < hoop.height || ball.y + 30 > hoop.height + 150)) {
+                gameOver();
+                return;
+            }
+
+            if (hoop.x < -50) hoop = { x: 400, height: Math.random() * 300 + 50, passed: false };
+
+            if (ball.y > 600 || ball.y < 0) gameOver();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            clearInterval(timerInterval);
+            alert(`Game Over! Score: ${score}`);
+            if (score > dailyHighScore) {
+                dailyHighScore = score;
+                highScoreDisplay.textContent = `Daily High: ${dailyHighScore}`;
+            }
+            document.getElementById('walletUI').style.display = 'block';
+            connectButton.style.display = walletPublicKey ? 'none' : 'block';
+            playButton.style.display = walletPublicKey ? 'block' : 'none';
+            practiceButton.style.display = walletPublicKey ? 'none' : 'block';
+        }
+
+        document.addEventListener('keydown', () => {
+            if (gameRunning) ball.velocity = ball.jump;
+        });
 
         setInterval(() => {
             if (pot > 0) {
