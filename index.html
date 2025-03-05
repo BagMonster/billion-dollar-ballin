@@ -15,7 +15,9 @@
         }
         @font-face {
             font-family: 'font';
-            src: url('./assets/font/FFFFORWA.TTF') format('truetype');
+            src: url('./assets/font/FFFFORWA.TTF') format('ttf'); /* Updated to match your repo */
+            font-weight: normal;
+            font-style: normal;
         }
         .fontload {
             visibility: hidden;
@@ -40,8 +42,8 @@
             z-index: 5;
         }
         #connectWallet {
-            background: url('./assets/sprites/btn-home.png') no-repeat center, #f28c38;
-            background-size: 100% 100%;
+            background: url('./assets/sprites/btn-home.png') no-repeat center;
+            background-size: contain;
             width: 200px;
             height: 60px;
             padding: 0;
@@ -55,8 +57,8 @@
             margin: 10px auto;
         }
         #playButton, #practiceButton {
-            background: url('./assets/sprites/btn-replay.png') no-repeat center, #f28c38;
-            background-size: 100% 100%;
+            background: url('./assets/sprites/btn-replay.png') no-repeat center;
+            background-size: contain;
             width: 200px;
             height: 60px;
             padding: 0;
@@ -69,74 +71,32 @@
             display: none;
             margin: 10px auto;
         }
-        #playerName {
-            margin: 10px auto;
-            padding: 10px;
-            width: 180px;
-            font-family: 'font', sans-serif;
-            font-size: 18px;
-            border-radius: 10px;
-            border: none;
-            display: block;
-        }
-        #walletStatus, #pot, #highScore, #score, #timer {
+        #walletStatus, #pot, #highScore {
             margin: 10px;
             font-size: 16px;
             text-shadow: 1px 1px 1px #000;
         }
-        @media (max-width: 600px) {
-            #connectWallet, #playButton, #practiceButton {
-                width: 120px;
-                height: 40px;
-                font-size: 14px;
-            }
-            #playerName {
-                width: 100px;
-                font-size: 14px;
-            }
-            #gameCanvas {
-                width: 100%;
-                height: auto;
-                max-width: 400px;
-                max-height: 600px;
-            }
-        }
     </style>
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
-    <!-- Add Phaser if using bundled JS -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script> -->
 </head>
 <body>
     <div class="fontload" style="font-family: 'font';">.</div>
     <canvas id="gameCanvas" width="400" height="600"></canvas>
     <div id="walletUI">
-        <input type="text" id="playerName" placeholder="Enter Name">
         <button id="connectWallet">Connect Wallet</button>
         <button id="playButton">Play (0.0025 SOL)</button>
         <button id="practiceButton">Practice Offline</button>
         <p id="walletStatus">Wallet not connected</p>
         <p id="pot">Pot: 0 SOL</p>
         <p id="highScore">Daily High: 0</p>
-        <p id="score">Score: 0</p>
-        <p id="timer">Time: 60s</p>
     </div>
-    <!-- Uncomment if uploaded -->
-    <!-- <script type="text/javascript" src="vendors~main.ab86658d639dc7e586ec.js"></script> -->
-    <!-- <script type="text/javascript" src="main.ab86658d639dc7e586ec.js"></script> -->
     <script>
-        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-        console.log('Device:', isMobile ? 'Mobile' : 'Desktop');
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const ballImg = new Image(); ballImg.src = isMobile ? './assets/sprites/ball.png?v=1' : './assets/desktop/sprites/ball-sheet.png?v=1';
-        const hoopTopImg = new Image(); hoopTopImg.src = isMobile ? './assets/sprites/hoop-top.png?v=1' : './assets/desktop/sprites/hoop.png?v=1';
-        const hoopBotImg = new Image(); hoopBotImg.src = isMobile ? './assets/sprites/hoop-bot.png?v=1' : './assets/desktop/sprites/hoop.png?v=1';
-        const bgImg = new Image(); bgImg.src = isMobile ? './assets/background.png?v=1' : './assets/desktop/sprites/bg.png?v=1';
-
-        ballImg.onerror = () => console.error('Failed to load ball image:', ballImg.src);
-        hoopTopImg.onerror = () => console.error('Failed to load hoop top:', hoopTopImg.src);
-        hoopBotImg.onerror = () => console.error('Failed to load hoop bot:', hoopBotImg.src);
-        bgImg.onerror = () => console.error('Failed to load background:', bgImg.src);
+        const ballImg = new Image(); ballImg.src = './assets/sprites/ball.png';
+        const hoopTopImg = new Image(); hoopTopImg.src = './assets/sprites/hoop-top.png';
+        const hoopBotImg = new Image(); hoopBotImg.src = './assets/sprites/hoop-bot.png';
+        const bgImg = new Image(); bgImg.src = './assets/background.png';
 
         let ball = { x: 50, y: 300, velocity: 0, gravity: 0.5, jump: -10 };
         let hoop = null;
@@ -148,15 +108,12 @@
         let dailyHighScore = 0;
         let pot = 0;
 
-        const playerNameInput = document.getElementById('playerName');
         const connectButton = document.getElementById('connectWallet');
         const playButton = document.getElementById('playButton');
         const practiceButton = document.getElementById('practiceButton');
         const walletStatus = document.getElementById('walletStatus');
         const potDisplay = document.getElementById('pot');
         const highScoreDisplay = document.getElementById('highScore');
-        const scoreDisplay = document.getElementById('score');
-        const timerDisplay = document.getElementById('timer');
 
         connectButton.addEventListener('click', async () => {
             if (window.solana && window.solana.isPhantom) {
@@ -181,18 +138,10 @@
                 alert('Connect your wallet first!');
                 return;
             }
-            if (!playerNameInput.value.trim()) {
-                alert('Please enter your name!');
-                return;
-            }
             await chargeFee();
         });
 
         practiceButton.addEventListener('click', () => {
-            if (!playerNameInput.value.trim()) {
-                alert('Please enter your name!');
-                return;
-            }
             document.getElementById('walletUI').style.display = 'none';
             alert('Starting practice mode...');
             startGame();
@@ -248,8 +197,6 @@
         }
 
         function startGame() {
-            document.getElementById('walletUI').style.display = 'none';
-            setTimeout(() => document.getElementById('walletUI').style.display = 'none', 100);
             if (!ballImg.complete || !hoopTopImg.complete || !hoopBotImg.complete || !bgImg.complete) {
                 console.log('Images not loaded yet');
                 setTimeout(startGame, 100);
@@ -273,7 +220,6 @@
 
         function gameLoop() {
             if (!gameRunning) return;
-            document.getElementById('walletUI').style.display = 'none';
             ctx.drawImage(bgImg, 0, 0, 400, 600);
             ball.velocity += ball.gravity;
             ball.y += ball.velocity;
@@ -319,12 +265,6 @@
         document.addEventListener('keydown', () => {
             if (gameRunning) ball.velocity = ball.jump;
         });
-        document.addEventListener('touchstart', (e) => {
-            if (gameRunning && e.target.tagName !== 'INPUT') {
-                ball.velocity = ball.jump;
-                e.preventDefault();
-            }
-        }, { passive: false });
 
         setInterval(() => {
             if (pot > 0) {
@@ -336,8 +276,12 @@
             }
         }, 24 * 60 * 60 * 1000);
 
-        if (typeof Phaser !== 'undefined') console.log('Phaser detected—using bundled JS');
-        else console.log('No Phaser—using canvas logic');
+        // Expose elements to global scope if needed by bundled JS
+        window.scoreDisplay = document.createElement('p'); // Placeholder if not in DOM
+        window.timerDisplay = document.createElement('p');
     </script>
+    <!-- Remove these if not in repo or adjust paths -->
+    <!-- <script type="text/javascript" src="vendors~main.ab86658d639dc7e586ec.js"></script> -->
+    <!-- <script type="text/javascript" src="main.ab86658d639dc7e586ec.js"></script> -->
 </body>
 </html>
