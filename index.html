@@ -40,7 +40,7 @@
             z-index: 5;
         }
         #connectWallet {
-            background: url('./assets/sprites/btn-home.png') no-repeat center, url('./assets/desktop/sprites/btn-home.png') no-repeat center, #f28c38;
+            background: url('./assets/sprites/btn-home.png') no-repeat center, #f28c38;
             background-size: 100% 100%;
             width: 200px;
             height: 60px;
@@ -55,7 +55,7 @@
             margin: 10px auto;
         }
         #playButton, #practiceButton {
-            background: url('./assets/sprites/btn-replay.png') no-repeat center, url('./assets/desktop/sprites/btn-replay.png') no-repeat center, #f28c38;
+            background: url('./assets/sprites/btn-replay.png') no-repeat center, #f28c38;
             background-size: 100% 100%;
             width: 200px;
             height: 60px;
@@ -103,6 +103,8 @@
         }
     </style>
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <!-- Add Phaser if using bundled JS -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script> -->
 </head>
 <body>
     <div class="fontload" style="font-family: 'font';">.</div>
@@ -118,8 +120,10 @@
         <p id="score">Score: 0</p>
         <p id="timer">Time: 60s</p>
     </div>
+    <!-- Uncomment if uploaded -->
+    <!-- <script type="text/javascript" src="vendors~main.ab86658d639dc7e586ec.js"></script> -->
+    <!-- <script type="text/javascript" src="main.ab86658d639dc7e586ec.js"></script> -->
     <script>
-        let usePhaser = false;
         const isMobile = /Mobi|Android/i.test(navigator.userAgent);
         console.log('Device:', isMobile ? 'Mobile' : 'Desktop');
         const canvas = document.getElementById('gameCanvas');
@@ -153,16 +157,6 @@
         const highScoreDisplay = document.getElementById('highScore');
         const scoreDisplay = document.getElementById('score');
         const timerDisplay = document.getElementById('timer');
-
-        console.log('Checking button image:', connectButton.style.background.includes('btn-home.png') ? 'Loaded' : 'Failed');
-
-        window.addEventListener('load', () => {
-            if (!canvas.getContext) console.error('Canvas context failed!');
-            ctx.fillStyle = 'red';
-            ctx.fillRect(0, 0, 400, 600); // Debug: Should show red canvas
-            console.log('Canvas test draw');
-            startGame();
-        });
 
         connectButton.addEventListener('click', async () => {
             if (window.solana && window.solana.isPhantom) {
@@ -254,12 +248,10 @@
         }
 
         function startGame() {
-            console.log('startGame called');
             document.getElementById('walletUI').style.display = 'none';
             setTimeout(() => document.getElementById('walletUI').style.display = 'none', 100);
             if (!ballImg.complete || !hoopTopImg.complete || !hoopBotImg.complete || !bgImg.complete) {
-                console.log('Images not loaded yet—retrying...');
-                if (!ballImg.src) console.error('Image sources not set!');
+                console.log('Images not loaded yet');
                 setTimeout(startGame, 100);
                 return;
             }
@@ -322,12 +314,6 @@
             connectButton.style.display = walletPublicKey ? 'none' : 'block';
             playButton.style.display = walletPublicKey ? 'block' : 'none';
             practiceButton.style.display = walletPublicKey ? 'none' : 'block';
-            setTimeout(() => {
-                if (!gameRunning) {
-                    document.getElementById('walletUI').style.display = 'block';
-                    console.log('UI shown after game over');
-                }
-            }, 200);
         }
 
         document.addEventListener('keydown', () => {
@@ -337,12 +323,6 @@
             if (gameRunning && e.target.tagName !== 'INPUT') {
                 ball.velocity = ball.jump;
                 e.preventDefault();
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-                ctx.fillRect(ball.x, ball.y, 30, 30);
-                setTimeout(() => {
-                    ctx.drawImage(bgImg, ball.x, ball.y, 30, 30);
-                    ctx.drawImage(ballImg, ball.x, ball.y, 30, 30);
-                }, 100);
             }
         }, { passive: false });
 
@@ -356,11 +336,8 @@
             }
         }, 24 * 60 * 60 * 1000);
 
-        window.addEventListener('load', () => {
-            usePhaser = typeof Phaser !== 'undefined';
-            console.log(usePhaser ? 'Phaser detected—using bundled JS' : 'No Phaser—using canvas logic');
-            if (usePhaser) console.log('Check for vendorsLoaded:', typeof vendorsLoaded !== 'undefined');
-        });
+        if (typeof Phaser !== 'undefined') console.log('Phaser detected—using bundled JS');
+        else console.log('No Phaser—using canvas logic');
     </script>
 </body>
 </html>
