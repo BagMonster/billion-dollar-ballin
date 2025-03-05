@@ -11,11 +11,14 @@
             overflow: hidden;
         }
         body {
+            background-image: url('./assets/sprites/bg.png');
+            background-repeat: no-repeat;
+            background-size: cover;
             background-color: #1d273c;
         }
         @font-face {
             font-family: 'font';
-            src: url('./assets/font/FFFFORWA.TTF') format('ttf'); /* Updated to match your repo */
+            src: url('./assets/font/square-deal.woff2') format('woff2');
             font-weight: normal;
             font-style: normal;
         }
@@ -32,56 +35,31 @@
             text-align: center;
             color: white;
             font-family: 'font', sans-serif;
-            z-index: 10;
+            z-index: 10; /* Above Phaser canvas */
         }
-        #gameCanvas {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 5;
-        }
-        #connectWallet {
-            background: url('./assets/sprites/btn-home.png') no-repeat center;
-            background-size: contain;
-            width: 200px;
-            height: 60px;
-            padding: 0;
+        #connectWallet, #playButton, #practiceButton {
+            padding: 15px 30px;
+            margin: 10px;
+            background: #ffcc00;
             border: none;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 18px;
             font-family: 'font', sans-serif;
-            color: white;
-            text-shadow: 1px 1px 2px #000;
             display: block;
-            margin: 10px auto;
         }
-        #playButton, #practiceButton {
-            background: url('./assets/sprites/btn-replay.png') no-repeat center;
-            background-size: contain;
-            width: 200px;
-            height: 60px;
-            padding: 0;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            font-family: 'font', sans-serif;
-            color: white;
-            text-shadow: 1px 1px 2px #000;
-            display: none;
-            margin: 10px auto;
+        #playButton {
+            display: none; /* Hidden until wallet connects */
         }
         #walletStatus, #pot, #highScore {
             margin: 10px;
             font-size: 16px;
-            text-shadow: 1px 1px 1px #000;
         }
     </style>
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
 </head>
 <body>
     <div class="fontload" style="font-family: 'font';">.</div>
-    <canvas id="gameCanvas" width="400" height="600"></canvas>
     <div id="walletUI">
         <button id="connectWallet">Connect Wallet</button>
         <button id="playButton">Play (0.0025 SOL)</button>
@@ -90,23 +68,12 @@
         <p id="pot">Pot: 0 SOL</p>
         <p id="highScore">Daily High: 0</p>
     </div>
+    <script type="text/javascript" src="vendors~main.ab86658d639dc7e586ec.js"></script>
+    <script type="text/javascript" src="main.ab86658d639dc7e586ec.js"></script>
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const ballImg = new Image(); ballImg.src = './assets/sprites/ball.png';
-        const hoopTopImg = new Image(); hoopTopImg.src = './assets/sprites/hoop-top.png';
-        const hoopBotImg = new Image(); hoopBotImg.src = './assets/sprites/hoop-bot.png';
-        const bgImg = new Image(); bgImg.src = './assets/background.png';
-
-        let ball = { x: 50, y: 300, velocity: 0, gravity: 0.5, jump: -10 };
-        let hoop = null;
-        let score = 0;
-        let gameRunning = false;
         let walletPublicKey = null;
-        let timeLeft = 60;
-        let timerInterval = null;
-        let dailyHighScore = 0;
         let pot = 0;
+        let dailyHighScore = 0;
 
         const connectButton = document.getElementById('connectWallet');
         const playButton = document.getElementById('playButton');
@@ -121,9 +88,9 @@
                     const response = await window.solana.connect();
                     walletPublicKey = response.publicKey.toString();
                     walletStatus.textContent = `Connected: ${walletPublicKey.slice(0, 6)}...`;
-                    connectButton.style.display = 'none';
-                    practiceButton.style.display = 'none';
-                    playButton.style.display = 'block';
+                    connectButton.style.display = 'none'; // Hide connect button
+                    practiceButton.style.display = 'none'; // Hide practice button
+                    playButton.style.display = 'block'; // Show play button
                 } catch (err) {
                     walletStatus.textContent = 'Connection failed!';
                     console.error(err);
@@ -142,9 +109,9 @@
         });
 
         practiceButton.addEventListener('click', () => {
-            document.getElementById('walletUI').style.display = 'none';
+            document.getElementById('walletUI').style.display = 'none'; // Hide UI
             alert('Starting practice mode...');
-            startGame();
+            window.dispatchEvent(new Event('startGame')); // Trigger game start
         });
 
         async function chargeFee() {
@@ -152,8 +119,8 @@
             const ownerPublicKey = new solanaWeb3.PublicKey('YOUR_OWNER_WALLET_PUBLIC_KEY');
             const potPublicKey = new solanaWeb3.PublicKey('YOUR_POT_WALLET_PUBLIC_KEY');
 
-            const ownerCut = 0.00025 * solanaWeb3.LAMPORTS_PER_SOL;
-            const potAmount = 0.00225 * solanaWeb3.LAMPORTS_PER_SOL;
+            const ownerCut = 0.00025 * solanaWeb3.LAMPORTS_PER_SOL; // 10%
+            const potAmount = 0.00225 * solanaWeb3.LAMPORTS_PER_SOL; // 90%
 
             const ownerTx = new solanaWeb3.Transaction().add(
                 solanaWeb3.SystemProgram.transfer({
@@ -187,85 +154,16 @@
 
                 pot += 0.00225;
                 potDisplay.textContent = `Pot: ${pot.toFixed(5)} SOL`;
-                document.getElementById('walletUI').style.display = 'none';
+                document.getElementById('walletUI').style.display = 'none'; // Hide UI
                 alert('Fee paid! Game starting...');
-                startGame();
+                window.dispatchEvent(new Event('startGame')); // Trigger game start
             } catch (err) {
                 console.error('Fee payment failed:', err);
                 alert('Fee payment failed!');
             }
         }
 
-        function startGame() {
-            if (!ballImg.complete || !hoopTopImg.complete || !hoopBotImg.complete || !bgImg.complete) {
-                console.log('Images not loaded yet');
-                setTimeout(startGame, 100);
-                return;
-            }
-            ball.y = 300; ball.velocity = 0;
-            hoop = { x: 400, height: 200, passed: false };
-            score = 0;
-            timeLeft = 60;
-            gameRunning = true;
-            scoreDisplay.textContent = `Score: ${score}`;
-            timerDisplay.textContent = `Time: ${timeLeft}s`;
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                timerDisplay.textContent = `Time: ${timeLeft}s`;
-                if (timeLeft <= 0) gameOver();
-            }, 1000);
-            gameLoop();
-        }
-
-        function gameLoop() {
-            if (!gameRunning) return;
-            ctx.drawImage(bgImg, 0, 0, 400, 600);
-            ball.velocity += ball.gravity;
-            ball.y += ball.velocity;
-            ctx.drawImage(ballImg, ball.x, ball.y, 30, 30);
-
-            hoop.x -= 2;
-            ctx.drawImage(hoopTopImg, hoop.x, 0, 50, hoop.height);
-            ctx.drawImage(hoopBotImg, hoop.x, hoop.height + 150, 50, 600 - hoop.height - 150);
-
-            if (hoop.x + 50 < ball.x && !hoop.passed) {
-                score++;
-                scoreDisplay.textContent = `Score: ${score}`;
-                hoop = { x: 400, height: Math.random() * 300 + 50, passed: false };
-            }
-
-            if (ball.x + 30 > hoop.x && ball.x < hoop.x + 50 &&
-                (ball.y < hoop.height || ball.y + 30 > hoop.height + 150)) {
-                gameOver();
-                return;
-            }
-
-            if (hoop.x < -50) hoop = { x: 400, height: Math.random() * 300 + 50, passed: false };
-
-            if (ball.y > 600 || ball.y < 0) gameOver();
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        function gameOver() {
-            gameRunning = false;
-            clearInterval(timerInterval);
-            alert(`Game Over! Score: ${score}`);
-            if (score > dailyHighScore) {
-                dailyHighScore = score;
-                highScoreDisplay.textContent = `Daily High: ${dailyHighScore}`;
-            }
-            document.getElementById('walletUI').style.display = 'block';
-            connectButton.style.display = walletPublicKey ? 'none' : 'block';
-            playButton.style.display = walletPublicKey ? 'block' : 'none';
-            practiceButton.style.display = walletPublicKey ? 'none' : 'block';
-        }
-
-        document.addEventListener('keydown', () => {
-            if (gameRunning) ball.velocity = ball.jump;
-        });
-
+        // Daily payout simulation (needs backend for real use)
         setInterval(() => {
             if (pot > 0) {
                 console.log(`Daily payout: 95% (${(pot * 0.95).toFixed(5)} SOL) to high scorer, 5% (${(pot * 0.05).toFixed(5)} SOL) to owner`);
@@ -274,14 +172,7 @@
                 potDisplay.textContent = `Pot: 0 SOL`;
                 highScoreDisplay.textContent = `Daily High: 0`;
             }
-        }, 24 * 60 * 60 * 1000);
-
-        // Expose elements to global scope if needed by bundled JS
-        window.scoreDisplay = document.createElement('p'); // Placeholder if not in DOM
-        window.timerDisplay = document.createElement('p');
+        }, 24 * 60 * 60 * 1000); // Every 24 hours
     </script>
-    <!-- Remove these if not in repo or adjust paths -->
-    <!-- <script type="text/javascript" src="vendors~main.ab86658d639dc7e586ec.js"></script> -->
-    <!-- <script type="text/javascript" src="main.ab86658d639dc7e586ec.js"></script> -->
 </body>
 </html>
