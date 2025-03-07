@@ -82,6 +82,10 @@
         const remainingSeconds = Math.floor(seconds - 60 * minutes);
         return `${minutes < 10 ? "0" + minutes : minutes}:${remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds}`;
     }
+    function formatWalletAddress(address) {
+        if (!address || address.length < 9) return "Player";
+        return `${address.slice(0, 4)}...${address.slice(-5)}`;
+    }
 
     // BootScene: Loads game assets (images, sounds) and picks the menu
     class BootScene extends Phaser.Scene {
