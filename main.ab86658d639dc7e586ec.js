@@ -883,88 +883,55 @@
 
     // MenuScene: Desktop main menu—lets players enter their name and start or view leaderboard
     class MenuScene extends Phaser.Scene {
-        constructor() {
-            super("MenuScene");
-        }
-        // Sets up the menu—background, title, buttons (no name input)
-        create() {
-            // Add background
-            this.add.image(centerX(this), centerY(this), "menu-bg");
-
-            // Title text
-            this.add.text(centerX(this), 100, "Billion Dollar Ballin", {
-                fontSize: "70px",
-                fontFamily: "font",
-                color: "#ffcd00"
-            }).setOrigin(0.5);
-
-            // Play button—starts the game
-            const playButton = this.add.rectangle(centerX(this), centerY(this), 300, 80, 0xffcd00)
-                .setInteractive({ cursor: "pointer" })
-                .on("pointerup", () => {
-                    console.log("Starting game with name:", gameState.userName);
-                    this.scene.start("GameScene");
-                });
-            this.add.text(centerX(this), centerY(this), "PLAY", {
-                fontSize: "40px",
-                fontFamily: "font",
-                color: "#000"                
-            }).setOrigin(0.5);
-
-            // Leaderboard button—shows top scores
-            const leaderboardButton = this.add.rectangle(centerX(this), centerY(this) + 100, 300, 80, 0xffcd00)
-                .setInteractive({ cursor: "pointer" })
-                .on("pointerup", () => this.scene.start("LeaderboardScene"));
-            this.add.text(centerX(this), centerY(this) + 100, "LEADERBOARD", {
-                fontSize: "40px",
-                fontFamily: "font",
-                color: "#000"
-            }).setOrigin(0.5);
-        }        
+    constructor() {
+        super("MenuScene");
     }
+    create() {
+        this.add.image(centerX(this), centerY(this), "menu-bg");
+        this.add.text(centerX(this), 100, "Billion Dollar Ballin", {
+            fontSize: "70px",
+            fontFamily: "font",
+            color: "#ffcd00"
+        }).setOrigin(0.5);
+        const playButton = this.add.rectangle(centerX(this), centerY(this), 300, 80, 0xffcd00)
+            .setInteractive({ cursor: "pointer" })
+            .on("pointerup", () => {
+                console.log("Starting game with name:", gameState.userName);
+                this.scene.start("GameScene");
+            });
+        this.add.text(centerX(this), centerY(this), "PLAY", {
+            fontSize: "40px",
+            fontFamily: "font",
+            color: "#000"
+        }).setOrigin(0.5);
+        const leaderboardButton = this.add.rectangle(centerX(this), centerY(this) + 100, 300, 80, 0xffcd00)
+            .setInteractive({ cursor: "pointer" })
+            .on("pointerup", () => this.scene.start("LeaderboardScene"));
+        this.add.text(centerX(this), centerY(this) + 100, "LEADERBOARD", {
+            fontSize: "40px",
+            fontFamily: "font",
+            color: "#000"
+        }).setOrigin(0.5);
+    }
+}
 
     // MenuSceneMobile: Mobile main menu—starts game or views leaderboard (Updated)
     class MenuSceneMobile extends Phaser.Scene {
-        constructor() {
-            super("MenuSceneMobile");
-        }
-
-        // Sets up the mobile menu—background, title, buttons (no name input)
-        create() {
-            // Add background
-            this.add.image(centerX(this), centerY(this), "menu-bg");
-
-            // Title text—adjusted for mobile
-            this.add.text(centerX(this), 150, "Billion Dollar Ballin", {
-                fontSize: "50px", // Smaller for mobile
-                fontFamily: "font",
-                color: "#ffcd00"
-            }).setOrigin(0.5);
-
-            // Play button—starts the game, moved up
-            const playButton = this.add.rectangle(centerX(this), centerY(this), 200, 60, 0xffcd00)
-                .setInteractive({ cursor: "pointer" })
-                .on("pointerup", () => {
-                    console.log("Starting game with name:", gameState.userName);
-                    this.scene.start("GameSceneMobile");
-                });
-            this.add.text(centerX(this), centerY(this), "PLAY", {
-                fontSize: "30px", // Smaller text
-                fontFamily: "font",
-                color: "#000"
-            }).setOrigin(0.5);
-
-            // Leaderboard button—shows top scores, moved up
-            const leaderboardButton = this.add.rectangle(centerX(this), centerY(this) + 100, 200, 60, 0xffcd00)
-                .setInteractive({ cursor: "pointer" })
-                .on("pointerup", () => this.scene.start("LeaderboardScene"));
-            this.add.text(centerX(this), centerY(this) + 100, "LEADERBOARD", {
-                fontSize: "30px", // Smaller text
-                fontFamily: "font",
-                color: "#000"
-            }).setOrigin(0.5);
-        }
+    constructor() {
+        super("MenuSceneMobile");
     }
+    create() {
+        this.add.image(centerX(this), centerY(this), "menu-bg");
+        this.add.text(centerX(this), 150, "Billion Dollar Ballin", { fontSize: "50px", fontFamily: "font", color: "#ffcd00" }).setOrigin(0.5);
+        const playButton = this.add.rectangle(centerX(this), centerY(this), 200, 60, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", () => {
+            console.log("Starting game with name:", gameState.userName);
+            this.scene.start("GameSceneMobile");
+        });
+        this.add.text(centerX(this), centerY(this), "PLAY", { fontSize: "30px", fontFamily: "font", color: "#000" }).setOrigin(0.5);
+        const leaderboardButton = this.add.rectangle(centerX(this), centerY(this) + 100, 200, 60, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", () => this.scene.start("LeaderboardScene"));
+        this.add.text(centerX(this), centerY(this) + 100, "LEADERBOARD", { fontSize: "30px", fontFamily: "font", color: "#000" }).setOrigin(0.5);
+    }
+}
 
     // Export all scenes and helpers—webpack needs this
     if (typeof module !== "undefined") {
@@ -1018,7 +985,8 @@ const gameConfig = {
 
 // Start the game with the config
 window.addEventListener('startGame', (event) => {
-    gameState.userName = event.detail?.wallet ? formatWalletAddress(event.detail.wallet) : "Player"; // "Player" or "F3eQ...i3ugd"
+    const wallet = event.detail && event.detail.wallet ? event.detail.wallet : null;
+    gameState.userName = wallet ? formatWalletAddress(wallet) : "Player"; 
     new Phaser.Game(gameConfig);
 });
 
