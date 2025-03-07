@@ -893,6 +893,19 @@
             fontFamily: "font",
             color: "#ffcd00"
         }).setOrigin(0.5);
+
+        // Add rexUI text input
+        this.nameText = this.add.text(centerX(this), centerY(this) - 100, gameState.userName || "ENTER NAME", {
+            fontSize: "40px",
+            fontFamily: "font",
+            color: "#ffcd00"
+        }).setOrigin(0.5);
+        this.rexUI.edit(this.nameText, {
+            onTextChanged: (textObject, text) => {
+                gameState.userName = text || "Player"; // Update name on edit
+            }
+        });
+
         const playButton = this.add.rectangle(centerX(this), centerY(this), 300, 80, 0xffcd00)
             .setInteractive({ cursor: "pointer" })
             .on("pointerup", () => {
@@ -904,6 +917,7 @@
             fontFamily: "font",
             color: "#000"
         }).setOrigin(0.5);
+
         const leaderboardButton = this.add.rectangle(centerX(this), centerY(this) + 100, 300, 80, 0xffcd00)
             .setInteractive({ cursor: "pointer" })
             .on("pointerup", () => this.scene.start("LeaderboardScene"));
@@ -922,14 +936,43 @@
     }
     create() {
         this.add.image(centerX(this), centerY(this), "menu-bg");
-        this.add.text(centerX(this), 150, "Billion Dollar Ballin", { fontSize: "50px", fontFamily: "font", color: "#ffcd00" }).setOrigin(0.5);
-        const playButton = this.add.rectangle(centerX(this), centerY(this), 200, 60, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", () => {
-            console.log("Starting game with name:", gameState.userName);
-            this.scene.start("GameSceneMobile");
+        this.add.text(centerX(this), 150, "Billion Dollar Ballin", {
+            fontSize: "50px",
+            fontFamily: "font",
+            color: "#ffcd00"
+        }).setOrigin(0.5);
+
+        this.nameText = this.add.text(centerX(this), centerY(this) - 80, gameState.userName || "ENTER NAME", {
+            fontSize: "30px",
+            fontFamily: "font",
+            color: "#ffcd00"
+        }).setOrigin(0.5);
+        this.rexUI.edit(this.nameText, {
+            onTextChanged: (textObject, text) => {
+                gameState.userName = text || "Player";
+            }
         });
-        this.add.text(centerX(this), centerY(this), "PLAY", { fontSize: "30px", fontFamily: "font", color: "#000" }).setOrigin(0.5);
-        const leaderboardButton = this.add.rectangle(centerX(this), centerY(this) + 100, 200, 60, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", () => this.scene.start("LeaderboardScene"));
-        this.add.text(centerX(this), centerY(this) + 100, "LEADERBOARD", { fontSize: "30px", fontFamily: "font", color: "#000" }).setOrigin(0.5);
+
+        const playButton = this.add.rectangle(centerX(this), centerY(this), 200, 60, 0xffcd00)
+            .setInteractive({ cursor: "pointer" })
+            .on("pointerup", () => {
+                console.log("Starting game with name:", gameState.userName);
+                this.scene.start("GameSceneMobile");
+            });
+        this.add.text(centerX(this), centerY(this), "PLAY", {
+            fontSize: "30px",
+            fontFamily: "font",
+            color: "#000"
+        }).setOrigin(0.5);
+
+        const leaderboardButton = this.add.rectangle(centerX(this), centerY(this) + 100, 200, 60, 0xffcd00)
+            .setInteractive({ cursor: "pointer" })
+            .on("pointerup", () => this.scene.start("LeaderboardScene"));
+        this.add.text(centerX(this), centerY(this) + 100, "LEADERBOARD", {
+            fontSize: "30px",
+            fontFamily: "font",
+            color: "#000"
+        }).setOrigin(0.5);
     }
 }
 
@@ -962,25 +1005,59 @@ const screenHeight = window.innerHeight;
 window.gameState = gameState;
 gameState.isMobileView = screenWidth < screenHeight;
 
-// Game configuration—defines canvas size, scenes, and physics
+// Game configuration—defines canvas size, scenes, and physics with stack tracing
 const gameConfig = {
     type: Phaser.AUTO,
     width: screenWidth,
     height: screenHeight,
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-    scene: [
-        BootScene,
-        GameScene,
-        GameSceneMobile,
-        LeaderboardScene,
-        MenuScene,
-        MenuSceneMobile
-    ],
-    physics: {
-        default: "arcade",
-        arcade: { debug: false }
-    },
-    dom: { createContainer: true }
+    scene: [BootScene, GameScene, GameSceneMobile, LeaderboardScene, MenuScene, MenuSceneMobile].map(scene => {
+        return {
+            extend: {
+                init() {
+                    try {
+                        if (typeof this._originalInit === 'function') this._originalInit();
+                    } catch (error) {
+                        console.error(`Error in ${this.scene.key} init:`, error.stack || error);
+                        throw error;
+                    }
+                },
+                preload() {
+                    try {
+                        if (typeof this._originalPreload === 'function') this._originalPreload();
+                    } catch (error) {
+                        console.error(`Error in ${this.scene.key} preload:`, error.stack || error);
+                        throw error;
+                    }
+                },
+                create() {
+                    try {
+                        if (typeof this._originalCreate === 'function') this._originalCreate();
+                    } catch (error) {
+                        console.error(`Error in ${this.scene.key} create:`, error.stack || error);
+                        throw error;
+                    }
+                },
+                update() {
+                    try {
+                        if (typeof this._originalUpdate === 'function') this._originalUpdate();
+                    } catch (error) {
+                        console.error(`Error in ${this.scene.key} update:`, error.stack || error);
+                        throw error;
+                    }
+                }
+            },
+            _originalInit: scene.prototype.init,
+            _originalPreload: scene.prototype.preload,
+            _originalCreate: scene.prototype.create,
+            _originalUpdate: scene.prototype.update
+        };
+    }),
+    physics: { default: "arcade", arcade: { debug: false } },
+    dom: { createContainer: true },
+    plugins: {
+        scene: [{ key: 'rexUI', plugin: RexUIPlugin, mapping: 'rexUI' }]
+    }
 };
 
 // Start the game with the config
