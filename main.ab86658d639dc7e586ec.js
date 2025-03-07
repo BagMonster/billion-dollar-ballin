@@ -995,7 +995,7 @@
     };
 }
 
-});
+};
 
 // Detect mobile view—sets gameState.isMobileView based on screen size
 const screenWidth = window.innerWidth;
