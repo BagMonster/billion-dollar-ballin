@@ -967,29 +967,32 @@
     }
 
     // Export all scenes and helpers—webpack needs this
-    module.exports = {
-    BootScene,
-    GameScene,
-    setupAnimations,
-    GameSceneMobile,
-    LeaderboardScene,
-    MenuScene,
-    MenuSceneMobile,
-    gameState,
-    centerX,
-    centerY,
-    canvasWidth,
-    canvasHeight,
-    formatTime,
-    formatWalletAddress
-
+    if (typeof module !== "undefined") {
+    module.exports = { BootScene, 
+        GameScene, 
+        setupAnimations, 
+        GameSceneMobile, 
+        LeaderboardScene, 
+        MenuScene, 
+        MenuSceneMobile, 
+        gameState, 
+        centerX, 
+        centerY, 
+        canvasWidth, 
+        canvasHeight, 
+        formatTime, 
+        formatWalletAddress 
     };
+}
 
 });
 
 // Detect mobile view—sets gameState.isMobileView based on screen size
 const screenWidth = window.innerWidth;
 const screenHeight = window.innerHeight;
+
+// Expose gameState globally
+window.gameState = gameState;
 gameState.isMobileView = screenWidth < screenHeight;
 
 // Game configuration—defines canvas size, scenes, and physics
@@ -1015,7 +1018,7 @@ const gameConfig = {
 
 // Start the game with the config
 window.addEventListener('startGame', (event) => {
-    gameState.userName = formatWalletAddress(event.detail.wallet); // "Player" or "F3eQ...i3ugd"
+    gameState.userName = event.detail?.wallet ? formatWalletAddress(event.detail.wallet) : "Player"; // "Player" or "F3eQ...i3ugd"
     new Phaser.Game(gameConfig);
 });
 
