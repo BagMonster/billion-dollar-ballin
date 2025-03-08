@@ -292,7 +292,7 @@
             }, {
                 key: "update", // Updates ball rotation and resets if off-screen
                 value: function(t, e) {
-                    !this.isShoted && this.isShotStart && (this.ball.rotation = Phaser.Math.Angle.Between(-this.input.activePointer.x, -this.input.activePointer.y, -this.ball.x, -this.ball.y)), this.ball.y > s(this) && this.resetBall())
+                    !this.isShoted && this.isShotStart && (this.ball.rotation = Phaser.Math.Angle.Between(-this.input.activePointer.x, -this.input.activePointer.y, -this.ball.x, -this.ball.y)), this.ball.y > s(this) && this.resetBall()
                 }
             }, {
                 key: "resetBall", // Resets ball after shot
