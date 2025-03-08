@@ -613,5 +613,6 @@
             console.log("Game started with wallet:", o.userName);
             new Phaser.Game(ct);
         });
-
+    }
+});
 
