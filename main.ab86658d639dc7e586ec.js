@@ -978,22 +978,22 @@
 
     // Export all scenes and helpers—webpack needs this
     if (typeof module !== "undefined") {
-    module.exports = { BootScene, 
-        GameScene, 
-        setupAnimations, 
-        GameSceneMobile, 
-        LeaderboardScene, 
-        MenuScene, 
-        MenuSceneMobile, 
-        gameState, 
-        centerX, 
-        centerY, 
-        canvasWidth, 
-        canvasHeight, 
-        formatTime, 
-        formatWalletAddress 
+        module.exports = { BootScene, 
+            GameScene, 
+            setupAnimations, 
+            GameSceneMobile, 
+            LeaderboardScene, 
+            MenuScene, 
+            MenuSceneMobile, 
+            gameState, 
+            centerX, 
+            centerY, 
+            canvasWidth, 
+            canvasHeight, 
+            formatTime, 
+            formatWalletAddress 
+        };
     };
-};
 
 // Detect mobile view—sets gameState.isMobileView based on screen size
 const screenWidth = window.innerWidth;
@@ -1012,38 +1012,10 @@ const gameConfig = {
     scene: [BootScene, GameScene, GameSceneMobile, LeaderboardScene, MenuScene, MenuSceneMobile].map(scene => {
         return {
             extend: {
-                init() {
-                    try {
-                        if (typeof this._originalInit === 'function') this._originalInit();
-                    } catch (error) {
-                        console.error(`Error in ${this.scene.key} init:`, error.stack || error);
-                        throw error;
-                    }
-                },
-                preload() {
-                    try {
-                        if (typeof this._originalPreload === 'function') this._originalPreload();
-                    } catch (error) {
-                        console.error(`Error in ${this.scene.key} preload:`, error.stack || error);
-                        throw error;
-                    }
-                },
-                create() {
-                    try {
-                        if (typeof this._originalCreate === 'function') this._originalCreate();
-                    } catch (error) {
-                        console.error(`Error in ${this.scene.key} create:`, error.stack || error);
-                        throw error;
-                    }
-                },
-                update() {
-                    try {
-                        if (typeof this._originalUpdate === 'function') this._originalUpdate();
-                    } catch (error) {
-                        console.error(`Error in ${this.scene.key} update:`, error.stack || error);
-                        throw error;
-                    }
-                }
+                init() { try { if (typeof this._originalInit === 'function') this._originalInit(); } catch (error) { console.error(`Error in ${this.scene.key} init:`, error.stack || error); throw error; } },
+                preload() { try { if (typeof this._originalPreload === 'function') this._originalPreload(); } catch (error) { console.error(`Error in ${this.scene.key} preload:`, error.stack || error); throw error; } },
+                create() { try { if (typeof this._originalCreate === 'function') this._originalCreate(); } catch (error) { console.error(`Error in ${this.scene.key} create:`, error.stack || error); throw error; } },
+                update() { try { if (typeof this._originalUpdate === 'function') this._originalUpdate(); } catch (error) { console.error(`Error in ${this.scene.key} update:`, error.stack || error); throw error; } }
             },
             _originalInit: scene.prototype.init,
             _originalPreload: scene.prototype.preload,
@@ -1053,9 +1025,7 @@ const gameConfig = {
     }),
     physics: { default: "arcade", arcade: { debug: false } },
     dom: { createContainer: true },
-    plugins: {
-        scene: [{ key: 'rexUI', plugin: RexUIPlugin, mapping: 'rexUI' }]
-    }
+    plugins: { scene: [{ key: 'rexUI', plugin: RexUIPlugin, mapping: 'rexUI' }] }
 };
 
 // Start the game with the config
@@ -1064,5 +1034,5 @@ window.addEventListener('startGame', (event) => {
     gameState.userName = wallet ? formatWalletAddress(wallet) : "Player"; 
     new Phaser.Game(gameConfig);
 });
-
+} // Line 1057
 
