@@ -418,7 +418,7 @@
                     1 != o.levelNumber && this.addSlash()
                 }
             }, {
-                key: "update", value: function(t, e) { !this.isShoted && this.isShotStart && (this.ball.rotation = Phaser.Math.Angle.Between(-this.input.activePointer.x, -this.input.activePointer.y, -this.ball.x, -this.ball.y)), this.ball.y > s(this) && this.resetBall()) }
+                key: "update", value: function(t, e) { !this.isShoted && this.isShotStart && (this.ball.rotation = Phaser.Math.Angle.Between(-this.input.activePointer.x, -this.input.activePointer.y, -this.ball.x, -this.ball.y)), this.ball.y > s(this) && this.resetBall() }
             }, {
                 key: "resetBall", value: function() { this.isShoted && (console.log("adas"), this.isShoted = !1, this.isShotStart = !1, this.ball.setGravityY(0), this.ball.body.velocity.x = 0, this.ball.body.velocity.y = 0, this.ball.setPosition(140, s(this) - 430), this.player.play("player-dribble", !0), this.ball.setVisible(!1), this.isScored = !1, this.setHoopPosition()) }
             }, {
