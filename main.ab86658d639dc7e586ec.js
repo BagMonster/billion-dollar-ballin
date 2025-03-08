@@ -102,6 +102,11 @@
             return o += e < 10 ? "0" + e + ":" : e + ":", o += i < 10 ? "0" + i : i
         }
 
+        // Formats wallet address for display (e.g., "abcd...wxyz")
+        function formatWalletAddress(address) {
+            return address && address.length >= 9 ? `${address.slice(0, 4)}...${address.slice(-5)}` : "Player";
+        }
+
         /* Utility Functions—Class inheritance and type checking (Webpack boilerplate) */
         function c(t) { // Type checker for Symbol support
             return (c = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(t) { return typeof t } : function(t) { return t && "function" == typeof Symbol && t.constructor === Symbol && t !== Symbol.prototype ? "symbol" : typeof t })(t)
@@ -328,10 +333,12 @@
                     var e = this.add.container(n(this), r(this)).setDepth(10), // Container for game over UI
                         i = this.add.image(0, 0, "popup"), // Popup background
                         a = this.add.text(0, -300, "GAME OVER", { fontSize: "60px", fontFamily: "font", color: "red" }).setOrigin(.5), // Title
-                        s = this.add.text(0, -50, "SCORE\n".concat(o.score), { fontSize: "90px", fontFamily: "font", color: "back", align: "center" }).setOrigin(.5), // Score
+                        s = this.add.text(0, -50, "SCORE\n".concat(o.score), { fontSize: "90px", fontFamily: "font", color: "black", align: "center" }).setOrigin(.5), // Score
                         l = this.add.image(0, -7, "score-fill").setScale(1.3), // Score background
                         c = this.add.image(-130, 160, "btn-home").setInteractive({ cursor: "pointer" }).on("pointerup", (function() { o.score = 0, o.levelNumber = 1, t.scene.start("MenuScene") })), // Home button
-                        u = this.add.image(130, 160, "btn-replay").setInteractive({ cursor: "pointer" }).on("pointerup", (function() { o.score = 0, o.levelNumber = 1, t.scene.start("GameScene") })); // Replay button
+                        u = this.add.image(130, 160, "btn-replay").setInteractive({ cursor: "pointer" }).on("pointerup", (function() { 
+                            o.score = 0, o.levelNumber = 1, t.maxLife = 3, t.lifeArr.forEach(ball => ball.setVisible(true)), t.scene.start("GameScene") // Resets lives
+                        })); // Replay button
                     e.add([i, a, l, s, c, u])
                 }
             }, {
@@ -428,16 +435,19 @@
             }, {
                 key: "setHoopPosition", value: function() { var t = Phaser.Math.FloatBetween(n(this), a(this) - 250), e = Phaser.Math.FloatBetween(210, s(this) - 500); this.hoop.setPosition(t, e) }
             }, {
-                key: "addGameOver", value: function() {
+                key: "addGameOver",
+                value: function() {
                     var t = this;
                     this.dataPost();
                     var e = this.add.container(n(this), r(this)).setDepth(10),
                         i = this.add.image(0, 0, "popup"),
                         a = this.add.text(0, -300, "GAME OVER", { fontSize: "60px", fontFamily: "font", color: "red" }).setOrigin(.5),
-                        s = this.add.text(0, -50, "SCORE\n".concat(o.score), { fontSize: "90px", fontFamily: "font", color: "back", align: "center" }).setOrigin(.5),
+                        s = this.add.text(0, -50, "SCORE\n".concat(o.score), { fontSize: "90px", fontFamily: "font", color: "black", align: "center" }).setOrigin(.5),
                         l = this.add.image(0, -7, "score-fill").setScale(1.3),
                         c = this.add.image(-130, 160, "btn-home").setInteractive({ cursor: "pointer" }).on("pointerup", (function() { o.score = 0, o.levelNumber = 1, t.scene.start("MenuSceneMobile") })),
-                        u = this.add.image(130, 160, "btn-replay").setInteractive({ cursor: "pointer" }).on("pointerup", (function() { o.score = 0, o.levelNumber = 1, t.scene.start("GameSceneMobile") }));
+                        u = this.add.image(130, 160, "btn-replay").setInteractive({ cursor: "pointer" }).on("pointerup", (function() { 
+                            o.score = 0, o.levelNumber = 1, t.maxLife = 3, t.lifeArr.forEach(ball => ball.setVisible(true)), t.scene.start("GameSceneMobile") // Resets lives
+                        }));
                     e.add([i, a, l, s, c, u])
                 }
             }, {
@@ -507,42 +517,35 @@
         function q(t) { if (void 0 === t) throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); return t }
         function Q(t) { return (Q = Object.setPrototypeOf ? Object.getPrototypeOf : function(t) { return t.__proto__ || Object.getPrototypeOf(t) })(t) }
 
-        // MenuScene—Desktop main menu with name input
+        // MenuScene—Desktop main menu with wallet ID
         var Z = function(t) {
             !function(t, e) { if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function"); t.prototype = Object.create(e && e.prototype, { constructor: { value: t, writable: !0, configurable: !0 } }), e && K(t, e) }(u, Phaser.Scene);
             var e, i, l, c = J(u);
             function u() { // Constructor—sets up menu
-                var t, e, i, o;
                 return function(t, e) { if (!(t instanceof e)) throw new TypeError("Cannot call a class as a function") }(this, u),
-                    t = c.call(this, "MenuScene"), e = q(t), o = void 0, (i = "nameText") in e ? Object.defineProperty(e, i, { value: o, enumerable: !0, configurable: !0, writable: !0 }) : e[i] = o, t
+                    c.call(this, "MenuScene")
             }
             return e = u, (i = [{
-                key: "preload", // Loads rexUI plugin for name input
-                value: function() {
-                    this.load.scenePlugin({ key: "rexuiplugin", url: "assets/rexuiplugin.min.js", sceneKey: "rexUI" });
-                    this.load.plugin("rexcheckboxplugin", "assets/rexcheckboxplugin.min.js", !0)
-                }
+                key: "preload", // No plugins needed
+                value: function() {}
             }, {
-                key: "init", value: function() {}
+                key: "init",
+                value: function() {}
             }, {
-                key: "create", // Sets up menu UI
+                key: "create", // Sets up menu UI with title and buttons
                 value: function() {
                     var t = this,
-                        e = this.add.image(n(this), r(this), "menu-bg").setInteractive(); // Background
+                        e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
                     e.displayWidth = a(this), e.displayHeight = s(this); // Scales to canvas
-                    this.nameText = this.add.text(a(this) - 270, 120, "ENTER NAME", { fontSize: "20px", fontFamily: "optima", fixedWidth: 800, fixedHeight: 70, color: "#000000", align: "center" }), this.nameText.setOrigin(.5, 0); // Name input
-                    var i = !1;
-                    this.nameText.setInteractive().on("pointerdown", (function() { // Enables name editing
-                        i || (i = !0, t.nameText.text = ""), t.nameText.y = 95, t.rexUI.edit(t.nameText)
-                    }));
-                    e.on("pointerdown", (function() { t.nameText.y = 120 })); // Resets name position
-                    this.add.image(a(this) - 270, 230, "border").setAngle(-90).setAlpha(.01).setScale(.3).setInteractive({ cursor: "pointer" }).on("pointerup", (function() { t.scene.start("LeaderboardScene") })), // Leaderboard button
-                        this.add.image(a(this) - 270, 330, "border").setAngle(-90).setScale(.3).setAlpha(.01).setInteractive({ cursor: "pointer" }).on("pointerup", (function() { // Play button
-                            t.nameText.text.length > 2 && "ENTER NAME" != t.nameText.text && (o.userName = t.nameText.text, t.scene.start("GameScene"))
-                        }))
+                    this.add.text(n(this), 100, "Billion Dollar Ballin", { fontSize: "70px", fontFamily: "font", color: "#ffcd00" }).setOrigin(0.5); // Title
+                    var playButton = this.add.rectangle(n(this), r(this), 300, 80, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", function() { t.scene.start("GameScene") });
+                    this.add.text(n(this), r(this), "PLAY", { fontSize: "40px", fontFamily: "font", color: "#000" }).setOrigin(.5); // Play button
+                    var leaderboardButton = this.add.rectangle(n(this), r(this) + 100, 300, 80, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", function() { t.scene.start("LeaderboardScene") });
+                    this.add.text(n(this), r(this) + 100, "LEADERBOARD", { fontSize: "40px", fontFamily: "font", color: "#000" }).setOrigin(.5); // Leaderboard button
                 }
             }, {
-                key: "update", value: function(t, e) {}
+                key: "update",
+                value: function(t, e) {}
             }]) && W(e.prototype, i), l && W(e, l), u
         }();
 
@@ -555,40 +558,39 @@
         function nt(t) { if (void 0 === t) throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); return t }
         function rt(t) { return (rt = Object.setPrototypeOf ? Object.getPrototypeOf : function(t) { return t.__proto__ || Object.getPrototypeOf(t) })(t) }
 
-        // MenuSceneMobile—Mobile main menu with name input
+        // MenuSceneMobile—Mobile main menu with wallet ID
         var at = function(t) {
             !function(t, e) { if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function"); t.prototype = Object.create(e && e.prototype, { constructor: { value: t, writable: !0, configurable: !0 } }), e && et(t, e) }(u, Phaser.Scene);
             var e, i, l, c = it(u);
             function u() {
-                var t, e, i, o;
                 return function(t, e) { if (!(t instanceof e)) throw new TypeError("Cannot call a class as a function") }(this, u),
-                    t = c.call(this, "MenuSceneMobile"), e = nt(t), o = void 0, (i = "nameText") in e ? Object.defineProperty(e, i, { value: o, enumerable: !0, configurable: !0, writable: !0 }) : e[i] = o, t
+                    c.call(this, "MenuSceneMobile")
             }
             return e = u, (i = [{
-                key: "preload", value: function() {
-                    this.load.scenePlugin({ key: "rexuiplugin", url: "assets/rexuiplugin.min.js", sceneKey: "rexUI" });
-                    this.load.plugin("rexcheckboxplugin", "assets/rexcheckboxplugin.min.js", !0)
-                }
+                key: "preload",
+                value: function() {} // No plugins needed
             }, {
-                key: "init", value: function() {}
+                key: "init",
+                value: function() {}
             }, {
-                key: "create", value: function() {
+                key: "create",
+                value: function() {
                     var t = this,
                         e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
                     e.displayWidth = a(this), e.displayHeight = s(this);
-                    this.nameText = this.add.text(130, 390, "ENTER NAME", { fontSize: "25px", fontFamily: "optima", fixedWidth: 800, fixedHeight: 70, color: "#000000", align: "center" }), this.nameText.setOrigin(.5, 0); // Adjusted position
-                    var i = !1;
-                    this.nameText.setInteractive().on("pointerdown", (function() { i || (i = !0, t.nameText.text = ""), t.nameText.y = 370, t.rexUI.edit(t.nameText) }));
-                    e.on("pointerdown", (function() { t.nameText.y = 390 }));
-                    this.add.image(170, 520, "border").setAngle(-90).setAlpha(.001).setScale(.3, .31).setInteractive({ cursor: "pointer" }).on("pointerup", (function() { t.scene.start("LeaderboardScene") })), // Adjusted position
-                        this.add.image(170, 640, "border").setAngle(-90).setScale(.3, .31).setAlpha(.001).setInteractive({ cursor: "pointer" }).on("pointerup", (function() { t.nameText.text.length > 2 && "ENTER NAME" != t.nameText.text && (o.userName = t.nameText.text, o.isMobileView ? t.scene.start("GameSceneMobile") : t.scene.start("GameScene")) })) // Adjusted position
+                    this.add.text(n(this), 150, "Billion Dollar Ballin", { fontSize: "50px", fontFamily: "font", color: "#ffcd00" }).setOrigin(0.5); // Title
+                    var playButton = this.add.rectangle(n(this), r(this), 200, 60, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", function() { t.scene.start("GameSceneMobile") });
+                    this.add.text(n(this), r(this), "PLAY", { fontSize: "30px", fontFamily: "font", color: "#000" }).setOrigin(.5); // Play button
+                    var leaderboardButton = this.add.rectangle(n(this), r(this) + 100, 200, 60, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", function() { t.scene.start("LeaderboardScene") });
+                    this.add.text(n(this), r(this) + 100, "LEADERBOARD", { fontSize: "30px", fontFamily: "font", color: "#000" }).setOrigin(.5); // Leaderboard button
                 }
             }, {
-                key: "update", value: function(t, e) {}
+                key: "update",
+                value: function(t, e) {}
             }]) && tt(e.prototype, i), l && tt(e, l), u
         }(),
 
-        // Game Initialization—Sets up canvas and starts game
+        // Game Initialization—Sets up canvas and waits for wallet event
         st = window.innerWidth, // Screen width
         lt = window.innerHeight; // Screen height
         console.log(lt), o.isMobileView = st < lt; // Detects mobile view
@@ -603,6 +605,13 @@
             physics: { default: "arcade", arcade: { gravity: { y: 0 }, debug: !1 } }, // Arcade physics setup
             scene: [b, T, Z, at, H, B] // All scenes
         };
-        new Phaser.Game(ct) // Starts the game
-    }
-});
+
+        // Wallet Integration—Starts game with wallet address
+        window.addEventListener('startGame', function(event) {
+            var wallet = event.detail && event.detail.wallet ? event.detail.wallet : null;
+            o.userName = wallet ? formatWalletAddress(wallet) : "Player";
+            console.log("Game started with wallet:", o.userName);
+            new Phaser.Game(ct);
+        });
+
+
