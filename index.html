@@ -11,9 +11,6 @@
             overflow: hidden;
         }
         body {
-            /*background-image: url('./assets/sprites/bg.png');
-            background-repeat: no-repeat;
-            background-size: cover; */
             background-color: #08233e;
         }
         @font-face {
@@ -39,18 +36,18 @@
         #connectWallet, #playButton, #practiceButton {
             padding: 15px 30px;
             margin: 10px;
-            background: linear-gradient(to right, rgba(108, 69, 177, 0.5), rgba(196, 148, 133, 0.5)); /* Gradient with 50% transparency */
+            background: linear-gradient(to right, rgba(108, 69, 177, 0.5), rgba(196, 148, 133, 0.5));
             border: none;
             border-radius: 10px;
             cursor: pointer;
             font-size: 18px;
             font-family: 'font', sans-serif;
-            color: white; /* White font */
-            text-shadow: 1px 1px 2px #000; /* Shadow for contrast */
+            color: white;
+            text-shadow: 1px 1px 2px #000;
             display: block;
         }
         #playButton {
-            display: none; /* Hidden until wallet connects */
+            display: none; /* Hidden until wallet connects or practice mode */
         }
         #walletStatus, #pot, #highScore {
             margin: 10px;
@@ -62,13 +59,14 @@
 </head>
 <body>
     <div class="fontload" style="font-family: 'font';">.</div>
+    <div id="game"></div>
     <div id="walletUI">
         <button id="connectWallet">Connect Wallet</button>
-        <button id="playButton">Play (0.0025 SOL)</button>
-        <button id="practiceButton">Practice Offline</button>
-        <p id="walletStatus">Wallet not connected</p>
-        <p id="pot">Pot: 0 SOL</p>
-        <p id="highScore">Daily High: 0</p>
+        <button id="practiceButton" style="display: block;">Practice Offline</button>
+        <button id="playButton" style="display: none;">Play (0.0025 SOL)</button>
+        <div id="walletStatus">Wallet not connected</div>
+        <div id="pot">Pot: 0 SOL</div>
+        <div id="highScore">Daily High: 0</div>
     </div>
     <script type="text/javascript" src="vendors~main.ab86658d639dc7e586ec.js"></script>
     <script src="https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js"></script>
@@ -85,12 +83,13 @@
         const potDisplay = document.getElementById('pot');
         const highScoreDisplay = document.getElementById('highScore');
 
+        // Wallet connection logic (Phantom Wallet)
         connectButton.addEventListener('click', async () => {
             if (window.solana && window.solana.isPhantom) {
                 try {
                     const response = await window.solana.connect();
                     walletPublicKey = response.publicKey.toString();
-                    walletStatus.textContent = `Connected: ${walletPublicKey.slice(0, 6)}...`;
+                    walletStatus.textContent = `Wallet: ${walletPublicKey.slice(0, 4)}...${walletPublicKey.slice(-4)}`;
                     connectButton.style.display = 'none'; // Hide connect button
                     practiceButton.style.display = 'none'; // Hide practice button
                     playButton.style.display = 'block'; // Show play button
@@ -103,18 +102,26 @@
             }
         });
 
-        playButton.addEventListener('click', async () => {
-            if (!walletPublicKey) {
-                alert('Connect your wallet first!');
-                return;
-            }
-            await chargeFee();
+        // Practice offline logic
+        practiceButton.addEventListener('click', () => {
+            walletStatus.textContent = 'Wallet: Player';
+            connectButton.style.display = 'none'; // Hide connect button
+            practiceButton.style.display = 'none'; // Hide practice button
+            playButton.style.display = 'block'; // Show play button
         });
 
-        practiceButton.addEventListener('click', () => {
-            document.getElementById('walletUI').style.display = 'none'; // Hide UI
-            alert('Starting practice mode...');
-            window.dispatchEvent(new Event('startGame')); // Trigger game start
+        // Start game logic (after wallet connect or practice)
+        playButton.addEventListener('click', async () => {
+            const wallet = walletStatus.textContent.includes('Wallet: Player') 
+                ? null 
+                : walletPublicKey; // Use walletPublicKey if connected, null for practice
+
+            if (wallet) { // If wallet is connected, charge fee
+                await chargeFee();
+            } else { // Practice mode—start immediately
+                document.getElementById('walletUI').style.display = 'none'; // Hide UI
+                window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: wallet } }));
+            }
         });
 
         async function chargeFee() {
@@ -159,7 +166,7 @@
                 potDisplay.textContent = `Pot: ${pot.toFixed(5)} SOL`;
                 document.getElementById('walletUI').style.display = 'none'; // Hide UI
                 alert('Fee paid! Game starting...');
-                window.dispatchEvent(new Event('startGame')); // Trigger game start
+                window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
             } catch (err) {
                 console.error('Fee payment failed:', err);
                 alert('Fee payment failed!');
@@ -179,3 +186,5 @@
     </script>
 </body>
 </html>
+
+
