@@ -545,7 +545,11 @@
                     this.playButton.fillRoundedRect(n(this) - 150, r(this) + 50, 300, 80, 10);
                     this.playButton.setAlpha(0.5); // Faded when disabled
                     this.playButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 150, r(this) + 50, 300, 80), Phaser.Geom.Rectangle.Contains)
-                        .on("pointerup", function() { t.scene.start("GameScene") });
+                        .on("pointerup", function() {
+                            if (o.canPlay) { // Only start game if o.canPlay is true
+                                t.scene.start("GameScene");
+                            }
+                        });
                     this.playButton.setInteractive(false); // Initially disabled
                     this.add.text(n(this), r(this) + 90, "PLAY", { fontSize: "40px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5).setAlpha(0.5); // Fade text too
                     // Gradient button background for "LEADERBOARD"
@@ -610,7 +614,11 @@
                     this.playButton.fillRoundedRect(n(this) - 100, r(this) + 150, 200, 60, 10);
                     this.playButton.setAlpha(0.5); // Faded when disabled
                     this.playButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 100, r(this) + 150, 200, 60), Phaser.Geom.Rectangle.Contains)
-                        .on("pointerup", function() { t.scene.start("GameSceneMobile") });
+                        .on("pointerup", function() {
+                            if (o.canPlay) { // Only start game if o.canPlay is true
+                                t.scene.start("GameSceneMobile");
+                            }
+                        });
                     this.playButton.setInteractive(false); // Initially disabled
                     this.add.text(n(this), r(this) + 180, "PLAY", { fontSize: "30px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5).setAlpha(0.5); // Fade text too
                     // Gradient button background for "LEADERBOARD"
