@@ -537,12 +537,22 @@
                     var t = this,
                         e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
                     e.displayWidth = a(this), e.displayHeight = s(this); // Scales to canvas
-                    this.add.text(n(this), 100, "Billion Dollar Ballin", { fontSize: "70px", fontFamily: "font", color: "#ffcd00" }).setOrigin(0.5); // Title
-                    var playButton = this.add.rectangle(n(this), r(this), 300, 80, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", function() { t.scene.start("GameScene") });
-                    this.add.text(n(this), r(this), "PLAY", { fontSize: "40px", fontFamily: "font", color: "#000" }).setOrigin(.5); // Play button
-                    var leaderboardButton = this.add.rectangle(n(this), r(this) + 100, 300, 80, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", function() { t.scene.start("LeaderboardScene") });
-                    this.add.text(n(this), r(this) + 100, "LEADERBOARD", { fontSize: "40px", fontFamily: "font", color: "#000" }).setOrigin(.5); // Leaderboard button
-                    // Wallet display—shows "Wallet: Player" or "Wallet: abcd...wxyz"
+                    // Removed "Billion Dollar Ballin" text—already in background image
+                    // Gradient button background for "PLAY"
+                    var playButton = this.add.graphics();
+                    playButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5); // Matches wallet gradient
+                    playButton.fillRoundedRect(n(this) - 150, r(this) + 50, 300, 80, 10); // Adjusted position
+                    playButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 150, r(this) + 50, 300, 80), Phaser.Geom.Rectangle.Contains)
+                        .on("pointerup", function() { t.scene.start("GameScene") });
+                    this.add.text(n(this), r(this) + 90, "PLAY", { fontSize: "40px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5);
+                    // Gradient button background for "LEADERBOARD"
+                    var leaderboardButton = this.add.graphics();
+                    leaderboardButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5);
+                    leaderboardButton.fillRoundedRect(n(this) - 150, r(this) + 150, 300, 80, 10); // Adjusted position
+                    leaderboardButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 150, r(this) + 150, 300, 80), Phaser.Geom.Rectangle.Contains)
+                        .on("pointerup", function() { t.scene.start("LeaderboardScene") });
+                    this.add.text(n(this), r(this) + 190, "LEADERBOARD", { fontSize: "40px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5);
+                    // Wallet display
                     this.add.text(n(this), s(this) - 50, "Wallet: " + o.userName, { fontSize: "20px", fontFamily: "font", color: "#fff" }).setOrigin(0.5);
                 }
             }, {
@@ -580,12 +590,22 @@
                     var t = this,
                         e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
                     e.displayWidth = a(this), e.displayHeight = s(this);
-                    this.add.text(n(this), 150, "Billion Dollar Ballin", { fontSize: "50px", fontFamily: "font", color: "#ffcd00" }).setOrigin(0.5); // Title
-                    var playButton = this.add.rectangle(n(this), r(this), 200, 60, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", function() { t.scene.start("GameSceneMobile") });
-                    this.add.text(n(this), r(this), "PLAY", { fontSize: "30px", fontFamily: "font", color: "#000" }).setOrigin(.5); // Play button
-                    var leaderboardButton = this.add.rectangle(n(this), r(this) + 100, 200, 60, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", function() { t.scene.start("LeaderboardScene") });
-                    this.add.text(n(this), r(this) + 100, "LEADERBOARD", { fontSize: "30px", fontFamily: "font", color: "#000" }).setOrigin(.5); // Leaderboard button
-                    // Wallet display—shows "Wallet: Player" or "Wallet: abcd...wxyz"
+                    // Removed "Billion Dollar Ballin" text—already in background image
+                    // Gradient button background for "PLAY"
+                    var playButton = this.add.graphics();
+                    playButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5);
+                    playButton.fillRoundedRect(n(this) - 100, r(this) + 150, 200, 60, 10); // Adjusted position
+                    playButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 100, r(this) + 150, 200, 60), Phaser.Geom.Rectangle.Contains)
+                        .on("pointerup", function() { t.scene.start("GameSceneMobile") });
+                    this.add.text(n(this), r(this) + 180, "PLAY", { fontSize: "30px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5);
+                    // Gradient button background for "LEADERBOARD"
+                    var leaderboardButton = this.add.graphics();
+                    leaderboardButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5);
+                    leaderboardButton.fillRoundedRect(n(this) - 100, r(this) + 250, 200, 60, 10); // Adjusted position
+                    leaderboardButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 100, r(this) + 250, 200, 60), Phaser.Geom.Rectangle.Contains)
+                        .on("pointerup", function() { t.scene.start("LeaderboardScene") });
+                    this.add.text(n(this), r(this) + 280, "LEADERBOARD", { fontSize: "30px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5);
+                    // Wallet display
                     this.add.text(n(this), s(this) - 50, "Wallet: " + o.userName, { fontSize: "20px", fontFamily: "font", color: "#fff" }).setOrigin(0.5);
                 }
             }, {
@@ -600,7 +620,7 @@
         console.log(lt), o.isMobileView = st < lt; // Detects mobile view
         var ct = { // Game configuration
             type: Phaser.AUTO,
-            backgroundColor: "#001625",
+            backgroundColor: "#08233e",
             parent: "game",
             width: o.isMobileView ? 720 : 1280,
             height: o.isMobileView ? 1280 : 961,
