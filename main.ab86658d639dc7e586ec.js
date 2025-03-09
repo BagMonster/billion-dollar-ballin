@@ -539,28 +539,32 @@
                     this.playButtonEnabled = false; // Tracks button state
                     var e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
                     e.displayWidth = a(this), e.displayHeight = s(this);
-                    // Gradient button background for "PLAY"
+                    // Add button container box (styled like practiceMessage)
+                    var buttonBox = this.add.graphics();
+                    buttonBox.fillStyle(0x000000, 0.8); // Semi-transparent black
+                    buttonBox.fillRoundedRect(n(this) - 150, 150, 300, 250, 10); // Centered, 300x250px
+                    // Wallet display (top of box)
+                    this.add.text(n(this), 50, "Wallet: " + o.userName, { fontSize: "20px", fontFamily: "font", color: "#fff" }).setOrigin(0.5);
+                    // Gradient button background for "PLAY" (inside box)
                     this.playButton = this.add.graphics();
                     this.playButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5);
-                    this.playButton.fillRoundedRect(n(this) - 150, r(this) + 50, 300, 80, 10);
+                    this.playButton.fillRoundedRect(n(this) - 150, 200, 300, 80, 10); // Below wallet
                     this.playButton.setAlpha(0.5); // Faded when disabled
-                    this.playButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 150, r(this) + 50, 300, 80), Phaser.Geom.Rectangle.Contains)
+                    this.playButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 150, 200, 300, 80), Phaser.Geom.Rectangle.Contains)
                         .on("pointerup", function() {
-                            if (o.canPlay) { // Only start game if o.canPlay is true
+                            if (o.canPlay) {
                                 t.scene.start("GameScene");
                             }
                         });
                     this.playButton.setInteractive(false); // Initially disabled
-                    this.add.text(n(this), r(this) + 90, "PLAY", { fontSize: "40px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5).setAlpha(0.5); // Fade text too
-                    // Gradient button background for "LEADERBOARD"
+                    this.add.text(n(this), 240, "PLAY", { fontSize: "40px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5).setAlpha(0.5);
+                    // Gradient button background for "LEADERBOARD" (inside box)
                     var leaderboardButton = this.add.graphics();
                     leaderboardButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5);
-                    leaderboardButton.fillRoundedRect(n(this) - 150, r(this) + 150, 300, 80, 10);
-                    leaderboardButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 150, r(this) + 150, 300, 80), Phaser.Geom.Rectangle.Contains)
+                    leaderboardButton.fillRoundedRect(n(this) - 150, 300, 300, 80, 10); // Below PLAY
+                    leaderboardButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 150, 300, 300, 80), Phaser.Geom.Rectangle.Contains)
                         .on("pointerup", function() { t.scene.start("LeaderboardScene") });
-                    this.add.text(n(this), r(this) + 190, "LEADERBOARD", { fontSize: "40px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5);
-                    // Wallet display
-                    this.add.text(n(this), s(this) - 50, "Wallet: " + o.userName, { fontSize: "20px", fontFamily: "font", color: "#fff" }).setOrigin(0.5);
+                    this.add.text(n(this), 340, "LEADERBOARD", { fontSize: "40px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5);
                 }
             }, {
                 key: "update",
@@ -608,28 +612,32 @@
                     this.playButtonEnabled = false; // Tracks button state
                     var e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
                     e.displayWidth = a(this), e.displayHeight = s(this);
-                    // Gradient button background for "PLAY"
+                    // Add button container box (styled like practiceMessage)
+                    var buttonBox = this.add.graphics();
+                    buttonBox.fillStyle(0x000000, 0.8); // Semi-transparent black
+                    buttonBox.fillRoundedRect(100, 50, 200, 400, 10); // Left-aligned, 200x400px
+                    // Wallet display (top of box)
+                    this.add.text(200, 70, "Wallet: " + o.userName, { fontSize: "20px", fontFamily: "font", color: "#fff" }).setOrigin(0.5);
+                    // Gradient button background for "PLAY" (inside box)
                     this.playButton = this.add.graphics();
                     this.playButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5);
-                    this.playButton.fillRoundedRect(n(this) - 100, r(this) + 150, 200, 60, 10);
+                    this.playButton.fillRoundedRect(100, 150, 200, 60, 10); // Inside box
                     this.playButton.setAlpha(0.5); // Faded when disabled
-                    this.playButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 100, r(this) + 150, 200, 60), Phaser.Geom.Rectangle.Contains)
+                    this.playButton.setInteractive(new Phaser.Geom.Rectangle(100, 150, 200, 60), Phaser.Geom.Rectangle.Contains)
                         .on("pointerup", function() {
-                            if (o.canPlay) { // Only start game if o.canPlay is true
+                            if (o.canPlay) {
                                 t.scene.start("GameSceneMobile");
                             }
                         });
                     this.playButton.setInteractive(false); // Initially disabled
-                    this.add.text(n(this), r(this) + 180, "PLAY", { fontSize: "30px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5).setAlpha(0.5); // Fade text too
-                    // Gradient button background for "LEADERBOARD"
+                    this.add.text(200, 180, "PLAY", { fontSize: "30px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5).setAlpha(0.5);
+                    // Gradient button background for "LEADERBOARD" (inside box)
                     var leaderboardButton = this.add.graphics();
                     leaderboardButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5);
-                    leaderboardButton.fillRoundedRect(n(this) - 100, r(this) + 250, 200, 60, 10);
-                    leaderboardButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 100, r(this) + 250, 200, 60), Phaser.Geom.Rectangle.Contains)
+                    leaderboardButton.fillRoundedRect(100, 250, 200, 60, 10); // Inside box
+                    leaderboardButton.setInteractive(new Phaser.Geom.Rectangle(100, 250, 200, 60), Phaser.Geom.Rectangle.Contains)
                         .on("pointerup", function() { t.scene.start("LeaderboardScene") });
-                    this.add.text(n(this), r(this) + 280, "LEADERBOARD", { fontSize: "30px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5);
-                    // Wallet display
-                    this.add.text(n(this), s(this) - 50, "Wallet: " + o.userName, { fontSize: "20px", fontFamily: "font", color: "#fff" }).setOrigin(0.5);
+                    this.add.text(200, 280, "LEADERBOARD", { fontSize: "30px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5);
                 }
             }, {
                 key: "update",
@@ -672,6 +680,7 @@
             o.userName = wallet ? formatWalletAddress(wallet) : "Player";
             o.canPlay = true; // Allow play after wallet connect or practice
             console.log("Wallet updated:", o.userName);
+            document.getElementById('walletUI').style.display = 'none'; // Hide wallet UI after choice
             if (game.scene.isActive("MenuScene") || game.scene.isActive("MenuSceneMobile")) {
                 var scene = game.scene.getScene(o.isMobileView ? "MenuSceneMobile" : "MenuScene");
                 scene.children.list.forEach(child => {
@@ -683,5 +692,6 @@
         });
     } // Close 311: function(t, e, i)
 }); // Close !function(t) and pass module map
+
 
 
