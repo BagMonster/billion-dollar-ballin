@@ -521,34 +521,36 @@
         var Z = function(t) {
             !function(t, e) { if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function"); t.prototype = Object.create(e && e.prototype, { constructor: { value: t, writable: !0, configurable: !0 } }), e && K(t, e) }(u, Phaser.Scene);
             var e, i, l, c = J(u);
-            function u() { // Constructor—sets up menu
+            function u() {
                 return function(t, e) { if (!(t instanceof e)) throw new TypeError("Cannot call a class as a function") }(this, u),
                     c.call(this, "MenuScene")
             }
             return e = u, (i = [{
                 key: "preload",
-                value: function() {} // No plugins needed
+                value: function() {}
             }, {
                 key: "init",
                 value: function() {}
             }, {
                 key: "create",
                 value: function() {
-                    var t = this,
-                        e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
-                    e.displayWidth = a(this), e.displayHeight = s(this); // Scales to canvas
-                    // Removed "Billion Dollar Ballin" text—already in background image
+                    var t = this;
+                    this.playButtonEnabled = false; // Tracks button state
+                    var e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
+                    e.displayWidth = a(this), e.displayHeight = s(this);
                     // Gradient button background for "PLAY"
-                    var playButton = this.add.graphics();
-                    playButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5); // Matches wallet gradient
-                    playButton.fillRoundedRect(n(this) - 150, r(this) + 50, 300, 80, 10); // Adjusted position
-                    playButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 150, r(this) + 50, 300, 80), Phaser.Geom.Rectangle.Contains)
+                    this.playButton = this.add.graphics();
+                    this.playButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5);
+                    this.playButton.fillRoundedRect(n(this) - 150, r(this) + 50, 300, 80, 10);
+                    this.playButton.setAlpha(0.5); // Faded when disabled
+                    this.playButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 150, r(this) + 50, 300, 80), Phaser.Geom.Rectangle.Contains)
                         .on("pointerup", function() { t.scene.start("GameScene") });
-                    this.add.text(n(this), r(this) + 90, "PLAY", { fontSize: "40px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5);
+                    this.playButton.setInteractive(false); // Initially disabled
+                    this.add.text(n(this), r(this) + 90, "PLAY", { fontSize: "40px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5).setAlpha(0.5); // Fade text too
                     // Gradient button background for "LEADERBOARD"
                     var leaderboardButton = this.add.graphics();
                     leaderboardButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5);
-                    leaderboardButton.fillRoundedRect(n(this) - 150, r(this) + 150, 300, 80, 10); // Adjusted position
+                    leaderboardButton.fillRoundedRect(n(this) - 150, r(this) + 150, 300, 80, 10);
                     leaderboardButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 150, r(this) + 150, 300, 80), Phaser.Geom.Rectangle.Contains)
                         .on("pointerup", function() { t.scene.start("LeaderboardScene") });
                     this.add.text(n(this), r(this) + 190, "LEADERBOARD", { fontSize: "40px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5);
@@ -557,7 +559,17 @@
                 }
             }, {
                 key: "update",
-                value: function(t, e) {}
+                value: function(t, e) {
+                    // Enable "PLAY" button when o.canPlay is true
+                    if (o.canPlay && !this.playButtonEnabled) {
+                        this.playButton.setInteractive(true);
+                        this.playButton.setAlpha(1); // Restore opacity
+                        this.children.list.forEach(child => {
+                            if (child.text === "PLAY") child.setAlpha(1); // Restore text opacity
+                        });
+                        this.playButtonEnabled = true;
+                    }
+                }
             }]) && W(e.prototype, i), l && W(e, l), u
         }();
 
@@ -580,28 +592,30 @@
             }
             return e = u, (i = [{
                 key: "preload",
-                value: function() {} // No plugins needed
+                value: function() {}
             }, {
                 key: "init",
                 value: function() {}
             }, {
                 key: "create",
                 value: function() {
-                    var t = this,
-                        e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
+                    var t = this;
+                    this.playButtonEnabled = false; // Tracks button state
+                    var e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
                     e.displayWidth = a(this), e.displayHeight = s(this);
-                    // Removed "Billion Dollar Ballin" text—already in background image
                     // Gradient button background for "PLAY"
-                    var playButton = this.add.graphics();
-                    playButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5);
-                    playButton.fillRoundedRect(n(this) - 100, r(this) + 150, 200, 60, 10); // Adjusted position
-                    playButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 100, r(this) + 150, 200, 60), Phaser.Geom.Rectangle.Contains)
+                    this.playButton = this.add.graphics();
+                    this.playButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5);
+                    this.playButton.fillRoundedRect(n(this) - 100, r(this) + 150, 200, 60, 10);
+                    this.playButton.setAlpha(0.5); // Faded when disabled
+                    this.playButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 100, r(this) + 150, 200, 60), Phaser.Geom.Rectangle.Contains)
                         .on("pointerup", function() { t.scene.start("GameSceneMobile") });
-                    this.add.text(n(this), r(this) + 180, "PLAY", { fontSize: "30px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5);
+                    this.playButton.setInteractive(false); // Initially disabled
+                    this.add.text(n(this), r(this) + 180, "PLAY", { fontSize: "30px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5).setAlpha(0.5); // Fade text too
                     // Gradient button background for "LEADERBOARD"
                     var leaderboardButton = this.add.graphics();
                     leaderboardButton.fillGradientStyle(0x6C45B1, 0x6C45B1, 0xC49485, 0xC49485, 0.5);
-                    leaderboardButton.fillRoundedRect(n(this) - 100, r(this) + 250, 200, 60, 10); // Adjusted position
+                    leaderboardButton.fillRoundedRect(n(this) - 100, r(this) + 250, 200, 60, 10);
                     leaderboardButton.setInteractive(new Phaser.Geom.Rectangle(n(this) - 100, r(this) + 250, 200, 60), Phaser.Geom.Rectangle.Contains)
                         .on("pointerup", function() { t.scene.start("LeaderboardScene") });
                     this.add.text(n(this), r(this) + 280, "LEADERBOARD", { fontSize: "30px", fontFamily: "font", color: "#fff", textShadow: "1px 1px 2px #000" }).setOrigin(.5);
@@ -610,15 +624,25 @@
                 }
             }, {
                 key: "update",
-                value: function(t, e) {}
+                value: function(t, e) {
+                    // Enable "PLAY" button when o.canPlay is true
+                    if (o.canPlay && !this.playButtonEnabled) {
+                        this.playButton.setInteractive(true);
+                        this.playButton.setAlpha(1); // Restore opacity
+                        this.children.list.forEach(child => {
+                            if (child.text === "PLAY") child.setAlpha(1); // Restore text opacity
+                        });
+                        this.playButtonEnabled = true;
+                    }
+                }
             }]) && tt(e.prototype, i), l && tt(e, l), u
         }(),
 
         // Game Initialization—Sets up canvas and starts game
-        st = window.innerWidth, // Screen width
-        lt = window.innerHeight; // Screen height
-        console.log(lt), o.isMobileView = st < lt; // Detects mobile view
-        var ct = { // Game configuration
+        st = window.innerWidth,
+        lt = window.innerHeight;
+        console.log(lt), o.isMobileView = st < lt;
+        var ct = {
             type: Phaser.AUTO,
             backgroundColor: "#08233e",
             parent: "game",
@@ -627,16 +651,17 @@
             scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
             dom: { createContainer: !0 },
             physics: { default: "arcade", arcade: { gravity: { y: 0 }, debug: !1 } },
-            scene: [b, T, Z, at, H, B] // All scenes
+            scene: [b, T, Z, at, H, B]
         };
 
         // Start game immediately with default "Player"
         o.userName = "Player";
         console.log("Game starting with default name:", o.userName);
-        var game = new Phaser.Game(ct); // Boots now
+        var game = new Phaser.Game(ct);
         window.addEventListener('startGame', function(event) {
             var wallet = event.detail && event.detail.wallet ? event.detail.wallet : null;
             o.userName = wallet ? formatWalletAddress(wallet) : "Player";
+            o.canPlay = true; // Allow play after wallet connect or practice
             console.log("Wallet updated:", o.userName);
             if (game.scene.isActive("MenuScene") || game.scene.isActive("MenuSceneMobile")) {
                 var scene = game.scene.getScene(o.isMobileView ? "MenuSceneMobile" : "MenuScene");
