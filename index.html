@@ -47,11 +47,28 @@
             display: block;
         }
         #playButton {
-            display: none; /* Hidden until wallet connects or practice mode */
+            display: none; /* Hidden until wallet connects */
         }
         #walletStatus, #pot, #highScore {
             margin: 10px;
             font-size: 16px;
+        }
+        #practiceMessage {
+            display: none; /* Hidden by default */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            font-family: 'font', sans-serif;
+            font-size: 24px;
+            line-height: 1.5;
+            z-index: 15; /* Above Phaser canvas and wallet UI */
+            max-width: 80%;
         }
     </style>
     <script src="https://unpkg.com/@solana/web3.js@1.98.0/lib/min/index.iife.min.js"></script>
@@ -68,6 +85,11 @@
         <div id="pot">Pot: 0 SOL</div>
         <div id="highScore">Daily High: 0</div>
     </div>
+    <div id="practiceMessage">
+        You’re in Practice Mode!<br>
+        Tap the ‘PLAY’ button to sharpen your skills<br>
+        before entering the SOL tournament.
+    </div>
     <script type="text/javascript" src="vendors~main.ab86658d639dc7e586ec.js"></script>
     <script src="https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js"></script>
     <script type="text/javascript" src="main.ab86658d639dc7e586ec.js"></script>
@@ -82,6 +104,7 @@
         const walletStatus = document.getElementById('walletStatus');
         const potDisplay = document.getElementById('pot');
         const highScoreDisplay = document.getElementById('highScore');
+        const practiceMessage = document.getElementById('practiceMessage');
 
         // Wallet connection logic (Phantom Wallet)
         connectButton.addEventListener('click', async () => {
@@ -105,22 +128,16 @@
         // Practice offline logic
         practiceButton.addEventListener('click', () => {
             walletStatus.textContent = 'Wallet: Player';
-            connectButton.style.display = 'none'; // Hide connect button
-            practiceButton.style.display = 'none'; // Hide practice button
-            playButton.style.display = 'block'; // Show play button
+            document.getElementById('walletUI').style.display = 'none'; // Hide wallet UI
+            practiceMessage.style.display = 'block'; // Show practice message
+            window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: null } })); // Dispatch startGame immediately
         });
 
-        // Start game logic (after wallet connect or practice)
+        // Start game logic (after wallet connect)
         playButton.addEventListener('click', async () => {
-            const wallet = walletStatus.textContent.includes('Wallet: Player') 
-                ? null 
-                : walletPublicKey; // Use walletPublicKey if connected, null for practice
-
+            const wallet = walletPublicKey; // Wallet is connected
             if (wallet) { // If wallet is connected, charge fee
                 await chargeFee();
-            } else { // Practice mode—start immediately
-                document.getElementById('walletUI').style.display = 'none'; // Hide UI
-                window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: wallet } }));
             }
         });
 
@@ -186,5 +203,4 @@
     </script>
 </body>
 </html>
-
 
