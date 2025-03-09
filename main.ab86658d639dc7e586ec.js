@@ -86,7 +86,8 @@
             levelNumber: 1, // Current game level
             score: 0, // Player’s score
             userName: "", // Player’s name
-            isMobileView: !1 // Mobile vs. desktop mode
+            isMobileView: !1, // Mobile vs. desktop mode
+            canPlay: false
         };
 
         // Helper Functions—Canvas positioning and formatting
