@@ -33,7 +33,7 @@
             font-family: 'font', sans-serif;
             z-index: 10;
         }
-        #connectWallet, #playButton, #practiceButton {
+        #connectWallet, #playButton, #practiceButton, #practiceOkButton {
             padding: 15px 30px;
             margin: 10px;
             background: linear-gradient(to right, rgba(108, 69, 177, 0.5), rgba(196, 148, 133, 0.5));
@@ -70,6 +70,9 @@
             z-index: 15; /* Above Phaser canvas and wallet UI */
             max-width: 80%;
         }
+        #practiceOkButton {
+            margin: 20px auto 0; /* Center and space above */
+        }
     </style>
     <script src="https://unpkg.com/@solana/web3.js@1.98.0/lib/min/index.iife.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -88,7 +91,8 @@
     <div id="practiceMessage">
         You’re in Practice Mode!<br>
         Tap the ‘PLAY’ button to sharpen your skills<br>
-        before entering the SOL tournament.
+        before entering the SOL tournament.<br>
+        <button id="practiceOkButton">Ok</button>
     </div>
     <script type="text/javascript" src="vendors~main.ab86658d639dc7e586ec.js"></script>
     <script src="https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js"></script>
@@ -105,6 +109,7 @@
         const potDisplay = document.getElementById('pot');
         const highScoreDisplay = document.getElementById('highScore');
         const practiceMessage = document.getElementById('practiceMessage');
+        const practiceOkButton = document.getElementById('practiceOkButton');
 
         // Wallet connection logic (Phantom Wallet)
         connectButton.addEventListener('click', async () => {
@@ -131,6 +136,11 @@
             document.getElementById('walletUI').style.display = 'none'; // Hide wallet UI
             practiceMessage.style.display = 'block'; // Show practice message
             window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: null } })); // Dispatch startGame immediately
+        });
+
+        // Close practice message
+        practiceOkButton.addEventListener('click', () => {
+            practiceMessage.style.display = 'none'; // Hide practice message
         });
 
         // Start game logic (after wallet connect)
@@ -203,4 +213,3 @@
     </script>
 </body>
 </html>
-
