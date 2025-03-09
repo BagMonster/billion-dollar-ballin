@@ -526,13 +526,13 @@
                     c.call(this, "MenuScene")
             }
             return e = u, (i = [{
-                key: "preload", // No plugins needed
-                value: function() {}
+                key: "preload",
+                value: function() {} // No plugins needed
             }, {
                 key: "init",
                 value: function() {}
             }, {
-                key: "create", // Sets up menu UI with title and buttons
+                key: "create",
                 value: function() {
                     var t = this,
                         e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
@@ -542,6 +542,8 @@
                     this.add.text(n(this), r(this), "PLAY", { fontSize: "40px", fontFamily: "font", color: "#000" }).setOrigin(.5); // Play button
                     var leaderboardButton = this.add.rectangle(n(this), r(this) + 100, 300, 80, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", function() { t.scene.start("LeaderboardScene") });
                     this.add.text(n(this), r(this) + 100, "LEADERBOARD", { fontSize: "40px", fontFamily: "font", color: "#000" }).setOrigin(.5); // Leaderboard button
+                    // Wallet display—shows "Wallet: Player" or "Wallet: abcd...wxyz"
+                    this.add.text(n(this), s(this) - 50, "Wallet: " + o.userName, { fontSize: "20px", fontFamily: "font", color: "#fff" }).setOrigin(0.5);
                 }
             }, {
                 key: "update",
@@ -583,6 +585,8 @@
                     this.add.text(n(this), r(this), "PLAY", { fontSize: "30px", fontFamily: "font", color: "#000" }).setOrigin(.5); // Play button
                     var leaderboardButton = this.add.rectangle(n(this), r(this) + 100, 200, 60, 0xffcd00).setInteractive({ cursor: "pointer" }).on("pointerup", function() { t.scene.start("LeaderboardScene") });
                     this.add.text(n(this), r(this) + 100, "LEADERBOARD", { fontSize: "30px", fontFamily: "font", color: "#000" }).setOrigin(.5); // Leaderboard button
+                    // Wallet display—shows "Wallet: Player" or "Wallet: abcd...wxyz"
+                    this.add.text(n(this), s(this) - 50, "Wallet: " + o.userName, { fontSize: "20px", fontFamily: "font", color: "#fff" }).setOrigin(0.5);
                 }
             }, {
                 key: "update",
@@ -590,29 +594,40 @@
             }]) && tt(e.prototype, i), l && tt(e, l), u
         }(),
 
-        // Game Initialization—Sets up canvas and waits for wallet event
+        // Game Initialization—Sets up canvas and starts game
         st = window.innerWidth, // Screen width
         lt = window.innerHeight; // Screen height
         console.log(lt), o.isMobileView = st < lt; // Detects mobile view
         var ct = { // Game configuration
-            type: Phaser.AUTO, // Renderer (WebGL or Canvas)
-            backgroundColor: "#001625", // Canvas background
-            parent: "game", // DOM element ID
-            width: o.isMobileView ? 720 : 1280, // Canvas width
-            height: o.isMobileView ? 1280 : 961, // Canvas height
-            scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH }, // Scales to fit screen
-            dom: { createContainer: !0 }, // Enables DOM elements
-            physics: { default: "arcade", arcade: { gravity: { y: 0 }, debug: !1 } }, // Arcade physics setup
+            type: Phaser.AUTO,
+            backgroundColor: "#001625",
+            parent: "game",
+            width: o.isMobileView ? 720 : 1280,
+            height: o.isMobileView ? 1280 : 961,
+            scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+            dom: { createContainer: !0 },
+            physics: { default: "arcade", arcade: { gravity: { y: 0 }, debug: !1 } },
             scene: [b, T, Z, at, H, B] // All scenes
         };
 
-        // Wallet Integration—Starts game with wallet address
+        // Start game immediately with default "Player"
+        o.userName = "Player";
+        console.log("Game starting with default name:", o.userName);
+        var game = new Phaser.Game(ct); // Boots now
         window.addEventListener('startGame', function(event) {
             var wallet = event.detail && event.detail.wallet ? event.detail.wallet : null;
             o.userName = wallet ? formatWalletAddress(wallet) : "Player";
-            console.log("Game started with wallet:", o.userName);
-            new Phaser.Game(ct);
+            console.log("Wallet updated:", o.userName);
+            if (game.scene.isActive("MenuScene") || game.scene.isActive("MenuSceneMobile")) {
+                var scene = game.scene.getScene(o.isMobileView ? "MenuSceneMobile" : "MenuScene");
+                scene.children.list.forEach(child => {
+                    if (child.text && child.text.startsWith("Wallet: ")) {
+                        child.setText("Wallet: " + o.userName);
+                    }
+                });
+            }
         });
-    }
-});
+    } // Close 311: function(t, e, i)
+}); // Close !function(t) and pass module map
+
 
