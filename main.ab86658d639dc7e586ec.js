@@ -598,7 +598,7 @@
         var ct = {
             type: Phaser.AUTO,
             backgroundColor: "#08233e",
-            parent: "game",
+            parent: "game", 
             width: o.isMobileView ? 720 : 1280,
             height: o.isMobileView ? 1280 : 961,
             scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
@@ -609,13 +609,16 @@
 
         // Start game immediately with default "Player"
         o.userName = "Player";
+        o.canPlay = false; // Ensure this starts as false
         console.log("Game starting with default name:", o.userName);
         var game = new Phaser.Game(ct);
+
         window.addEventListener('startGame', function(event) {
+            console.log("startGame event received from index.html");
             var wallet = event.detail && event.detail.wallet ? event.detail.wallet : null;
             o.userName = wallet ? formatWalletAddress(wallet) : "Player";
             o.canPlay = true; // Allow play after wallet connect or practice
-            console.log("Wallet updated:", o.userName);
+            console.log("Wallet updated:", o.userName, "canPlay:", o.canPlay);
             document.getElementById('walletUI').style.display = 'none'; // Hide wallet UI after choice
             if (game.scene.isActive("MenuScene") || game.scene.isActive("MenuSceneMobile")) {
                 var scene = game.scene.getScene(o.isMobileView ? "MenuSceneMobile" : "MenuScene");
@@ -625,17 +628,26 @@
                     }
                 });
             }
-            // Enable buttons after startGame
-            document.getElementById('playButton').style.opacity = '1';
-            document.getElementById('playButton').style.pointerEvents = 'auto';
-            document.getElementById('leaderboardButton').style.opacity = '1';
-            document.getElementById('leaderboardButton').style.pointerEvents = 'auto';
+            // Fallback: Ensure playButton is enabled (in case index.html didn't handle it)
+            var playButton = document.getElementById('playButton');
+            if (playButton) {
+                playButton.style.opacity = '1';
+                playButton.style.pointerEvents = 'auto';
+                console.log("Fallback: Ensured playButton is enabled:", playButton.style.opacity, playButton.style.pointerEvents);
+            }
+            // Start the appropriate game scene
+            console.log("Starting game scene:", o.isMobileView ? "GameSceneMobile" : "GameScene");
+            game.scene.start(o.isMobileView ? "GameSceneMobile" : "GameScene");
         });
-        window.addEventListener('startGame', function(event) {
-            console.log("startGame received from main.js");
-            playButton.style.display = 'block';
-            leaderboardButton.style.display = 'block';
-            enableButtons();
+
+        window.addEventListener('startLeaderboard', function() {
+            console.log("startLeaderboard event received from index.html, canPlay:", o.canPlay);
+            if (o.canPlay) {
+                console.log("Starting LeaderboardScene");
+                game.scene.start("LeaderboardScene");
+            } else {
+                console.log("Cannot start LeaderboardScene: canPlay is false");
+            }
         });
     } // Close 311: function(t, e, i)
 }); // Close !function(t) and pass module map
