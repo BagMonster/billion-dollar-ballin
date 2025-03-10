@@ -41,7 +41,7 @@
                 right: 2%;
             }
         }
-        #connectWallet, #playButton, #practiceButton, #practiceOkButton {
+        #connectWallet, #playButton, #practiceButton, #leaderboardButton, #practiceOkButton {
             padding: 15px 30px;
             margin: 10px;
             background: linear-gradient(to right, rgba(108, 69, 177, 0.5), rgba(196, 148, 133, 0.5));
@@ -53,9 +53,11 @@
             color: white;
             text-shadow: 1px 1px 2px #000;
             display: block;
+            opacity: 0.5; /* Initially disabled */
+            pointer-events: none; /* Disable clicks until enabled */
         }
-        #playButton {
-            display: none; /* Hidden until wallet connects */
+        #playButton, #leaderboardButton {
+            display: none; /* Hidden until wallet connect or practice */
         }
         #walletStatus, #pot, #highScore {
             margin: 10px;
@@ -92,6 +94,7 @@
         <button id="connectWallet">Connect Wallet</button>
         <button id="practiceButton" style="display: block;">Practice Offline</button>
         <button id="playButton" style="display: none;">Play (0.0025 SOL)</button>
+        <button id="leaderboardButton" style="display: none;">Leaderboard</button>
         <div id="walletStatus">Wallet not connected</div>
         <div id="pot">Pot: 0 SOL</div>
         <div id="highScore">Daily High: 0</div>
@@ -113,6 +116,7 @@
         const connectButton = document.getElementById('connectWallet');
         const playButton = document.getElementById('playButton');
         const practiceButton = document.getElementById('practiceButton');
+        const leaderboardButton = document.getElementById('leaderboardButton');
         const walletStatus = document.getElementById('walletStatus');
         const potDisplay = document.getElementById('pot');
         const highScoreDisplay = document.getElementById('highScore');
@@ -129,6 +133,8 @@
                     connectButton.style.display = 'none'; // Hide connect button
                     practiceButton.style.display = 'none'; // Hide practice button
                     playButton.style.display = 'block'; // Show play button
+                    leaderboardButton.style.display = 'block'; // Show leaderboard button
+                    enableButtons();
                 } catch (err) {
                     walletStatus.textContent = 'Connection failed!';
                     console.error(err);
@@ -149,7 +155,18 @@
         // Close practice message
         practiceOkButton.addEventListener('click', () => {
             practiceMessage.style.display = 'none'; // Hide practice message
+            playButton.style.display = 'block'; // Show play button
+            leaderboardButton.style.display = 'block'; // Show leaderboard button
+            enableButtons();
         });
+
+        // Enable buttons when ready
+        function enableButtons() {
+            playButton.style.opacity = '1';
+            playButton.style.pointerEvents = 'auto';
+            leaderboardButton.style.opacity = '1';
+            leaderboardButton.style.pointerEvents = 'auto';
+        }
 
         // Start game logic (after wallet connect)
         playButton.addEventListener('click', async () => {
@@ -157,6 +174,10 @@
             if (wallet) { // If wallet is connected, charge fee
                 await chargeFee();
             }
+        });
+
+        leaderboardButton.addEventListener('click', () => {
+            window.dispatchEvent(new CustomEvent('startLeaderboard')); // Custom event for leaderboard
         });
 
         async function chargeFee() {
