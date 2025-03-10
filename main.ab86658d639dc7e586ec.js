@@ -631,10 +631,11 @@
             document.getElementById('leaderboardButton').style.opacity = '1';
             document.getElementById('leaderboardButton').style.pointerEvents = 'auto';
         });
-        window.addEventListener('startLeaderboard', function() {
-            if (o.canPlay) {
-                game.scene.start(o.isMobileView ? "LeaderboardScene" : "LeaderboardScene");
-            }
+        window.addEventListener('startGame', function(event) {
+            console.log("startGame received from main.js");
+            playButton.style.display = 'block';
+            leaderboardButton.style.display = 'block';
+            enableButtons();
         });
     } // Close 311: function(t, e, i)
 }); // Close !function(t) and pass module map
