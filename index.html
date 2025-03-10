@@ -26,12 +26,20 @@
         }
         #walletUI {
             position: absolute;
-            top: 2%; /* Small percentage from top */
-            right: 2%; /* Small percentage from right */
+            top: 2%; /* Default for desktop */
+            right: 2%; /* Default for desktop */
             text-align: center;
             color: white;
             font-family: 'font', sans-serif;
             z-index: 10;
+        }
+        /* Media query for mobile (e.g., screens < 768px) */
+        @media only screen and (max-width: 767px) {
+            #walletUI {
+                top: auto; /* Reset top */
+                bottom: 2%; /* Move to bottom-right on mobile */
+                right: 2%;
+            }
         }
         #connectWallet, #playButton, #practiceButton, #practiceOkButton {
             padding: 15px 30px;
