@@ -146,6 +146,7 @@
         // Enable leaderboard by default
         leaderboardButton.style.opacity = '1';
         leaderboardButton.style.pointerEvents = 'auto';
+        console.log("Leaderboard button enabled by default:", leaderboardButton.style.opacity, leaderboardButton.style.pointerEvents);
 
         // Wallet connection logic (Phantom Wallet)
         connectButton.addEventListener('click', async () => {
@@ -155,10 +156,10 @@
                     const response = await window.solana.connect();
                     walletPublicKey = response.publicKey.toString();
                     walletStatus.textContent = `Wallet: ${walletPublicKey.slice(0, 4)}...${walletPublicKey.slice(-4)}`;
-                    connectButton.style.display = 'none'; // Hide connect button
-                    practiceButton.style.display = 'none'; // Hide practice button
-                    enablePlayButton(); // Enable play button after connection
-                    console.log("Wallet connected, play button enabled");
+                    connectButton.style.display = 'none';
+                    practiceButton.style.display = 'none';
+                    enablePlayButton();
+                    console.log("Wallet connected, play button enabled:", playButton.style.opacity, playButton.style.pointerEvents);
                 } catch (err) {
                     walletStatus.textContent = 'Connection failed!';
                     console.error("Connection error:", err);
@@ -173,19 +174,19 @@
         practiceButton.addEventListener('click', () => {
             console.log("Practice Offline clicked");
             walletStatus.textContent = 'Wallet: Player';
-            document.getElementById('walletUI').style.display = 'none'; // Hide wallet UI
-            practiceMessage.style.display = 'block'; // Show practice message
-            window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: null } })); // Dispatch startGame immediately
+            document.getElementById('walletUI').style.display = 'none';
+            practiceMessage.style.display = 'block';
+            window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: null } }));
             console.log("Practice mode started, startGame dispatched");
         });
 
         // Close practice message
         practiceOkButton.addEventListener('click', () => {
             console.log("Practice Ok clicked");
-            practiceMessage.style.display = 'none'; // Hide practice message
-            document.getElementById('walletUI').style.display = 'block'; // Show wallet UI again
-            enablePlayButton(); // Enable play button after OK
-            console.log("Practice message closed, play button enabled");
+            practiceMessage.style.display = 'none';
+            document.getElementById('walletUI').style.display = 'block';
+            enablePlayButton();
+            console.log("Practice message closed, play button enabled:", playButton.style.opacity, playButton.style.pointerEvents);
         });
 
         // Enable play button
@@ -197,12 +198,14 @@
 
         // Start game logic (after wallet connect or practice)
         playButton.addEventListener('click', async () => {
-            console.log("Play button clicked");
-            const wallet = walletPublicKey; // Wallet is connected
-            if (wallet) { // If wallet is connected, charge fee
+            console.log("Play button clicked, walletPublicKey:", walletPublicKey);
+            console.log("Play button state:", playButton.style.opacity, playButton.style.pointerEvents);
+            const wallet = walletPublicKey;
+            if (wallet) {
+                console.log("Wallet connected, attempting to charge fee");
                 await chargeFee();
             } else {
-                // Start game directly for practice mode
+                console.log("No wallet, starting practice mode");
                 document.getElementById('walletUI').style.display = 'none';
                 window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: null } }));
             }
@@ -210,7 +213,8 @@
 
         leaderboardButton.addEventListener('click', () => {
             console.log("Leaderboard button clicked");
-            window.dispatchEvent(new CustomEvent('startLeaderboard')); // Custom event for leaderboard
+            console.log("Leaderboard button state:", leaderboardButton.style.opacity, leaderboardButton.style.pointerEvents);
+            window.dispatchEvent(new CustomEvent('startLeaderboard'));
         });
 
         async function chargeFee() {
@@ -219,8 +223,8 @@
             const ownerPublicKey = new solanaWeb3.PublicKey('YOUR_OWNER_WALLET_PUBLIC_KEY');
             const potPublicKey = new solanaWeb3.PublicKey('YOUR_POT_WALLET_PUBLIC_KEY');
 
-            const ownerCut = 0.00025 * solanaWeb3.LAMPORTS_PER_SOL; // 10%
-            const potAmount = 0.00225 * solanaWeb3.LAMPORTS_PER_SOL; // 90%
+            const ownerCut = 0.00025 * solanaWeb3.LAMPORTS_PER_SOL;
+            const potAmount = 0.00225 * solanaWeb3.LAMPORTS_PER_SOL;
 
             const ownerTx = new solanaWeb3.Transaction().add(
                 solanaWeb3.SystemProgram.transfer({
@@ -254,7 +258,7 @@
 
                 pot += 0.00225;
                 potDisplay.textContent = `Pot: ${pot.toFixed(5)} SOL`;
-                document.getElementById('walletUI').style.display = 'none'; // Hide UI
+                document.getElementById('walletUI').style.display = 'none';
                 alert('Fee paid! Game starting...');
                 window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
             } catch (err) {
@@ -263,7 +267,6 @@
             }
         }
 
-        // Daily payout simulation (needs backend for real use)
         setInterval(() => {
             if (pot > 0) {
                 console.log(`Daily payout: 95% (${(pot * 0.95).toFixed(5)} SOL) to high scorer, 5% (${(pot * 0.05).toFixed(5)} SOL) to owner`);
@@ -272,7 +275,7 @@
                 potDisplay.textContent = `Pot: 0 SOL`;
                 highScoreDisplay.textContent = `Daily High: 0`;
             }
-        }, 24 * 60 * 60 * 1000); // Every 24 hours
+        }, 24 * 60 * 60 * 1000);
     </script>
 </body>
 </html>
