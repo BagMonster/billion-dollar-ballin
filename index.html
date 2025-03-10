@@ -41,7 +41,7 @@
                 right: 2%;
             }
         }
-        #connectWallet, #playButton, #practiceButton, #leaderboardButton, #practiceOkButton {
+        #connectWallet, #practiceButton, #practiceOkButton {
             padding: 15px 30px;
             margin: 10px;
             background: linear-gradient(to right, rgba(108, 69, 177, 0.5), rgba(196, 148, 133, 0.5));
@@ -53,10 +53,18 @@
             color: white;
             text-shadow: 1px 1px 2px #000;
             display: block;
-            opacity: 0.5; /* Initially disabled */
-            pointer-events: none; /* Disable clicks until enabled */
         }
         #playButton, #leaderboardButton {
+            padding: 15px 30px;
+            margin: 10px;
+            background: linear-gradient(to right, rgba(108, 69, 177, 0.5), rgba(196, 148, 133, 0.5));
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-family: 'font', sans-serif;
+            color: white;
+            text-shadow: 1px 1px 2px #000;
             display: none; /* Hidden until wallet connect or practice */
         }
         #walletStatus, #pot, #highScore {
@@ -92,9 +100,9 @@
     <div id="game"></div>
     <div id="walletUI">
         <button id="connectWallet">Connect Wallet</button>
-        <button id="practiceButton" style="display: block;">Practice Offline</button>
-        <button id="playButton" style="display: none;">Play (0.0025 SOL)</button>
-        <button id="leaderboardButton" style="display: none;">Leaderboard</button>
+        <button id="practiceButton">Practice Offline</button>
+        <button id="playButton">Play (0.0025 SOL)</button>
+        <button id="leaderboardButton">Leaderboard</button>
         <div id="walletStatus">Wallet not connected</div>
         <div id="pot">Pot: 0 SOL</div>
         <div id="highScore">Daily High: 0</div>
@@ -123,8 +131,12 @@
         const practiceMessage = document.getElementById('practiceMessage');
         const practiceOkButton = document.getElementById('practiceOkButton');
 
+        // Debug logs to verify event firing
+        console.log("Script loaded, checking buttons:", { connectButton, practiceButton, playButton, leaderboardButton });
+
         // Wallet connection logic (Phantom Wallet)
         connectButton.addEventListener('click', async () => {
+            console.log("Connect Wallet clicked");
             if (window.solana && window.solana.isPhantom) {
                 try {
                     const response = await window.solana.connect();
@@ -135,33 +147,40 @@
                     playButton.style.display = 'block'; // Show play button
                     leaderboardButton.style.display = 'block'; // Show leaderboard button
                     enableButtons();
+                    console.log("Wallet connected, buttons enabled");
                 } catch (err) {
                     walletStatus.textContent = 'Connection failed!';
-                    console.error(err);
+                    console.error("Connection error:", err);
                 }
             } else {
                 walletStatus.textContent = 'Install Phantom Wallet!';
+                console.log("Phantom Wallet not detected");
             }
         });
 
         // Practice offline logic
         practiceButton.addEventListener('click', () => {
+            console.log("Practice Offline clicked");
             walletStatus.textContent = 'Wallet: Player';
             document.getElementById('walletUI').style.display = 'none'; // Hide wallet UI
             practiceMessage.style.display = 'block'; // Show practice message
             window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: null } })); // Dispatch startGame immediately
+            console.log("Practice mode started, startGame dispatched");
         });
 
         // Close practice message
         practiceOkButton.addEventListener('click', () => {
+            console.log("Practice Ok clicked");
             practiceMessage.style.display = 'none'; // Hide practice message
             playButton.style.display = 'block'; // Show play button
             leaderboardButton.style.display = 'block'; // Show leaderboard button
             enableButtons();
+            console.log("Practice message closed, buttons enabled");
         });
 
         // Enable buttons when ready
         function enableButtons() {
+            console.log("Enabling buttons");
             playButton.style.opacity = '1';
             playButton.style.pointerEvents = 'auto';
             leaderboardButton.style.opacity = '1';
@@ -170,6 +189,7 @@
 
         // Start game logic (after wallet connect)
         playButton.addEventListener('click', async () => {
+            console.log("Play button clicked");
             const wallet = walletPublicKey; // Wallet is connected
             if (wallet) { // If wallet is connected, charge fee
                 await chargeFee();
@@ -177,10 +197,12 @@
         });
 
         leaderboardButton.addEventListener('click', () => {
+            console.log("Leaderboard button clicked");
             window.dispatchEvent(new CustomEvent('startLeaderboard')); // Custom event for leaderboard
         });
 
         async function chargeFee() {
+            console.log("Charging fee");
             const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
             const ownerPublicKey = new solanaWeb3.PublicKey('YOUR_OWNER_WALLET_PUBLIC_KEY');
             const potPublicKey = new solanaWeb3.PublicKey('YOUR_POT_WALLET_PUBLIC_KEY');
