@@ -65,7 +65,15 @@
             font-family: 'font', sans-serif;
             color: white;
             text-shadow: 1px 1px 2px #000;
-            display: none; /* Hidden until wallet connect or practice */
+            display: block; /* Show by default */
+        }
+        #playButton {
+            opacity: 0.5; /* Greyed out initially */
+            pointer-events: none; /* Disabled until enabled */
+        }
+        #leaderboardButton {
+            opacity: 1; /* Always enabled */
+            pointer-events: auto; /* Always clickable */
         }
         #walletStatus, #pot, #highScore {
             margin: 10px;
@@ -131,8 +139,12 @@
         const practiceMessage = document.getElementById('practiceMessage');
         const practiceOkButton = document.getElementById('practiceOkButton');
 
-        // Debug logs to verify event firing
+        // Debug logs
         console.log("Script loaded, checking buttons:", { connectButton, practiceButton, playButton, leaderboardButton });
+
+        // Enable leaderboard by default
+        leaderboardButton.style.opacity = '1';
+        leaderboardButton.style.pointerEvents = 'auto';
 
         // Wallet connection logic (Phantom Wallet)
         connectButton.addEventListener('click', async () => {
@@ -144,10 +156,8 @@
                     walletStatus.textContent = `Wallet: ${walletPublicKey.slice(0, 4)}...${walletPublicKey.slice(-4)}`;
                     connectButton.style.display = 'none'; // Hide connect button
                     practiceButton.style.display = 'none'; // Hide practice button
-                    playButton.style.display = 'block'; // Show play button
-                    leaderboardButton.style.display = 'block'; // Show leaderboard button
-                    enableButtons();
-                    console.log("Wallet connected, buttons enabled");
+                    enablePlayButton(); // Enable play button after connection
+                    console.log("Wallet connected, play button enabled");
                 } catch (err) {
                     walletStatus.textContent = 'Connection failed!';
                     console.error("Connection error:", err);
@@ -172,27 +182,28 @@
         practiceOkButton.addEventListener('click', () => {
             console.log("Practice Ok clicked");
             practiceMessage.style.display = 'none'; // Hide practice message
-            playButton.style.display = 'block'; // Show play button
-            leaderboardButton.style.display = 'block'; // Show leaderboard button
-            enableButtons();
-            console.log("Practice message closed, buttons enabled");
+            document.getElementById('walletUI').style.display = 'block'; // Show wallet UI again
+            enablePlayButton(); // Enable play button after OK
+            console.log("Practice message closed, play button enabled");
         });
 
-        // Enable buttons when ready
-        function enableButtons() {
-            console.log("Enabling buttons");
+        // Enable play button
+        function enablePlayButton() {
+            console.log("Enabling play button");
             playButton.style.opacity = '1';
             playButton.style.pointerEvents = 'auto';
-            leaderboardButton.style.opacity = '1';
-            leaderboardButton.style.pointerEvents = 'auto';
         }
 
-        // Start game logic (after wallet connect)
+        // Start game logic (after wallet connect or practice)
         playButton.addEventListener('click', async () => {
             console.log("Play button clicked");
             const wallet = walletPublicKey; // Wallet is connected
             if (wallet) { // If wallet is connected, charge fee
                 await chargeFee();
+            } else {
+                // Start game directly for practice mode
+                document.getElementById('walletUI').style.display = 'none';
+                window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: null } }));
             }
         });
 
