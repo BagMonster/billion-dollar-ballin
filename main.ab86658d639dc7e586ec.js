@@ -539,8 +539,6 @@
                     this.playButtonEnabled = false; // Tracks button state (for reference)
                     var e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
                     e.displayWidth = a(this), e.displayHeight = s(this);
-                    // Wallet display (top of screen, synced from index.html)
-                    this.add.text(n(this), 50, "Wallet: " + o.userName, { fontSize: "20px", fontFamily: "font", color: "#fff" }).setOrigin(0.5);
                 }
             }, {
                 key: "update",
@@ -580,8 +578,6 @@
                     this.playButtonEnabled = false; // Tracks button state (for reference)
                     var e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
                     e.displayWidth = a(this), e.displayHeight = s(this);
-                    // Wallet display (inside box, synced from index.html)
-                    this.add.text(200, 70, "Wallet: " + o.userName, { fontSize: "20px", fontFamily: "font", color: "#fff" }).setOrigin(0.5);
                 }
             }, {
                 key: "update",
@@ -662,6 +658,5 @@
         });
     } // Close 311: function(t, e, i)
 }); // Close !function(t) and pass module map
-
 
 
