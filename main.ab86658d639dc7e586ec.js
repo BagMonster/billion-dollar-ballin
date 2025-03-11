@@ -641,13 +641,9 @@
         });
 
         window.addEventListener('startLeaderboard', function() {
-            console.log("startLeaderboard event received from index.html, canPlay:", o.canPlay);
-            if (o.canPlay) {
-                console.log("Starting LeaderboardScene");
-                game.scene.start("LeaderboardScene");
-            } else {
-                console.log("Cannot start LeaderboardScene: canPlay is false");
-            }
+            console.log("startLeaderboard event received from index.html");
+            console.log("Starting LeaderboardScene");
+            game.scene.start("LeaderboardScene");
         });
     } // Close 311: function(t, e, i)
 }); // Close !function(t) and pass module map
