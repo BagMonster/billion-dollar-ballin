@@ -594,11 +594,13 @@
         // Game Initialization—Sets up canvas and starts game
         st = window.innerWidth,
         lt = window.innerHeight;
-        console.log(lt), o.isMobileView = st < lt;
+        console.log("Screen dimensions:", st, lt);
+        o.isMobileView = st < lt;
+        console.log("isMobileView:", o.isMobileView);
         var ct = {
             type: Phaser.AUTO,
             backgroundColor: "#08233e",
-            parent: "game", 
+            parent: "game",
             width: o.isMobileView ? 720 : 1280,
             height: o.isMobileView ? 1280 : 961,
             scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
@@ -607,19 +609,31 @@
             scene: [b, T, Z, at, H, B]
         };
 
-        // Start game immediately with default "Player"
         o.userName = "Player";
         o.canPlay = false; // Ensure this starts as false
-        console.log("Game starting with default name:", o.userName);
+        console.log("Game starting with default name:", o.userName, "canPlay:", o.canPlay);
         var game = new Phaser.Game(ct);
 
         window.addEventListener('startGame', function(event) {
             console.log("startGame event received from index.html");
             var wallet = event.detail && event.detail.wallet ? event.detail.wallet : null;
             o.userName = wallet ? formatWalletAddress(wallet) : "Player";
-            o.canPlay = true; // Allow play after wallet connect or practice
+            o.canPlay = true;
             console.log("Wallet updated:", o.userName, "canPlay:", o.canPlay);
-            document.getElementById('walletUI').style.display = 'none'; // Hide wallet UI after choice
+
+            // Stop the current menu scene
+            if (game.scene.isActive("MenuScene")) {
+                console.log("Stopping MenuScene");
+                game.scene.stop("MenuScene");
+            } else if (game.scene.isActive("MenuSceneMobile")) {
+                console.log("Stopping MenuSceneMobile");
+                game.scene.stop("MenuSceneMobile");
+            }
+
+            // Hide wallet UI
+            document.getElementById('walletUI').style.display = 'none';
+
+            // Sync wallet text in active menu scene
             if (game.scene.isActive("MenuScene") || game.scene.isActive("MenuSceneMobile")) {
                 var scene = game.scene.getScene(o.isMobileView ? "MenuSceneMobile" : "MenuScene");
                 scene.children.list.forEach(child => {
@@ -628,22 +642,23 @@
                     }
                 });
             }
-            // Fallback: Ensure playButton is enabled (in case index.html didn't handle it)
-            var playButton = document.getElementById('playButton');
-            if (playButton) {
-                playButton.style.opacity = '1';
-                playButton.style.pointerEvents = 'auto';
-                console.log("Fallback: Ensured playButton is enabled:", playButton.style.opacity, playButton.style.pointerEvents);
-            }
+
             // Start the appropriate game scene
-            console.log("Starting game scene:", o.isMobileView ? "GameSceneMobile" : "GameScene");
-            game.scene.start(o.isMobileView ? "GameSceneMobile" : "GameScene");
+            var targetScene = o.isMobileView ? "GameSceneMobile" : "GameScene";
+            console.log("Starting scene:", targetScene);
+            game.scene.start(targetScene);
+            console.log("Scene start command issued, current scenes:", game.scene.getScenes().map(s => s.scene.key));
         });
 
         window.addEventListener('startLeaderboard', function() {
-            console.log("startLeaderboard event received from index.html");
-            console.log("Starting LeaderboardScene");
-            game.scene.start("LeaderboardScene");
+            console.log("startLeaderboard event received from index.html, canPlay:", o.canPlay);
+            if (o.canPlay) {
+                console.log("Starting LeaderboardScene");
+                game.scene.start("LeaderboardScene");
+                console.log("Current scenes after start:", game.scene.getScenes().map(s => s.scene.key));
+            } else {
+                console.log("Cannot start LeaderboardScene: canPlay is false");
+            }
         });
     } // Close 311: function(t, e, i)
 }); // Close !function(t) and pass module map
