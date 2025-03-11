@@ -37,7 +37,7 @@
         @media only screen and (max-width: 767px) {
             #walletUI {
                 top: auto; /* Reset top */
-                bottom: 20%; /* Keep at bottom */
+                bottom: 20%; /* Adjusted to 20% for better mobile layout */
                 right: auto; /* Reset right */
                 left: 2%; /* Move to left side on mobile */
             }
@@ -99,7 +99,7 @@
     <div id="walletUI">
         <button id="connectWallet">Connect Wallet</button>
         <button id="practiceButton">Practice Offline</button>
-        <button id="playButton">Play (0.0025 SOL)</button>
+        <button id="playButton">Play (0.01 SOL)</button>
         <button id="practicePlayButton">Play (Practice)</button>
         <button id="leaderboardButton">Leaderboard</button>
         <div id="walletStatus">Wallet not connected</div>
@@ -218,8 +218,9 @@
             const ownerPublicKey = new solanaWeb3.PublicKey('YOUR_OWNER_WALLET_PUBLIC_KEY');
             const potPublicKey = new solanaWeb3.PublicKey('YOUR_POT_WALLET_PUBLIC_KEY');
 
-            const ownerCut = 0.00025 * solanaWeb3.LAMPORTS_PER_SOL;
-            const potAmount = 0.00225 * solanaWeb3.LAMPORTS_PER_SOL;
+            const totalFee = 0.01 * solanaWeb3.LAMPORTS_PER_SOL; // 0.01 SOL
+            const ownerCut = 0.00075 * solanaWeb3.LAMPORTS_PER_SOL; // 7.5% of 0.01 SOL
+            const potAmount = 0.00925 * solanaWeb3.LAMPORTS_PER_SOL; // 92.5% of 0.01 SOL
 
             const ownerTx = new solanaWeb3.Transaction().add(
                 solanaWeb3.SystemProgram.transfer({
@@ -251,7 +252,7 @@
                 const potSignature = await connection.sendRawTransaction(signedPot.serialize());
                 await connection.confirmTransaction(potSignature);
 
-                pot += 0.00225;
+                pot += 0.00925; // Add to pot (92.5% of 0.01 SOL)
                 potDisplay.textContent = `Pot: ${pot.toFixed(5)} SOL`;
                 document.getElementById('walletUI').style.display = 'none';
                 alert('Fee paid! Game starting...');
@@ -262,15 +263,60 @@
             }
         }
 
-        setInterval(() => {
+        // Placeholder for marketing wallet (to be replaced by GR1 with actual devnet address)
+        const marketingPublicKey = new solanaWeb3.PublicKey('YOUR_MARKETING_WALLET_PUBLIC_KEY');
+
+        setInterval(async () => {
             if (pot > 0) {
-                console.log(`Daily payout: 95% (${(pot * 0.95).toFixed(5)} SOL) to high scorer, 5% (${(pot * 0.05).toFixed(5)} SOL) to owner`);
+                const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+
+                // Calculate marketing cut (2.5% of pot)
+                const marketingCut = pot * 0.025;
+                const potAfterMarketing = pot - marketingCut;
+
+                console.log(`Marketing cut: ${marketingCut.toFixed(5)} SOL (2.5% of pot)`);
+
+                // Create transaction for marketing cut (to be implemented by GR1 backend)
+                const marketingTx = new solanaWeb3.Transaction().add(
+                    solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: potPublicKey, // Assuming pot wallet sends marketing cut
+                        toPubkey: marketingPublicKey,
+                        lamports: Math.floor(marketingCut * solanaWeb3.LAMPORTS_PER_SOL), // Convert to lamports
+                    })
+                );
+
+                // Simulate sending marketing cut (replace with backend logic)
+                try {
+                    const { blockhash } = await connection.getLatestBlockhash();
+                    marketingTx.recentBlockhash = blockhash;
+                    marketingTx.feePayer = potPublicKey; // Note: This needs backend signing
+                    console.log("Marketing transaction prepared:", marketingTx);
+                    // Backend will need to sign and send this transaction
+                } catch (err) {
+                    console.error("Marketing transaction setup failed:", err);
+                }
+
+                // Check if pot after marketing cut is greater than 2.5 SOL
+                if (potAfterMarketing > 2.5) {
+                    // Top 3 split: 70% to 1st, 20% to 2nd, 10% to 3rd
+                    const firstPlace = potAfterMarketing * 0.7;
+                    const secondPlace = potAfterMarketing * 0.2;
+                    const thirdPlace = potAfterMarketing * 0.1;
+                    console.log(`Payout (36 hours, pot > 2.5 SOL): 1st: ${firstPlace.toFixed(5)} SOL (70%), 2nd: ${secondPlace.toFixed(5)} SOL (20%), 3rd: ${thirdPlace.toFixed(5)} SOL (10%)`);
+                    // Backend will handle sending these payouts from potPublicKey
+                } else {
+                    // Single winner takes all after marketing cut
+                    console.log(`Payout (36 hours): Winner: ${potAfterMarketing.toFixed(5)} SOL (100% after marketing cut)`);
+                    // Backend will handle sending this payout from potPublicKey
+                }
+
+                // Reset pot and high score
                 pot = 0;
                 dailyHighScore = 0;
                 potDisplay.textContent = `Pot: 0 SOL`;
                 highScoreDisplay.textContent = `Daily High: 0`;
             }
-        }, 24 * 60 * 60 * 1000);
+        }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
     </script>
 </body>
 </html>
