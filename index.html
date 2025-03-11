@@ -37,7 +37,7 @@
         @media only screen and (max-width: 767px) {
             #walletUI {
                 top: auto; /* Reset top */
-                bottom: 20%; /* Keep at bottom */
+                bottom: 20%; /* Adjusted to 20% for better mobile layout */
                 right: auto; /* Reset right */
                 left: 2%; /* Move to left side on mobile */
             }
@@ -176,8 +176,8 @@
             walletStatus.textContent = 'Wallet: Player';
             document.getElementById('walletUI').style.display = 'none';
             practiceMessage.style.display = 'block';
-            window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: null } }));
-            console.log("Practice mode started, startGame dispatched");
+            console.log("Showing practice message, waiting for OK");
+            // Removed premature startGame dispatch
         });
 
         // Close practice message
@@ -207,6 +207,7 @@
             } else {
                 console.log("No wallet, starting practice mode");
                 document.getElementById('walletUI').style.display = 'none';
+                document.getElementById('practiceMessage').style.display = 'none'; // Ensure message is hidden
                 window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: null } }));
             }
         });
@@ -259,6 +260,7 @@
                 pot += 0.00225;
                 potDisplay.textContent = `Pot: ${pot.toFixed(5)} SOL`;
                 document.getElementById('walletUI').style.display = 'none';
+                document.getElementById('practiceMessage').style.display = 'none'; // Ensure message is hidden
                 alert('Fee paid! Game starting...');
                 window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
             } catch (err) {
