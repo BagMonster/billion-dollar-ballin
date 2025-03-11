@@ -73,12 +73,15 @@
             background: rgba(0, 0, 0, 0.8); /* Transparent black background */
             padding: 20px;
             border-radius: 10px;
+            border: 2px solid gold; /* Gold outline */
             text-align: center;
             color: white;
             font-family: 'font', sans-serif;
             font-size: 16px;
             margin-bottom: 10px; /* Space between status box and buttons */
             display: inline-block; /* Ensures it fits content width */
+            width: 200px; /* Matches button width */
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
         }
         #practiceMessage {
             display: none; /* Hidden by default */
@@ -109,9 +112,9 @@
     <div id="game"></div>
     <div id="walletUI">
         <div id="statusBox">
-            <div id="walletStatus">Wallet not connected</div>
-            <div id="pot">Pot: 0 SOL</div>
-            <div id="highScore">Daily High: 0</div>
+            <div id="walletStatus">🏆 Wallet: Not Connected</div>
+            <div id="pot">💰 Pot: 0 SOL</div>
+            <div id="highScore">🎯 Daily High: 0</div>
         </div>
         <button id="connectWallet">Connect Wallet</button>
         <button id="practiceButton">Practice Offline</button>
@@ -155,25 +158,25 @@
                 try {
                     const response = await window.solana.connect();
                     walletPublicKey = response.publicKey.toString();
-                    walletStatus.textContent = `Wallet: ${walletPublicKey.slice(0, 4)}...${walletPublicKey.slice(-4)}`;
+                    walletStatus.textContent = `🏆 Wallet: ${walletPublicKey.slice(0, 4)}...${walletPublicKey.slice(-4)}`;
                     connectButton.style.display = 'none';
                     practiceButton.style.display = 'none';
                     practicePlayButton.style.display = 'none'; // Hide practice play button in wallet mode
                     enablePlayButton();
                     console.log("Wallet connected, play button enabled");
                 } catch (err) {
-                    walletStatus.textContent = 'Connection failed!';
+                    walletStatus.textContent = '🏆 Connection failed!';
                     console.error("Connection error:", err);
                 }
             } else {
-                walletStatus.textContent = 'Install Phantom Wallet!';
+                walletStatus.textContent = '🏆 Install Phantom Wallet!';
                 console.log("Phantom Wallet not detected");
             }
         });
 
         practiceButton.addEventListener('click', () => {
             console.log("Practice Offline clicked");
-            walletStatus.textContent = 'Wallet: Player';
+            walletStatus.textContent = '🏆 Wallet: Player';
             document.getElementById('walletUI').style.display = 'none';
             practiceMessage.style.display = 'block';
             console.log("Practice mode started, waiting for OK");
@@ -266,7 +269,7 @@
                 await connection.confirmTransaction(potSignature);
 
                 pot += 0.00925; // Add to pot (92.5% of 0.01 SOL)
-                potDisplay.textContent = `Pot: ${pot.toFixed(5)} SOL`;
+                potDisplay.textContent = `💰 Pot: ${pot.toFixed(5)} SOL`;
                 document.getElementById('walletUI').style.display = 'none';
                 alert('Fee paid! Game starting...');
                 window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
@@ -326,8 +329,8 @@
                 // Reset pot and high score
                 pot = 0;
                 dailyHighScore = 0;
-                potDisplay.textContent = `Pot: 0 SOL`;
-                highScoreDisplay.textContent = `Daily High: 0`;
+                potDisplay.textContent = `💰 Pot: 0 SOL`;
+                highScoreDisplay.textContent = `🎯 Daily High: 0`;
             }
         }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
     </script>
