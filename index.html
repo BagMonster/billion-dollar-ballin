@@ -42,10 +42,10 @@
                 left: 2%; /* Move to left side on mobile */
             }
         }
-        #connectWallet, #practiceButton, #practiceOkButton {
+        #connectWallet, #practiceButton, #practiceOkButton, #playButton, #leaderboardButton {
             padding: 15px 30px;
             margin: 10px;
-            background: linear-gradient(to right, rgba(108, 69, 177, 0.5), rgba(196, 148, 133, 0.5));
+            background: linear-gradient(to right, rgba(108, 69, 177, 1.0), rgba(196, 148, 133, 1.0)); /* Increased opacity to 1.0 */
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -54,19 +54,8 @@
             color: white;
             text-shadow: 1px 1px 2px #000;
             display: block;
-        }
-        #playButton, #leaderboardButton {
-            padding: 15px 30px;
-            margin: 10px;
-            background: linear-gradient(to right, rgba(108, 69, 177, 0.5), rgba(196, 148, 133, 0.5));
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            font-family: 'font', sans-serif;
-            color: white;
-            text-shadow: 1px 1px 2px #000;
-            display: block; /* Show by default */
+            width: 200px; /* Fixed width for uniform size */
+            box-sizing: border-box; /* Include padding in width */
         }
         #playButton {
             opacity: 0.5; /* Greyed out initially */
