@@ -647,14 +647,19 @@
         });
 
         window.addEventListener('startLeaderboard', function() {
-            console.log("startLeaderboard event received from index.html, canPlay:", o.canPlay);
-            if (o.canPlay) {
-                console.log("Starting LeaderboardScene");
-                game.scene.start("LeaderboardScene");
-                console.log("Current scenes after start:", game.scene.getScenes().map(s => s.scene.key));
-            } else {
-                console.log("Cannot start LeaderboardScene: canPlay is false");
+            console.log("startLeaderboard event received from index.html");
+            // Stop the current menu scene
+            if (game.scene.isActive("MenuScene")) {
+                console.log("Stopping MenuScene");
+                game.scene.stop("MenuScene");
+            } else if (game.scene.isActive("MenuSceneMobile")) {
+                console.log("Stopping MenuSceneMobile");
+                game.scene.stop("MenuSceneMobile");
             }
+            // Start LeaderboardScene without canPlay condition
+            console.log("Attempting to start LeaderboardScene");
+            game.scene.start("LeaderboardScene");
+            console.log("LeaderboardScene start command issued, current scenes:", game.scene.getScenes().map(s => s.scene.key));
         });
     } // Close 311: function(t, e, i)
 }); // Close !function(t) and pass module map
