@@ -24,10 +24,13 @@
             position: absolute;
             left: -9999px;
         }
+        #game {
+            position: relative; /* Make #game the positioning context for #walletUI */
+        }
         #walletUI {
             position: absolute;
-            top: 2%; /* Default for desktop */
-            right: 2%; /* Default for desktop */
+            top: 10px; /* Adjusted to fit inside the top-right corner of the menu image */
+            right: 10px; /* Adjusted to fit inside the top-right corner of the menu image */
             text-align: center;
             color: white;
             font-family: 'font', sans-serif;
