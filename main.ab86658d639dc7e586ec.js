@@ -539,6 +539,9 @@
                     this.playButtonEnabled = false; // Tracks button state (for reference)
                     var e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
                     e.displayWidth = a(this), e.displayHeight = s(this);
+                    window.menuWidth = e.displayWidth;
+                    window.menuHeight = e.displayHeight;
+                    console.log("Menu image dimensions:", window.menuWidth, window.menuHeight);
                 }
             }, {
                 key: "update",
