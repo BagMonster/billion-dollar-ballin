@@ -109,7 +109,7 @@
             left: 20px;
             width: 50px;
             height: 50px;
-            background: rgba(0, 0, 0, 0.8); /* Matches statusBox */
+            background: rgba(0, 0, 0, 0.8);
             border: 2px solid gold;
             border-radius: 10px;
             cursor: pointer;
@@ -126,34 +126,55 @@
             margin: 3px 0;
             border-radius: 2px;
         }
-        #sideMenu {
+        #menuTextBox {
+            display: none;
             position: fixed;
-            top: 0;
-            left: -250px; /* Hidden off-screen initially */
-            width: 250px;
-            height: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.9);
-            border-right: 2px solid gold;
-            z-index: 15;
-            transition: left 0.3s ease; /* Slide animation */
+            border: 2px solid gold;
+            border-radius: 10px;
             padding: 20px;
-            box-sizing: border-box;
-        }
-        #sideMenu.open {
-            left: 0; /* Slide in */
-        }
-        #sideMenu a {
-            display: block;
+            z-index: 25;
             color: white;
             font-family: 'font', sans-serif;
+            text-align: center;
+            max-width: 80%;
+            box-sizing: border-box;
+        }
+        #menuTextBox .text-content {
+            line-height: 1.5;
+        }
+        #menuTextBox h3 {
+            margin: 0 0 15px 0;
+            font-size: 24px;
+        }
+        #menuTextBox a {
+            display: block;
+            color: white;
             font-size: 18px;
             text-decoration: none;
-            margin: 20px 0;
+            margin: 10px 0;
             text-shadow: 1px 1px 2px #000;
             transition: color 0.3s ease;
         }
-        #sideMenu a:hover {
-            color: #3EDCD7; /* Cyan on hover */
+        #menuTextBox a:hover {
+            color: #3EDCD7;
+        }
+        #menuTextBox #closeTextBox {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: rgba(251, 37, 244, 0.8);
+            border: 2px solid #C0C0C0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'font', sans-serif;
+            color: white;
+            font-size: 16px;
+        }
+        #menuTextBox #closeTextBox:hover {
+            background: rgba(251, 37, 244, 1);
         }
         /* Media query for mobile (e.g., screens < 768px) */
         @media only screen and (max-width: 767px) {
@@ -184,16 +205,16 @@
                 height: 3px;
                 margin: 3px 0;
             }
-            #sideMenu {
-                width: 200px;
-                left: -200px; /* Adjusted for smaller width */
+            #menuTextBox {
+                padding: 15px;
             }
-            #sideMenu.open {
-                left: 0;
-            }
-            #sideMenu a {
+            #menuTextBox a {
                 font-size: 16px;
-                margin: 15px 0;
+                margin: 8px 0;
+            }
+            #menuTextBox #closeTextBox {
+                padding: 8px 15px;
+                font-size: 14px;
             }
         }
     </style>
@@ -208,10 +229,14 @@
         <div class="line"></div>
         <div class="line"></div>
     </div>
-    <div id="sideMenu">
-        <a href="#" onclick="alert('Game Instructions coming soon!')">Game Instructions</a>
-        <a href="https://x.com/TrenchMonster_G" target="_blank">Follow on X</a>
-        <a href="https://discord.gg/example" target="_blank">Join our Discord</a>
+    <div id="menuTextBox" style="display: none;">
+        <div class="text-content">
+            <h3>Menu</h3>
+            <a href="#" onclick="alert('Game Instructions coming soon!')">Game Instructions</a><br>
+            <a href="https://x.com/TrenchMonster_G" target="_blank">Follow on X</a><br>
+            <a href="https://discord.gg/example" target="_blank">Join our Discord</a><br>
+            <button id="closeTextBox">Close</button>
+        </div>
     </div>
     <div id="walletUI">
         <div id="statusBox">
@@ -443,41 +468,30 @@
                 console.log("Adjusted walletUI to menu image corner:", offset, "Max right:", window.menuWidth - 220);
             }
 
-            // Menu Toggle Logic with Direct and Delegated Event
+            // Menu Text Box Toggle Logic
             const menuButton = document.getElementById('menuButton');
-            const sideMenu = document.getElementById('sideMenu');
-            let isMenuOpen = false;
+            const menuTextBox = document.getElementById('menuTextBox');
+            const closeTextBox = document.getElementById('closeTextBox');
+            let isTextBoxOpen = false;
 
-            console.log("Checking menu elements on DOM load:", { menuButton, sideMenu });
+            console.log("Checking menu elements on DOM load:", { menuButton, menuTextBox });
 
-            if (menuButton && sideMenu) {
-                // Direct listener as primary
+            if (menuButton && menuTextBox && closeTextBox) {
                 menuButton.addEventListener('click', (e) => {
-                    console.log("Direct button click detected, toggling menu...");
-                    isMenuOpen = !isMenuOpen;
-                    if (isMenuOpen) {
-                        sideMenu.classList.add('open');
-                    } else {
-                        sideMenu.classList.remove('open');
-                    }
-                    console.log("Menu toggled (direct):", isMenuOpen ? "Open" : "Closed");
+                    console.log("Menu button clicked, toggling text box...");
+                    isTextBoxOpen = !isTextBoxOpen;
+                    menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
+                    console.log("Text box toggled:", isTextBoxOpen ? "Open" : "Closed");
                 });
 
-                // Delegated listener as fallback
-                document.addEventListener('click', (e) => {
-                    if (e.target === menuButton || menuButton.contains(e.target)) {
-                        console.log("Delegated button click detected, toggling menu...");
-                        isMenuOpen = !isMenuOpen;
-                        if (isMenuOpen) {
-                            sideMenu.classList.add('open');
-                        } else {
-                            sideMenu.classList.remove('open');
-                        }
-                        console.log("Menu toggled (delegated):", isMenuOpen ? "Open" : "Closed");
-                    }
+                closeTextBox.addEventListener('click', (e) => {
+                    console.log("Close button clicked, hiding text box...");
+                    isTextBoxOpen = false;
+                    menuTextBox.style.display = 'none';
+                    console.log("Text box closed");
                 });
             } else {
-                console.error("Menu elements not found on DOM load:", { menuButton, sideMenu });
+                console.error("Menu elements not found on DOM load:", { menuButton, menuTextBox, closeTextBox });
             }
         });
     </script>
