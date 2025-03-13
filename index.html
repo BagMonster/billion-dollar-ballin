@@ -457,8 +457,8 @@
             }
         }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
         // menu button code here
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM fully loaded, setting up menu...");
+        window.onload = () => {
+            console.log("Window fully loaded, setting up menu...");
             if (window.menuWidth && !window.isMobileView) {
                 const offset = 20;
                 const walletUI = document.getElementById('walletUI');
@@ -473,7 +473,7 @@
             const closeTextBox = document.getElementById('closeTextBox');
             let isTextBoxOpen = false;
 
-            console.log("Checking menu elements on DOM load:", { menuButton, menuTextBox });
+            console.log("Checking menu elements on window load:", { menuButton, menuTextBox, closeTextBox });
 
             if (menuButton && menuTextBox && closeTextBox) {
                 menuButton.addEventListener('click', (e) => {
@@ -490,9 +490,9 @@
                     console.log("Text box closed");
                 });
             } else {
-                console.error("Menu elements not found on DOM load:", { menuButton, menuTextBox, closeTextBox });
+                console.error("Menu elements not found on window load:", { menuButton, menuTextBox, closeTextBox });
             }
-        });
+        };
     </script>
 </body>
 </html>
