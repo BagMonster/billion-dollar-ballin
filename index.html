@@ -178,7 +178,7 @@
             #menuButton .line {
                 width: 28px;
                 height: 3px;
-                margin: 2px 0;
+                margin: 1px 0;
             }
             #sideMenu {
                 width: 200px;
@@ -430,6 +430,7 @@
         }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
         // menu button code here
         window.addEventListener('load', () => {
+            console.log("Load event fired, checking DOM...");
             if (window.menuWidth && !window.isMobileView) {
                 const offset = 20;
                 const walletUI = document.getElementById('walletUI');
@@ -438,24 +439,29 @@
                 console.log("Adjusted walletUI to menu image corner:", offset, "Max right:", window.menuWidth - 220);
             }
 
-            // Updated Menu Toggle Logic
-            const menuButton = document.getElementById('menuButton');
-            const sideMenu = document.getElementById('sideMenu');
-            let isMenuOpen = false;
+            // Enhanced Menu Toggle Logic with Delay and Delegation
+            setTimeout(() => {
+                const menuButton = document.getElementById('menuButton');
+                const sideMenu = document.getElementById('sideMenu');
+                let isMenuOpen = false;
 
-            if (menuButton && sideMenu) {
-                menuButton.addEventListener('click', () => {
-                    isMenuOpen = !isMenuOpen;
-                    if (isMenuOpen) {
-                        sideMenu.classList.add('open');
-                    } else {
-                        sideMenu.classList.remove('open');
-                    }
-                    console.log("Menu toggled:", isMenuOpen ? "Open" : "Closed");
-                });
-            } else {
-                console.error("Menu elements not found:", { menuButton, sideMenu });
-            }
+                console.log("Checking menu elements after delay:", { menuButton, sideMenu });
+
+                if (menuButton && sideMenu) {
+                    menuButton.addEventListener('click', () => {
+                        console.log("Button clicked, toggling menu...");
+                        isMenuOpen = !isMenuOpen;
+                        if (isMenuOpen) {
+                            sideMenu.classList.add('open');
+                        } else {
+                            sideMenu.classList.remove('open');
+                        }
+                        console.log("Menu toggled:", isMenuOpen ? "Open" : "Closed");
+                    });
+                } else {
+                    console.error("Menu elements not found after delay:", { menuButton, sideMenu });
+                }
+            }, 1000); // 1-second delay to ensure DOM is ready
         });
         window.addEventListener('resize', () => {
             if (window.menuWidth && !window.isMobileView) {
