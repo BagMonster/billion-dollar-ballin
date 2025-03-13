@@ -344,6 +344,22 @@
                 highScoreDisplay.textContent = `🎯 Daily High: 0`;
             }
         }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
+        // Insert the new code here
+        window.addEventListener('load', () => {
+            if (window.menuWidth && !window.isMobileView) {
+                const offset = 20;
+                document.getElementById('walletUI').style.top = `${offset}px`;
+                document.getElementById('walletUI').style.right = `${offset}px`;
+                console.log("Adjusted walletUI to menu image corner:", offset);
+            }
+        });
+        window.addEventListener('resize', () => {
+            if (window.menuWidth && !window.isMobileView) {
+                const offset = 20;
+                document.getElementById('walletUI').style.top = `${offset}px`;
+                document.getElementById('walletUI').style.right = `${offset}px`;
+            }
+        });
     </script>
 </body>
 </html>
