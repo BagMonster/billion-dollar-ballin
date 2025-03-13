@@ -537,7 +537,7 @@
                 value: function() {
                     var t = this;
                     this.playButtonEnabled = false; // Tracks button state (for reference)
-                    var e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
+                    var e = this.add.image(n(this), r(this), "menu-bg");
                     e.displayWidth = a(this), e.displayHeight = s(this);
                     window.menuWidth = e.displayWidth;
                     window.menuHeight = e.displayHeight;
@@ -579,7 +579,7 @@
                 value: function() {
                     var t = this;
                     this.playButtonEnabled = false; // Tracks button state (for reference)
-                    var e = this.add.image(n(this), r(this), "menu-bg").setInteractive();
+                    var e = this.add.image(n(this), r(this), "menu-bg");
                     e.displayWidth = a(this), e.displayHeight = s(this);
                 }
             }, {
