@@ -99,6 +99,62 @@
         #practiceOkButton {
             margin: 20px auto 0; /* Center and space above */
         }
+        #menuButton {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(to right, rgba(251, 37, 244, 0.8), rgba(62, 220, 215, 0.8));
+            border: 2px solid gold;
+            border-radius: 10px;
+            cursor: pointer;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        #menuButton:hover {
+            background: linear-gradient(to right, rgba(251, 37, 244, 1), rgba(62, 220, 215, 1));
+        }
+        #menuButton .line {
+            width: 30px;
+            height: 4px;
+            background-color: white;
+            margin: 3px 0;
+            border-radius: 2px;
+        }
+        #sideMenu {
+            position: fixed;
+            top: 0;
+            left: -250px; /* Hidden off-screen initially */
+            width: 250px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            border-right: 2px solid gold;
+            z-index: 15;
+            transition: left 0.3s ease; /* Slide animation */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #sideMenu.open {
+            left: 0; /* Slide in */
+        }
+        #sideMenu a {
+            display: block;
+            color: white;
+            font-family: 'font', sans-serif;
+            font-size: 18px;
+            text-decoration: none;
+            margin: 20px 0;
+            text-shadow: 1px 1px 2px #000;
+            transition: color 0.3s ease;
+        }
+        #sideMenu a:hover {
+            color: #3EDCD7; /* Cyan on hover */
+        }
         /* Media query for mobile (e.g., screens < 768px) */
         @media only screen and (max-width: 767px) {
             #walletUI {
@@ -117,6 +173,28 @@
                 padding: 15px 30px;
                 font-size: 20px;
             }
+            #menuButton {
+                width: 40px;
+                height: 40px;
+                top: 15px;
+                left: 15px;
+            }
+            #menuButton .line {
+                width: 24px;
+                height: 3px;
+                margin: 2px 0;
+            }
+            #sideMenu {
+                width: 200px;
+                left: -200px; /* Adjusted for smaller width */
+            }
+            #sideMenu.open {
+                left: 0;
+            }
+            #sideMenu a {
+                font-size: 16px;
+                margin: 15px 0;
+            }
         }
     </style>
     <script src="https://unpkg.com/@solana/web3.js@1.98.0/lib/min/index.iife.min.js"></script>
@@ -125,6 +203,16 @@
 <body>
     <div class="fontload" style="font-family: 'font';">.</div>
     <div id="game"></div>
+    <div id="menuButton">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+    </div>
+    <div id="sideMenu">
+        <a href="#" onclick="alert('Game Instructions coming soon!')">Game Instructions</a>
+        <a href="https://x.com/TrenchMonster_G" target="_blank">Follow on X</a>
+        <a href="https://discord.gg/example" target="_blank">Join our Discord</a>
+    </div>
     <div id="walletUI">
         <div id="statusBox">
             <div id="pot">🏆 Pot: 0 SOL</div>
@@ -359,6 +447,19 @@
                 document.getElementById('walletUI').style.top = `${offset}px`;
                 document.getElementById('walletUI').style.right = `${offset}px`;
             }
+        });
+        const menuButton = document.getElementById('menuButton');
+        const sideMenu = document.getElementById('sideMenu');
+        let isMenuOpen = false;
+
+        menuButton.addEventListener('click', () => {
+            isMenuOpen = !isMenuOpen;
+            if (isMenuOpen) {
+                sideMenu.classList.add('open');
+            } else {
+                sideMenu.classList.remove('open');
+            }
+            console.log("Menu toggled:", isMenuOpen ? "Open" : "Closed");
         });
     </script>
 </body>
