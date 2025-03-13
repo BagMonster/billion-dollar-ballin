@@ -105,7 +105,7 @@
             left: 20px;
             width: 50px;
             height: 50px;
-            background: linear-gradient(to right, rgba(251, 37, 244, 0.8), rgba(62, 220, 215, 0.8));
+            background: rgba(0, 0, 0, 0.8); /* Matches statusBox */
             border: 2px solid gold;
             border-radius: 10px;
             cursor: pointer;
@@ -114,10 +114,6 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: background 0.3s ease;
-        }
-        #menuButton:hover {
-            background: linear-gradient(to right, rgba(251, 37, 244, 1), rgba(62, 220, 215, 1));
         }
         #menuButton .line {
             width: 30px;
@@ -432,34 +428,42 @@
                 highScoreDisplay.textContent = `🎯 Daily High: 0`;
             }
         }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
-        // Insert the new code here
+        // menu button code here
         window.addEventListener('load', () => {
             if (window.menuWidth && !window.isMobileView) {
                 const offset = 20;
-                document.getElementById('walletUI').style.top = `${offset}px`;
-                document.getElementById('walletUI').style.right = `${offset}px`;
-                console.log("Adjusted walletUI to menu image corner:", offset);
+                const walletUI = document.getElementById('walletUI');
+                walletUI.style.top = `${offset}px`;
+                walletUI.style.right = `${Math.min(offset, window.menuWidth - 220)}px`;
+                console.log("Adjusted walletUI to menu image corner:", offset, "Max right:", window.menuWidth - 220);
+            }
+
+            // Updated Menu Toggle Logic
+            const menuButton = document.getElementById('menuButton');
+            const sideMenu = document.getElementById('sideMenu');
+            let isMenuOpen = false;
+
+            if (menuButton && sideMenu) {
+                menuButton.addEventListener('click', () => {
+                    isMenuOpen = !isMenuOpen;
+                    if (isMenuOpen) {
+                        sideMenu.classList.add('open');
+                    } else {
+                        sideMenu.classList.remove('open');
+                    }
+                    console.log("Menu toggled:", isMenuOpen ? "Open" : "Closed");
+                });
+            } else {
+                console.error("Menu elements not found:", { menuButton, sideMenu });
             }
         });
         window.addEventListener('resize', () => {
             if (window.menuWidth && !window.isMobileView) {
                 const offset = 20;
-                document.getElementById('walletUI').style.top = `${offset}px`;
-                document.getElementById('walletUI').style.right = `${offset}px`;
+                const walletUI = document.getElementById('walletUI');
+                walletUI.style.top = `${offset}px`;
+                walletUI.style.right = `${Math.min(offset, window.menuWidth - 220)}px`;
             }
-        });
-        const menuButton = document.getElementById('menuButton');
-        const sideMenu = document.getElementById('sideMenu');
-        let isMenuOpen = false;
-
-        menuButton.addEventListener('click', () => {
-            isMenuOpen = !isMenuOpen;
-            if (isMenuOpen) {
-                sideMenu.classList.add('open');
-            } else {
-                sideMenu.classList.remove('open');
-            }
-            console.log("Menu toggled:", isMenuOpen ? "Open" : "Closed");
         });
     </script>
 </body>
