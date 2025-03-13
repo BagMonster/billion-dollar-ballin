@@ -29,8 +29,8 @@
         }
         #walletUI {
             position: absolute;
-            top: 1%; /* Fallback for desktop */
-            right: 1%; /* Fallback for desktop */
+            top: 20px; /* Fixed offset for desktop menu image */
+            right: 20px; /* Fixed offset for desktop menu image */
             text-align: center;
             color: white;
             font-family: 'font', sans-serif;
@@ -102,20 +102,20 @@
         /* Media query for mobile (e.g., screens < 768px) */
         @media only screen and (max-width: 767px) {
             #walletUI {
-                top: auto; /* Reset top */
-                bottom: 5%; /* Adjusted for better mobile layout */
-                right: auto; /* Reset right */
-                left: 2%; /* Move to left side on mobile */
+                top: auto;
+                bottom: 10%;
+                right: auto;
+                left: 2%;
             }
             #statusBox {
-                width: 150px; /* Match new mobile button width */
-                padding: 15px; /* Slightly less padding to fit smaller width */
-                font-size: 14px; /* Slightly smaller text for proportionality */
+                width: 180px;
+                padding: 15px;
+                font-size: 16px;
             }
             #connectWallet, #practiceButton, #practiceOkButton, #playButton, #practicePlayButton, #leaderboardButton {
-                width: 150px; /* Smaller than desktop (200px), but larger than current scaled size */
-                padding: 12px 24px; /* Proportional padding for smaller width */
-                font-size: 16px; /* Slightly smaller but readable */
+                width: 180px;
+                padding: 15px 30px;
+                font-size: 18px;
             }
         }
     </style>
