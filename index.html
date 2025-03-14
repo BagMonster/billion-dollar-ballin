@@ -440,20 +440,22 @@
             menuButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 sideMenu.classList.toggle('open');
+                console.log("Menu toggled:", sideMenu.classList.contains('open'));
             });
 
             document.addEventListener('click', (e) => {
                 if (!sideMenu.contains(e.target) && e.target !== menuButton) {
                     sideMenu.classList.remove('open');
+                    console.log("Clicked outside menu, closed menu.");
                 }
             });
 
-            // Wait reliably until Phaser canvas is loaded, then disable its pointer events
+            // Updated, robust canvas logic:
             const observer = new MutationObserver(() => {
-                const canvas = document.querySelector('#game canvas');
+                const canvas = document.querySelector('canvas');
                 if (canvas) {
                     canvas.style.pointerEvents = 'none';
-                    console.log("Phaser canvas pointer-events set to none.");
+                    console.log("Canvas found, pointer-events disabled.");
                     observer.disconnect();
                 }
             });
