@@ -26,9 +26,10 @@
         }
         #game {
             position: relative;
+            pointer-events: none; /* Let DOM elements receive clicks */
         }
-        #menuButton, #menuTextBox {
-            pointer-events: auto; /* Ensure menu button and text box are clickable */
+        #menuButton, #sideMenu {
+            pointer-events: auto; /* Ensure menu button is clickable */
         }
         #walletUI {
             position: absolute;
@@ -108,7 +109,7 @@
             left: 20px;
             width: 50px;
             height: 50px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.8); /* Matches statusBox */
             border: 2px solid gold;
             border-radius: 10px;
             cursor: pointer;
@@ -125,55 +126,34 @@
             margin: 3px 0;
             border-radius: 2px;
         }
-        #menuTextBox {
-            display: none;
+        #sideMenu {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: -250px; /* Hidden off-screen initially */
+            width: 250px;
+            height: 100%;
             background: rgba(0, 0, 0, 0.9);
-            border: 2px solid gold;
-            border-radius: 10px;
+            border-right: 2px solid gold;
+            z-index: 15;
+            transition: left 0.3s ease; /* Slide animation */
             padding: 20px;
-            z-index: 25;
-            color: white;
-            font-family: 'font', sans-serif;
-            text-align: center;
-            max-width: 80%;
             box-sizing: border-box;
         }
-        #menuTextBox .text-content {
-            line-height: 1.5;
+        #sideMenu.open {
+            left: 0; /* Slide in */
         }
-        #menuTextBox h3 {
-            margin: 0 0 15px 0;
-            font-size: 24px;
-        }
-        #menuTextBox a {
+        #sideMenu a {
             display: block;
             color: white;
+            font-family: 'font', sans-serif;
             font-size: 18px;
             text-decoration: none;
-            margin: 10px 0;
+            margin: 20px 0;
             text-shadow: 1px 1px 2px #000;
             transition: color 0.3s ease;
         }
-        #menuTextBox a:hover {
-            color: #3EDCD7;
-        }
-        #menuTextBox #closeTextBox {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: rgba(251, 37, 244, 0.8);
-            border: 2px solid #C0C0C0;
-            border-radius: 10px;
-            cursor: pointer;
-            font-family: 'font', sans-serif;
-            color: white;
-            font-size: 16px;
-        }
-        #menuTextBox #closeTextBox:hover {
-            background: rgba(251, 37, 244, 1);
+        #sideMenu a:hover {
+            color: #3EDCD7; /* Cyan on hover */
         }
         /* Media query for mobile (e.g., screens < 768px) */
         @media only screen and (max-width: 767px) {
@@ -204,16 +184,16 @@
                 height: 3px;
                 margin: 3px 0;
             }
-            #menuTextBox {
-                padding: 15px;
+            #sideMenu {
+                width: 200px;
+                left: -200px; /* Adjusted for smaller width */
             }
-            #menuTextBox a {
+            #sideMenu.open {
+                left: 0;
+            }
+            #sideMenu a {
                 font-size: 16px;
-                margin: 8px 0;
-            }
-            #menuTextBox #closeTextBox {
-                padding: 8px 15px;
-                font-size: 14px;
+                margin: 15px 0;
             }
         }
     </style>
@@ -228,14 +208,10 @@
         <div class="line"></div>
         <div class="line"></div>
     </div>
-    <div id="menuTextBox" style="display: none;">
-        <div class="text-content">
-            <h3>Menu</h3>
-            <a href="#" onclick="alert('Game Instructions coming soon!')">Game Instructions</a><br>
-            <a href="https://x.com/TrenchMonster_G" target="_blank">Follow on X</a><br>
-            <a href="https://discord.gg/example" target="_blank">Join our Discord</a><br>
-            <button id="closeTextBox">Close</button>
-        </div>
+    <div id="sideMenu">
+        <a href="#" onclick="alert('Game Instructions coming soon!')">Game Instructions</a>
+        <a href="https://x.com/TrenchMonster_G" target="_blank">Follow on X</a>
+        <a href="https://discord.gg/example" target="_blank">Join our Discord</a>
     </div>
     <div id="walletUI">
         <div id="statusBox">
@@ -272,11 +248,8 @@
         const highScoreDisplay = document.getElementById('highScore');
         const practiceMessage = document.getElementById('practiceMessage');
         const practiceOkButton = document.getElementById('practiceOkButton');
-        const menuButton = document.getElementById('menuButton');
-        const menuTextBox = document.getElementById('menuTextBox');
-        const closeTextBox = document.getElementById('closeTextBox');
 
-        console.log("Script loaded, checking buttons:", { connectButton, practiceButton, playButton, practicePlayButton, leaderboardButton, menuButton, menuTextBox, closeTextBox });
+        console.log("Script loaded, checking buttons:", { connectButton, practiceButton, playButton, practicePlayButton, leaderboardButton });
 
         leaderboardButton.style.opacity = '1';
         leaderboardButton.style.pointerEvents = 'auto';
@@ -287,9 +260,10 @@
                 try {
                     const response = await window.solana.connect();
                     walletPublicKey = response.publicKey.toString();
+                    // Removed walletStatus update since it's no longer in #statusBox
                     connectButton.style.display = 'none';
                     practiceButton.style.display = 'none';
-                    practicePlayButton.style.display = 'none';
+                    practicePlayButton.style.display = 'none'; // Hide practice play button in wallet mode
                     enablePlayButton();
                     console.log("Wallet connected, play button enabled");
                 } catch (err) {
@@ -353,63 +327,15 @@
             console.log("startLeaderboard event dispatched");
         });
 
-        // Menu Text Box Toggle Logic
-        const menuButton = document.getElementById('menuButton');
-        const menuTextBox = document.getElementById('menuTextBox');
-        const closeTextBox = document.getElementById('closeTextBox');
-        let isTextBoxOpen = false;
-
-        console.log("Checking menu elements on script load:", { menuButton, menuTextBox, closeTextBox });
-    
-        if (menuButton && menuTextBox && closeTextBox) {
-            setTimeout(() => {
-                menuButton.addEventListener('click', (e) => {
-                    console.log("Menu button clicked, toggling text box...");
-                    e.stopPropagation();
-                    isTextBoxOpen = !isTextBoxOpen;
-                    menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
-                    console.log("Text box toggled:", isTextBoxOpen ? "Open" : "Closed");
-                });
-
-                menuButton.addEventListener('pointerdown', (e) => {
-                    console.log("Menu button pointerdown detected, toggling text box...");
-                    e.stopPropagation();
-                    isTextBoxOpen = !isTextBoxOpen;
-                    menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
-                    console.log("Text box toggled (pointerdown):", isTextBoxOpen ? "Open" : "Closed");
-                });
-
-                closeTextBox.addEventListener('click', (e) => {
-                    console.log("Close button clicked, hiding text box...");
-                    e.stopPropagation();
-                    isTextBoxOpen = false;
-                    menuTextBox.style.display = 'none';
-                    console.log("Text box closed");
-                });
-
-                document.addEventListener('click', (e) => {
-                    if (e.target === menuButton || menuButton.contains(e.target)) {
-                        console.log("Delegated menu button click detected, toggling text box...");
-                        e.stopPropagation();
-                        isTextBoxOpen = !isTextBoxOpen;
-                        menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
-                        console.log("Text box toggled (delegated):", isTextBoxOpen ? "Open" : "Closed");
-                    }
-                });
-            }, 1000);
-        } else {
-            console.error("Menu elements not found on script load:", { menuButton, menuTextBox, closeTextBox });
-        }
-
         async function chargeFee() {
             console.log("Charging fee");
             const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
             const ownerPublicKey = new solanaWeb3.PublicKey('YOUR_OWNER_WALLET_PUBLIC_KEY');
             const potPublicKey = new solanaWeb3.PublicKey('YOUR_POT_WALLET_PUBLIC_KEY');
 
-            const totalFee = 0.01 * solanaWeb3.LAMPORTS_PER_SOL;
-            const ownerCut = 0.00075 * solanaWeb3.LAMPORTS_PER_SOL;
-            const potAmount = 0.00925 * solanaWeb3.LAMPORTS_PER_SOL;
+            const totalFee = 0.01 * solanaWeb3.LAMPORTS_PER_SOL; // 0.01 SOL
+            const ownerCut = 0.00075 * solanaWeb3.LAMPORTS_PER_SOL; // 7.5% of 0.01 SOL
+            const potAmount = 0.00925 * solanaWeb3.LAMPORTS_PER_SOL; // 92.5% of 0.01 SOL
 
             const ownerTx = new solanaWeb3.Transaction().add(
                 solanaWeb3.SystemProgram.transfer({
@@ -441,7 +367,7 @@
                 const potSignature = await connection.sendRawTransaction(signedPot.serialize());
                 await connection.confirmTransaction(potSignature);
 
-                pot += 0.00925;
+                pot += 0.00925; // Add to pot (92.5% of 0.01 SOL)
                 potDisplay.textContent = `🏆 Pot: ${pot.toFixed(5)} SOL`;
                 document.getElementById('walletUI').style.display = 'none';
                 alert('Fee paid! Game starting...');
@@ -452,64 +378,106 @@
             }
         }
 
+        // Placeholder for marketing wallet (to be replaced by GR1 with actual devnet address)
         const marketingPublicKey = new solanaWeb3.PublicKey('YOUR_MARKETING_WALLET_PUBLIC_KEY');
 
         setInterval(async () => {
             if (pot > 0) {
                 const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+
+                // Calculate marketing cut (2.5% of pot)
                 const marketingCut = pot * 0.025;
                 const potAfterMarketing = pot - marketingCut;
 
                 console.log(`Marketing cut: ${marketingCut.toFixed(5)} SOL (2.5% of pot)`);
 
+                // Create transaction for marketing cut (to be implemented by GR1 backend)
                 const marketingTx = new solanaWeb3.Transaction().add(
                     solanaWeb3.SystemProgram.transfer({
-                        fromPubkey: potPublicKey,
+                        fromPubkey: potPublicKey, // Assuming pot wallet sends marketing cut
                         toPubkey: marketingPublicKey,
-                        lamports: Math.floor(marketingCut * solanaWeb3.LAMPORTS_PER_SOL),
+                        lamports: Math.floor(marketingCut * solanaWeb3.LAMPORTS_PER_SOL), // Convert to lamports
                     })
                 );
 
+                // Simulate sending marketing cut (replace with backend logic)
                 try {
                     const { blockhash } = await connection.getLatestBlockhash();
                     marketingTx.recentBlockhash = blockhash;
-                    marketingTx.feePayer = potPublicKey;
+                    marketingTx.feePayer = potPublicKey; // Note: This needs backend signing
                     console.log("Marketing transaction prepared:", marketingTx);
+                    // Backend will need to sign and send this transaction
                 } catch (err) {
                     console.error("Marketing transaction setup failed:", err);
                 }
 
+                // Check if pot after marketing cut is greater than 2.5 SOL
                 if (potAfterMarketing > 2.5) {
+                    // Top 3 split: 70% to 1st, 20% to 2nd, 10% to 3rd
                     const firstPlace = potAfterMarketing * 0.7;
                     const secondPlace = potAfterMarketing * 0.2;
                     const thirdPlace = potAfterMarketing * 0.1;
                     console.log(`Payout (36 hours, pot > 2.5 SOL): 1st: ${firstPlace.toFixed(5)} SOL (70%), 2nd: ${secondPlace.toFixed(5)} SOL (20%), 3rd: ${thirdPlace.toFixed(5)} SOL (10%)`);
+                    // Backend will handle sending these payouts from potPublicKey
                 } else {
+                    // Single winner takes all after marketing cut
                     console.log(`Payout (36 hours): Winner: ${potAfterMarketing.toFixed(5)} SOL (100% after marketing cut)`);
+                    // Backend will handle sending this payout from potPublicKey
                 }
 
+                // Reset pot and high score
                 pot = 0;
                 dailyHighScore = 0;
                 potDisplay.textContent = `🏆 Pot: 0 SOL`;
                 highScoreDisplay.textContent = `🎯 Daily High: 0`;
             }
-        }, 36 * 60 * 60 * 1000);
-
-        console.log("Script loaded, setting up menu...");
-        if (window.menuWidth && !window.isMobileView) {
-            const offset = 20;
-            const walletUI = document.getElementById('walletUI');
-            walletUI.style.top = `${offset}px`;
-            walletUI.style.right = `${Math.min(offset, window.menuWidth - 220)}px`;
-            console.log("Adjusted walletUI to menu image corner:", offset, "Max right:", window.menuWidth - 220);
-        }
-
-        window.addEventListener('resize', () => {
+        }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
+        // menu button code here
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM fully loaded, setting up menu...");
             if (window.menuWidth && !window.isMobileView) {
                 const offset = 20;
                 const walletUI = document.getElementById('walletUI');
                 walletUI.style.top = `${offset}px`;
                 walletUI.style.right = `${Math.min(offset, window.menuWidth - 220)}px`;
+                console.log("Adjusted walletUI to menu image corner:", offset, "Max right:", window.menuWidth - 220);
+            }
+
+            // Menu Toggle Logic with Direct and Delegated Event
+            const menuButton = document.getElementById('menuButton');
+            const sideMenu = document.getElementById('sideMenu');
+            let isMenuOpen = false;
+
+            console.log("Checking menu elements on DOM load:", { menuButton, sideMenu });
+
+            if (menuButton && sideMenu) {
+                // Direct listener as primary
+                menuButton.addEventListener('click', (e) => {
+                    console.log("Direct button click detected, toggling menu...");
+                    isMenuOpen = !isMenuOpen;
+                    if (isMenuOpen) {
+                        sideMenu.classList.add('open');
+                    } else {
+                        sideMenu.classList.remove('open');
+                    }
+                    console.log("Menu toggled (direct):", isMenuOpen ? "Open" : "Closed");
+                });
+
+                // Delegated listener as fallback
+                document.addEventListener('click', (e) => {
+                    if (e.target === menuButton || menuButton.contains(e.target)) {
+                        console.log("Delegated button click detected, toggling menu...");
+                        isMenuOpen = !isMenuOpen;
+                        if (isMenuOpen) {
+                            sideMenu.classList.add('open');
+                        } else {
+                            sideMenu.classList.remove('open');
+                        }
+                        console.log("Menu toggled (delegated):", isMenuOpen ? "Open" : "Closed");
+                    }
+                });
+            } else {
+                console.error("Menu elements not found on DOM load:", { menuButton, sideMenu });
             }
         });
     </script>
