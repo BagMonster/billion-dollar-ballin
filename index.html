@@ -431,53 +431,24 @@
                 highScoreDisplay.textContent = `🎯 Daily High: 0`;
             }
         }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
-        // menu button code here
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM fully loaded, setting up menu...");
-            if (window.menuWidth && !window.isMobileView) {
-                const offset = 20;
-                const walletUI = document.getElementById('walletUI');
-                walletUI.style.top = `${offset}px`;
-                walletUI.style.right = `${Math.min(offset, window.menuWidth - 220)}px`;
-                console.log("Adjusted walletUI to menu image corner:", offset, "Max right:", window.menuWidth - 220);
-            }
-
-            // Menu Toggle Logic with Direct and Delegated Event
             const menuButton = document.getElementById('menuButton');
             const sideMenu = document.getElementById('sideMenu');
-            let isMenuOpen = false;
 
-            console.log("Checking menu elements on DOM load:", { menuButton, sideMenu });
+            menuButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sideMenu.classList.toggle('open');
+            });
 
-            if (menuButton && sideMenu) {
-                // Direct listener as primary
-                menuButton.addEventListener('click', (e) => {
-                    console.log("Direct button click detected, toggling menu...");
-                    isMenuOpen = !isMenuOpen;
-                    if (isMenuOpen) {
-                        sideMenu.classList.add('open');
-                    } else {
-                        sideMenu.classList.remove('open');
-                    }
-                    console.log("Menu toggled (direct):", isMenuOpen ? "Open" : "Closed");
-                });
+            document.addEventListener('click', (e) => {
+                if (!sideMenu.contains(e.target) && e.target !== menuButton) {
+                    sideMenu.classList.remove('open');
+                }
+            });
 
-                // Delegated listener as fallback
-                document.addEventListener('click', (e) => {
-                    if (e.target === menuButton || menuButton.contains(e.target)) {
-                        console.log("Delegated button click detected, toggling menu...");
-                        isMenuOpen = !isMenuOpen;
-                        if (isMenuOpen) {
-                            sideMenu.classList.add('open');
-                        } else {
-                            sideMenu.classList.remove('open');
-                        }
-                        console.log("Menu toggled (delegated):", isMenuOpen ? "Open" : "Closed");
-                    }
-                });
-            } else {
-                console.error("Menu elements not found on DOM load:", { menuButton, sideMenu });
-            }
+            // Prevent Phaser canvas from intercepting clicks
+            const canvas = document.querySelector('#game canvas');
+            if (canvas) canvas.style.pointerEvents = 'none';
         });
     </script>
 </body>
