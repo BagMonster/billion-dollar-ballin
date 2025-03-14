@@ -263,6 +263,14 @@
         const menuTextBox = document.getElementById('menuTextBox');
         const closeTextBox = document.getElementById('closeTextBox');
 
+        menuButton.addEventListener('click', () => {
+            menuTextBox.style.display = 'block';
+        });
+
+        closeTextBox.addEventListener('click', () => {
+            menuTextBox.style.display = 'none';
+        });
+
         const connectButton = document.getElementById('connectWallet');
         const practiceButton = document.getElementById('practiceButton');
         const practicePlayButton = document.getElementById('practicePlayButton');
