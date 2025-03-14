@@ -456,43 +456,61 @@
                 highScoreDisplay.textContent = `🎯 Daily High: 0`;
             }
         }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
-        // menu button code here
-        window.onload = () => {
-            console.log("Window fully loaded, setting up menu...");
+        // Immediate execution for menu button (like other buttons)
+        console.log("Script loaded, setting up menu...");
+        if (window.menuWidth && !window.isMobileView) {
+            const offset = 20;
+            const walletUI = document.getElementById('walletUI');
+            walletUI.style.top = `${offset}px`;
+            walletUI.style.right = `${Math.min(offset, window.menuWidth - 220)}px`;
+            console.log("Adjusted walletUI to menu image corner:", offset, "Max right:", window.menuWidth - 220);
+        }
+
+        // Menu Text Box Toggle Logic
+        const menuButton = document.getElementById('menuButton');
+        const menuTextBox = document.getElementById('menuTextBox');
+        const closeTextBox = document.getElementById('closeTextBox');
+        let isTextBoxOpen = false;
+
+        console.log("Checking menu elements on script load:", { menuButton, menuTextBox, closeTextBox });
+
+        if (menuButton && menuTextBox && closeTextBox) {
+            menuButton.addEventListener('click', (e) => {
+                console.log("Menu button clicked, toggling text box...");
+                isTextBoxOpen = !isTextBoxOpen;
+                menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
+                console.log("Text box toggled:", isTextBoxOpen ? "Open" : "Closed");
+            });
+
+            closeTextBox.addEventListener('click', (e) => {
+                console.log("Close button clicked, hiding text box...");
+                isTextBoxOpen = false;
+                menuTextBox.style.display = 'none';
+                console.log("Text box closed");
+            });
+
+            // Fallback delegated listener to debug Phaser interference
+            document.addEventListener('click', (e) => {
+                if (e.target === menuButton || menuButton.contains(e.target)) {
+                    console.log("Delegated menu button click detected, toggling text box...");
+                    isTextBoxOpen = !isTextBoxOpen;
+                    menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
+                    console.log("Text box toggled (delegated):", isTextBoxOpen ? "Open" : "Closed");
+                }
+            });
+        } else {
+            console.error("Menu elements not found on script load:", { menuButton, menuTextBox, closeTextBox });
+        }
+
+        // Keep existing resize listener
+        window.addEventListener('resize', () => {
             if (window.menuWidth && !window.isMobileView) {
                 const offset = 20;
                 const walletUI = document.getElementById('walletUI');
                 walletUI.style.top = `${offset}px`;
                 walletUI.style.right = `${Math.min(offset, window.menuWidth - 220)}px`;
-                console.log("Adjusted walletUI to menu image corner:", offset, "Max right:", window.menuWidth - 220);
             }
-
-            // Menu Text Box Toggle Logic
-            const menuButton = document.getElementById('menuButton');
-            const menuTextBox = document.getElementById('menuTextBox');
-            const closeTextBox = document.getElementById('closeTextBox');
-            let isTextBoxOpen = false;
-
-            console.log("Checking menu elements on window load:", { menuButton, menuTextBox, closeTextBox });
-
-            if (menuButton && menuTextBox && closeTextBox) {
-                menuButton.addEventListener('click', (e) => {
-                    console.log("Menu button clicked, toggling text box...");
-                    isTextBoxOpen = !isTextBoxOpen;
-                    menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
-                    console.log("Text box toggled:", isTextBoxOpen ? "Open" : "Closed");
-                });
-
-                closeTextBox.addEventListener('click', (e) => {
-                    console.log("Close button clicked, hiding text box...");
-                    isTextBoxOpen = false;
-                    menuTextBox.style.display = 'none';
-                    console.log("Text box closed");
-                });
-            } else {
-                console.error("Menu elements not found on window load:", { menuButton, menuTextBox, closeTextBox });
-            }
-        };
+        });
     </script>
 </body>
 </html>
