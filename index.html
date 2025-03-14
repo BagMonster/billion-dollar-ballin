@@ -29,6 +29,7 @@
         }
         #menuButton, #sideMenu {
             pointer-events: auto; /* Ensure menu button is clickable */
+            z-index: 9999;
         }
         #walletUI {
             position: absolute;
@@ -112,7 +113,7 @@
             border: 2px solid gold;
             border-radius: 10px;
             cursor: pointer;
-            z-index: 20;
+            z-index: 9999;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -133,7 +134,7 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.9);
             border-right: 2px solid gold;
-            z-index: 15;
+            z-index: 9999;
             transition: left 0.3s ease; /* Slide animation */
             padding: 20px;
             box-sizing: border-box;
@@ -154,17 +155,7 @@
         #sideMenu a:hover {
             color: #3EDCD7; /* Cyan on hover */
         }
-         #menuButton, 
-         #sideMenu,
-         #walletUI,
-         #practiceMessage {
-             pointer-events: auto !important;
-             z-index: 9999 !important; /* Ensure above Phaser canvas */
-         }
-
-         #game canvas {
-             pointer-events: none !important; 
-         }
+         
         /* Media query for mobile (e.g., screens < 768px) */
         @media only screen and (max-width: 767px) {
             #walletUI {
@@ -244,6 +235,9 @@
     <script src="https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js"></script>
     <script type="text/javascript" src="main.ab86658d639dc7e586ec.js"></script>
     <script>
+        console.log("Main script loaded.");
+
+        // Game state
         let walletPublicKey = null;
         let pot = 0;
         let dailyHighScore = 0;
@@ -254,12 +248,20 @@
         const practicePlayButton = document.getElementById('practicePlayButton');
         const leaderboardButton = document.getElementById('leaderboardButton');
         const walletStatus = document.getElementById('walletStatus');
+        
         const potDisplay = document.getElementById('pot');
         const highScoreDisplay = document.getElementById('highScore');
         const practiceMessage = document.getElementById('practiceMessage');
         const practiceOkButton = document.getElementById('practiceOkButton');
 
-        console.log("Script loaded, checking buttons:", { connectButton, practiceButton, playButton, practicePlayButton, leaderboardButton });
+        // Menu button references, EXACTLY like the others
+        const menuButton = document.getElementById('menuButton');
+        const sideMenu   = document.getElementById('sideMenu');
+
+        console.log("Button references:", {
+            connectButton, playButton, practiceButton, practicePlayButton,
+            leaderboardButton, menuButton, sideMenu
+        });
 
         leaderboardButton.style.opacity = '1';
         leaderboardButton.style.pointerEvents = 'auto';
@@ -270,7 +272,6 @@
                 try {
                     const response = await window.solana.connect();
                     walletPublicKey = response.publicKey.toString();
-                    // Removed walletStatus update since it's no longer in #statusBox
                     connectButton.style.display = 'none';
                     practiceButton.style.display = 'none';
                     practicePlayButton.style.display = 'none'; // Hide practice play button in wallet mode
@@ -335,6 +336,21 @@
             });
             window.dispatchEvent(new CustomEvent('startLeaderboard'));
             console.log("startLeaderboard event dispatched");
+        });
+
+        menuButton.addEventListener('click', (e) => {
+            console.log("Menu button clicked");
+            e.stopPropagation();
+            sideMenu.classList.toggle('open');
+            console.log("sideMenu open? =>", sideMenu.classList.contains('open'));
+        });
+
+        // Close sideMenu if user clicks outside
+        document.addEventListener('click', (e) => {
+            if (!sideMenu.contains(e.target) && e.target !== menuButton) {
+                sideMenu.classList.remove('open');
+                console.log("Clicked outside, sideMenu closed");
+            }
         });
 
         async function chargeFee() {
@@ -442,36 +458,6 @@
                 highScoreDisplay.textContent = `🎯 Daily High: 0`;
             }
         }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOMContentLoaded fully initialized.");
-
-            const menuButton = document.getElementById('menuButton');
-            const sideMenu = document.getElementById('sideMenu');
-
-            menuButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                sideMenu.classList.toggle('open');
-                console.log("Menu toggled:", sideMenu.classList.contains('open'));
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!sideMenu.contains(e.target) && e.target !== menuButton) {
-                    sideMenu.classList.remove('open');
-                    console.log("Menu closed (click outside).");
-                }
-            });
-
-            // Phaser canvas pointer-events handling
-            const observer = new MutationObserver(() => {
-                const canvas = document.querySelector('#game canvas');
-                if (canvas) {
-                    canvas.style.pointerEvents = 'none';
-                    console.log("Canvas pointer-events disabled.");
-                    observer.disconnect();
-                }
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
-        });
     </script>
 </body>
 </html>
