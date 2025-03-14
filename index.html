@@ -446,9 +446,15 @@
                 }
             });
 
-            // Prevent Phaser canvas from intercepting clicks
-            const canvas = document.querySelector('#game canvas');
-            if (canvas) canvas.style.pointerEvents = 'none';
+            // Improved logic to handle Phaser canvas dynamically
+            const intervalId = setInterval(() => {
+                const canvas = document.querySelector('#game canvas');
+                if (canvas) {
+                  canvas.style.pointerEvents = 'none';
+                  clearInterval(intervalId); // Stop checking once applied
+                  console.log("Pointer-events:none applied to Phaser canvas.");
+                }
+            }, 250); // checks every 250 milliseconds
         });
     </script>
 </body>
