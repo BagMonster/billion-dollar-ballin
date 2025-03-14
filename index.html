@@ -460,17 +460,6 @@
                     console.log("Clicked outside menu, closed menu.");
                 }
             });
-
-            // Updated, robust canvas logic:
-            const observer = new MutationObserver(() => {
-                const canvas = document.querySelector('canvas');
-                if (canvas) {
-                    canvas.style.pointerEvents = 'none';
-                    console.log("Canvas found, pointer-events disabled.");
-                    observer.disconnect();
-                }
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
         });
     </script>
 </body>
