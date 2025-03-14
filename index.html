@@ -258,117 +258,104 @@
     <script src="https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js"></script>
     <script type="text/javascript" src="main.ab86658d639dc7e586ec.js"></script>
     <script>
-        let walletPublicKey = null;
-        let pot = 0;
-        let dailyHighScore = 0;
-
-        const connectButton = document.getElementById('connectWallet');
-        const playButton = document.getElementById('playButton');
-        const practiceButton = document.getElementById('practiceButton');
-        const practicePlayButton = document.getElementById('practicePlayButton');
-        const leaderboardButton = document.getElementById('leaderboardButton');
-        const walletStatus = document.getElementById('walletStatus');
-        const potDisplay = document.getElementById('pot');
-        const highScoreDisplay = document.getElementById('highScore');
-        const practiceMessage = document.getElementById('practiceMessage');
-        const practiceOkButton = document.getElementById('practiceOkButton');
+    document.addEventListener('DOMContentLoaded', () => {
         const menuButton = document.getElementById('menuButton');
         const menuTextBox = document.getElementById('menuTextBox');
         const closeTextBox = document.getElementById('closeTextBox');
 
-        console.log("Script loaded, checking buttons:", { connectButton, practiceButton, playButton, practicePlayButton, leaderboardButton, menuButton, menuTextBox, closeTextBox });
+        const connectButton = document.getElementById('connectWallet');
+        const practiceButton = document.getElementById('practiceButton');
+        const practicePlayButton = document.getElementById('practicePlayButton');
+        const leaderboardButton = document.getElementById('leaderboardButton');
+        const playButton = document.getElementById('playButton');
+        const practiceOkButton = document.getElementById('practiceOkButton');
+        const practiceMessage = document.getElementById('practiceMessage');
+        const walletUI = document.getElementById('walletUI');
+
+        let walletPublicKey = null;
+
+        // Menu Text Box Toggle Logic
+        let isTextBoxOpen = false;
+
+        if (menuButton && menuTextBox && closeTextBox) {
+            menuButton.addEventListener('click', (e) => {
+                isTextBoxOpen = !isTextBoxOpen;
+                menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
+            });
+
+            closeTextBox.addEventListener('click', () => {
+                isTextBoxOpen = false;
+                menuTextBox.style.display = 'none';
+            });
+        }
 
         leaderboardButton.style.opacity = '1';
         leaderboardButton.style.pointerEvents = 'auto';
 
         connectButton.addEventListener('click', async () => {
-            console.log("Connect Wallet clicked");
             if (window.solana && window.solana.isPhantom) {
                 try {
                     const response = await window.solana.connect();
                     walletPublicKey = response.publicKey.toString();
-                    // Removed walletStatus update since it's no longer in #statusBox
                     connectButton.style.display = 'none';
                     practiceButton.style.display = 'none';
-                    practicePlayButton.style.display = 'none'; // Hide practice play button in wallet mode
+                    practicePlayButton.style.display = 'none';
                     enablePlayButton();
-                    console.log("Wallet connected, play button enabled");
                 } catch (err) {
                     console.error("Connection error:", err);
                 }
             } else {
-                console.log("Phantom Wallet not detected");
+                alert("Phantom Wallet not detected");
             }
         });
 
         practiceButton.addEventListener('click', () => {
-            console.log("Practice Offline clicked");
             document.getElementById('walletUI').style.display = 'none';
-            practiceMessage.style.display = 'block';
-            console.log("Practice mode started, waiting for OK");
+            document.getElementById('practiceMessage').style.display = 'block';
         });
 
         practiceOkButton.addEventListener('click', () => {
-            console.log("Practice Ok clicked");
-            practiceMessage.style.display = 'none';
+            document.getElementById('practiceMessage').style.display = 'none';
             document.getElementById('walletUI').style.display = 'block';
             enablePracticePlayButton();
-            console.log("Practice message closed, practice play button enabled");
         });
 
         function enablePlayButton() {
-            console.log("Enabling play button (tournament)");
             playButton.style.opacity = '1';
             playButton.style.pointerEvents = 'auto';
         }
 
         function enablePracticePlayButton() {
-            console.log("Enabling practice play button");
             practicePlayButton.style.opacity = '1';
             practicePlayButton.style.pointerEvents = 'auto';
         }
 
         playButton.addEventListener('click', async () => {
-            console.log("Play button (tournament) clicked");
             const wallet = walletPublicKey;
             if (wallet) {
                 await chargeFee();
             } else {
-                console.log("No wallet connected for tournament play");
                 alert("Please connect your wallet to play the tournament!");
             }
         });
 
         practicePlayButton.addEventListener('click', () => {
-            console.log("Practice play button clicked");
             document.getElementById('walletUI').style.display = 'none';
             window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: null } }));
-        });
+        });    
 
         leaderboardButton.addEventListener('click', () => {
-            console.log("Leaderboard button clicked, checking state:", {
-                opacity: leaderboardButton.style.opacity,
-                pointerEvents: leaderboardButton.style.pointerEvents
-            });
             window.dispatchEvent(new CustomEvent('startLeaderboard'));
-            console.log("startLeaderboard event dispatched");
         });
 
-        let isTextBoxOpen = false;
-        if (menuButton && menuTextBox && closeTextBox) {
-            menuButton.addEventListener('click', (e) => {
-                console.log("Menu button clicked, toggling text box...");
-                isTextBoxOpen = !isTextBoxOpen;
-                menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
-                console.log("Text box toggled:", isTextBoxOpen ? "Open" : "Closed");
-            });
+        // Menu button functionality fix
+        menuButton.addEventListener('click', () => {
+            menuTextBox.style.display = 'block';
+        });
 
-            closeTextBox.addEventListener('click', (e) => {
-                console.log("Close button clicked, hiding text box...");
-                isTextBoxOpen = false;
-                menuTextBox.style.display = 'none';
-                console.log("Text box closed");
-            });
+        closeTextBox.addEventListener('click', () => {
+            menuTextBox.style.display = 'none';
+        });
 
         async function chargeFee() {
             console.log("Charging fee");
