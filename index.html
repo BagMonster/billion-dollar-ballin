@@ -258,49 +258,31 @@
     <script src="https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js"></script>
     <script type="text/javascript" src="main.ab86658d639dc7e586ec.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
+        let walletPublicKey = null;
+        let pot = 0;
+        let dailyHighScore = 0;
+
+        const connectButton = document.getElementById('connectWallet');
+        const playButton = document.getElementById('playButton');
+        const practiceButton = document.getElementById('practiceButton');
+        const practicePlayButton = document.getElementById('practicePlayButton');
+        const leaderboardButton = document.getElementById('leaderboardButton');
+        const walletStatus = document.getElementById('walletStatus');
+        const potDisplay = document.getElementById('pot');
+        const highScoreDisplay = document.getElementById('highScore');
+        const practiceMessage = document.getElementById('practiceMessage');
+        const practiceOkButton = document.getElementById('practiceOkButton');
         const menuButton = document.getElementById('menuButton');
         const menuTextBox = document.getElementById('menuTextBox');
         const closeTextBox = document.getElementById('closeTextBox');
 
-        menuButton.addEventListener('click', () => {
-            menuTextBox.style.display = 'block';
-        });
-
-        closeTextBox.addEventListener('click', () => {
-            menuTextBox.style.display = 'none';
-        });
-
-        const connectButton = document.getElementById('connectWallet');
-        const practiceButton = document.getElementById('practiceButton');
-        const practicePlayButton = document.getElementById('practicePlayButton');
-        const leaderboardButton = document.getElementById('leaderboardButton');
-        const playButton = document.getElementById('playButton');
-        const practiceOkButton = document.getElementById('practiceOkButton');
-        const practiceMessage = document.getElementById('practiceMessage');
-        const walletUI = document.getElementById('walletUI');
-
-        let walletPublicKey = null;
-
-        // Menu Text Box Toggle Logic
-        let isTextBoxOpen = false;
-
-        if (menuButton && menuTextBox && closeTextBox) {
-            menuButton.addEventListener('click', (e) => {
-                isTextBoxOpen = !isTextBoxOpen;
-                menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
-            });
-
-            closeTextBox.addEventListener('click', () => {
-                isTextBoxOpen = false;
-                menuTextBox.style.display = 'none';
-            });
-        }
+        console.log("Script loaded, checking buttons:", { connectButton, practiceButton, playButton, practicePlayButton, leaderboardButton, menuButton, menuTextBox, closeTextBox });
 
         leaderboardButton.style.opacity = '1';
         leaderboardButton.style.pointerEvents = 'auto';
 
         connectButton.addEventListener('click', async () => {
+            console.log("Connect Wallet clicked");
             if (window.solana && window.solana.isPhantom) {
                 try {
                     const response = await window.solana.connect();
@@ -309,61 +291,115 @@
                     practiceButton.style.display = 'none';
                     practicePlayButton.style.display = 'none';
                     enablePlayButton();
+                    console.log("Wallet connected, play button enabled");
                 } catch (err) {
                     console.error("Connection error:", err);
                 }
             } else {
-                alert("Phantom Wallet not detected");
+                console.log("Phantom Wallet not detected");
             }
         });
 
         practiceButton.addEventListener('click', () => {
+            console.log("Practice Offline clicked");
             document.getElementById('walletUI').style.display = 'none';
-            document.getElementById('practiceMessage').style.display = 'block';
+            practiceMessage.style.display = 'block';
+            console.log("Practice mode started, waiting for OK");
         });
 
         practiceOkButton.addEventListener('click', () => {
-            document.getElementById('practiceMessage').style.display = 'none';
+            console.log("Practice Ok clicked");
+            practiceMessage.style.display = 'none';
             document.getElementById('walletUI').style.display = 'block';
             enablePracticePlayButton();
+            console.log("Practice message closed, practice play button enabled");
         });
 
         function enablePlayButton() {
+            console.log("Enabling play button (tournament)");
             playButton.style.opacity = '1';
             playButton.style.pointerEvents = 'auto';
         }
 
         function enablePracticePlayButton() {
+            console.log("Enabling practice play button");
             practicePlayButton.style.opacity = '1';
             practicePlayButton.style.pointerEvents = 'auto';
         }
 
         playButton.addEventListener('click', async () => {
+            console.log("Play button (tournament) clicked");
             const wallet = walletPublicKey;
             if (wallet) {
                 await chargeFee();
             } else {
+                console.log("No wallet connected for tournament play");
                 alert("Please connect your wallet to play the tournament!");
             }
         });
 
         practicePlayButton.addEventListener('click', () => {
+            console.log("Practice play button clicked");
             document.getElementById('walletUI').style.display = 'none';
             window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: null } }));
-        });    
+        });
 
         leaderboardButton.addEventListener('click', () => {
+            console.log("Leaderboard button clicked, checking state:", {
+                opacity: leaderboardButton.style.opacity,
+                pointerEvents: leaderboardButton.style.pointerEvents
+            });
             window.dispatchEvent(new CustomEvent('startLeaderboard'));
+            console.log("startLeaderboard event dispatched");
         });
 
-        // Menu button functionality fix
-        menuButton.addEventListener('click', () => {
-            menuTextBox.style.display = 'block';
-        });
+        // Menu Text Box Toggle Logic
+        const menuButton = document.getElementById('menuButton');
+        const menuTextBox = document.getElementById('menuTextBox');
+        const closeTextBox = document.getElementById('closeTextBox');
+        let isTextBoxOpen = false;
 
-        closeTextBox.addEventListener('click', () => {
-            menuTextBox.style.display = 'none';
-        });
+        console.log("Checking menu elements on script load:", { menuButton, menuTextBox, closeTextBox });
+    
+        if (menuButton && menuTextBox && closeTextBox) {
+            setTimeout(() => {
+                menuButton.addEventListener('click', (e) => {
+                    console.log("Menu button clicked, toggling text box...");
+                    e.stopPropagation();
+                    isTextBoxOpen = !isTextBoxOpen;
+                    menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
+                    console.log("Text box toggled:", isTextBoxOpen ? "Open" : "Closed");
+                });
+
+                menuButton.addEventListener('pointerdown', (e) => {
+                    console.log("Menu button pointerdown detected, toggling text box...");
+                    e.stopPropagation();
+                    isTextBoxOpen = !isTextBoxOpen;
+                    menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
+                    console.log("Text box toggled (pointerdown):", isTextBoxOpen ? "Open" : "Closed");
+                });
+
+                closeTextBox.addEventListener('click', (e) => {
+                    console.log("Close button clicked, hiding text box...");
+                    e.stopPropagation();
+                    isTextBoxOpen = false;
+                    menuTextBox.style.display = 'none';
+                    console.log("Text box closed");
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (e.target === menuButton || menuButton.contains(e.target)) {
+                        console.log("Delegated menu button click detected, toggling text box...");
+                        e.stopPropagation();
+                        isTextBoxOpen = !isTextBoxOpen;
+                        menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
+                        console.log("Text box toggled (delegated):", isTextBoxOpen ? "Open" : "Closed");
+                    }
+                });
+            }, 1000);
+        } else {
+            console.error("Menu elements not found on script load:", { menuButton, menuTextBox, closeTextBox });
+        }
 
         async function chargeFee() {
             console.log("Charging fee");
@@ -371,9 +407,9 @@
             const ownerPublicKey = new solanaWeb3.PublicKey('YOUR_OWNER_WALLET_PUBLIC_KEY');
             const potPublicKey = new solanaWeb3.PublicKey('YOUR_POT_WALLET_PUBLIC_KEY');
 
-            const totalFee = 0.01 * solanaWeb3.LAMPORTS_PER_SOL; // 0.01 SOL
-            const ownerCut = 0.00075 * solanaWeb3.LAMPORTS_PER_SOL; // 7.5% of 0.01 SOL
-            const potAmount = 0.00925 * solanaWeb3.LAMPORTS_PER_SOL; // 92.5% of 0.01 SOL
+            const totalFee = 0.01 * solanaWeb3.LAMPORTS_PER_SOL;
+            const ownerCut = 0.00075 * solanaWeb3.LAMPORTS_PER_SOL;
+            const potAmount = 0.00925 * solanaWeb3.LAMPORTS_PER_SOL;
 
             const ownerTx = new solanaWeb3.Transaction().add(
                 solanaWeb3.SystemProgram.transfer({
@@ -405,7 +441,7 @@
                 const potSignature = await connection.sendRawTransaction(signedPot.serialize());
                 await connection.confirmTransaction(potSignature);
 
-                pot += 0.00925; // Add to pot (92.5% of 0.01 SOL)
+                pot += 0.00925;
                 potDisplay.textContent = `🏆 Pot: ${pot.toFixed(5)} SOL`;
                 document.getElementById('walletUI').style.display = 'none';
                 alert('Fee paid! Game starting...');
@@ -416,61 +452,49 @@
             }
         }
 
-        // Placeholder for marketing wallet (to be replaced by GR1 with actual devnet address)
         const marketingPublicKey = new solanaWeb3.PublicKey('YOUR_MARKETING_WALLET_PUBLIC_KEY');
 
         setInterval(async () => {
             if (pot > 0) {
                 const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
-
-                // Calculate marketing cut (2.5% of pot)
                 const marketingCut = pot * 0.025;
                 const potAfterMarketing = pot - marketingCut;
 
                 console.log(`Marketing cut: ${marketingCut.toFixed(5)} SOL (2.5% of pot)`);
 
-                // Create transaction for marketing cut (to be implemented by GR1 backend)
                 const marketingTx = new solanaWeb3.Transaction().add(
                     solanaWeb3.SystemProgram.transfer({
-                        fromPubkey: potPublicKey, // Assuming pot wallet sends marketing cut
+                        fromPubkey: potPublicKey,
                         toPubkey: marketingPublicKey,
-                        lamports: Math.floor(marketingCut * solanaWeb3.LAMPORTS_PER_SOL), // Convert to lamports
+                        lamports: Math.floor(marketingCut * solanaWeb3.LAMPORTS_PER_SOL),
                     })
                 );
 
-                // Simulate sending marketing cut (replace with backend logic)
                 try {
                     const { blockhash } = await connection.getLatestBlockhash();
                     marketingTx.recentBlockhash = blockhash;
-                    marketingTx.feePayer = potPublicKey; // Note: This needs backend signing
+                    marketingTx.feePayer = potPublicKey;
                     console.log("Marketing transaction prepared:", marketingTx);
-                    // Backend will need to sign and send this transaction
                 } catch (err) {
                     console.error("Marketing transaction setup failed:", err);
                 }
 
-                // Check if pot after marketing cut is greater than 2.5 SOL
                 if (potAfterMarketing > 2.5) {
-                    // Top 3 split: 70% to 1st, 20% to 2nd, 10% to 3rd
                     const firstPlace = potAfterMarketing * 0.7;
                     const secondPlace = potAfterMarketing * 0.2;
                     const thirdPlace = potAfterMarketing * 0.1;
                     console.log(`Payout (36 hours, pot > 2.5 SOL): 1st: ${firstPlace.toFixed(5)} SOL (70%), 2nd: ${secondPlace.toFixed(5)} SOL (20%), 3rd: ${thirdPlace.toFixed(5)} SOL (10%)`);
-                    // Backend will handle sending these payouts from potPublicKey
                 } else {
-                    // Single winner takes all after marketing cut
                     console.log(`Payout (36 hours): Winner: ${potAfterMarketing.toFixed(5)} SOL (100% after marketing cut)`);
-                    // Backend will handle sending this payout from potPublicKey
                 }
 
-                // Reset pot and high score
                 pot = 0;
                 dailyHighScore = 0;
                 potDisplay.textContent = `🏆 Pot: 0 SOL`;
                 highScoreDisplay.textContent = `🎯 Daily High: 0`;
             }
-        }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
-        // Immediate execution for menu button (like other buttons)
+        }, 36 * 60 * 60 * 1000);
+
         console.log("Script loaded, setting up menu...");
         if (window.menuWidth && !window.isMobileView) {
             const offset = 20;
@@ -480,43 +504,6 @@
             console.log("Adjusted walletUI to menu image corner:", offset, "Max right:", window.menuWidth - 220);
         }
 
-        // Menu Text Box Toggle Logic
-        const menuButton = document.getElementById('menuButton');
-        const menuTextBox = document.getElementById('menuTextBox');
-        const closeTextBox = document.getElementById('closeTextBox');
-        let isTextBoxOpen = false;
-
-        console.log("Checking menu elements on script load:", { menuButton, menuTextBox, closeTextBox });
-
-        if (menuButton && menuTextBox && closeTextBox) {
-            menuButton.addEventListener('click', (e) => {
-                console.log("Menu button clicked, toggling text box...");
-                isTextBoxOpen = !isTextBoxOpen;
-                menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
-                console.log("Text box toggled:", isTextBoxOpen ? "Open" : "Closed");
-            });
-
-            closeTextBox.addEventListener('click', (e) => {
-                console.log("Close button clicked, hiding text box...");
-                isTextBoxOpen = false;
-                menuTextBox.style.display = 'none';
-                console.log("Text box closed");
-            });
-
-            // Fallback delegated listener to debug Phaser interference
-            document.addEventListener('click', (e) => {
-                if (e.target === menuButton || menuButton.contains(e.target)) {
-                    console.log("Delegated menu button click detected, toggling text box...");
-                    isTextBoxOpen = !isTextBoxOpen;
-                    menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
-                    console.log("Text box toggled (delegated):", isTextBoxOpen ? "Open" : "Closed");
-                }
-            });
-        } else {
-            console.error("Menu elements not found on script load:", { menuButton, menuTextBox, closeTextBox });
-        }
-
-        // Keep existing resize listener
         window.addEventListener('resize', () => {
             if (window.menuWidth && !window.isMobileView) {
                 const offset = 20;
