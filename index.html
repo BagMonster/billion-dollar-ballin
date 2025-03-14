@@ -154,6 +154,17 @@
         #sideMenu a:hover {
             color: #3EDCD7; /* Cyan on hover */
         }
+         #menuButton, 
+         #sideMenu,
+         #walletUI,
+         #practiceMessage {
+             pointer-events: auto !important;
+             z-index: 9999 !important; /* Ensure above Phaser canvas */
+         }
+
+         #game canvas {
+             pointer-events: auto !important; /* Keep canvas interactions intact */
+         }
         /* Media query for mobile (e.g., screens < 768px) */
         @media only screen and (max-width: 767px) {
             #walletUI {
