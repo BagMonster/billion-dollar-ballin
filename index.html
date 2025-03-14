@@ -272,8 +272,11 @@
         const highScoreDisplay = document.getElementById('highScore');
         const practiceMessage = document.getElementById('practiceMessage');
         const practiceOkButton = document.getElementById('practiceOkButton');
+        const menuButton = document.getElementById('menuButton');
+        const menuTextBox = document.getElementById('menuTextBox');
+        const closeTextBox = document.getElementById('closeTextBox');
 
-        console.log("Script loaded, checking buttons:", { connectButton, practiceButton, playButton, practicePlayButton, leaderboardButton });
+        console.log("Script loaded, checking buttons:", { connectButton, practiceButton, playButton, practicePlayButton, leaderboardButton, menuButton, menuTextBox, closeTextBox });
 
         leaderboardButton.style.opacity = '1';
         leaderboardButton.style.pointerEvents = 'auto';
@@ -350,6 +353,22 @@
             window.dispatchEvent(new CustomEvent('startLeaderboard'));
             console.log("startLeaderboard event dispatched");
         });
+
+        let isTextBoxOpen = false;
+        if (menuButton && menuTextBox && closeTextBox) {
+            menuButton.addEventListener('click', (e) => {
+                console.log("Menu button clicked, toggling text box...");
+                isTextBoxOpen = !isTextBoxOpen;
+                menuTextBox.style.display = isTextBoxOpen ? 'block' : 'none';
+                console.log("Text box toggled:", isTextBoxOpen ? "Open" : "Closed");
+            });
+
+            closeTextBox.addEventListener('click', (e) => {
+                console.log("Close button clicked, hiding text box...");
+                isTextBoxOpen = false;
+                menuTextBox.style.display = 'none';
+                console.log("Text box closed");
+            });
 
         async function chargeFee() {
             console.log("Charging fee");
