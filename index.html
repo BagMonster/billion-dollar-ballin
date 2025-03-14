@@ -432,32 +432,32 @@
             }
         }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
         // menu button stuff
+        // Menu toggle logic with guaranteed Phaser canvas fix:
         document.addEventListener('DOMContentLoaded', () => {
             const menuButton = document.getElementById('menuButton');
             const sideMenu = document.getElementById('sideMenu');
 
-            // Toggle side menu visibility on menuButton click
             menuButton.addEventListener('click', (e) => {
-                e.stopPropagation(); // prevent event bubbling
+                e.stopPropagation();
                 sideMenu.classList.toggle('open');
             });
 
-            // Hide sideMenu if clicked outside of it
             document.addEventListener('click', (e) => {
                 if (!sideMenu.contains(e.target) && e.target !== menuButton) {
                     sideMenu.classList.remove('open');
                 }
             });
 
-            // Dynamically check for Phaser canvas presence just once, then stop
-            const canvasCheckInterval = setInterval(() => {
+            // Wait reliably until Phaser canvas is loaded, then disable its pointer events
+            const observer = new MutationObserver(() => {
                 const canvas = document.querySelector('#game canvas');
                 if (canvas) {
                     canvas.style.pointerEvents = 'none';
-                    clearInterval(canvasCheckInterval); // stop interval after applying
-                    console.log('Phaser canvas pointer-events disabled successfully.');
+                    console.log("Phaser canvas pointer-events set to none.");
+                    observer.disconnect();
                 }
-            }, 250);
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
         });
     </script>
 </body>
