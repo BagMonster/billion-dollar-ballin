@@ -163,7 +163,7 @@
          }
 
          #game canvas {
-             pointer-events: auto !important; /* Keep canvas interactions intact */
+             pointer-events: none !important; 
          }
         /* Media query for mobile (e.g., screens < 768px) */
         @media only screen and (max-width: 767px) {
@@ -442,9 +442,9 @@
                 highScoreDisplay.textContent = `🎯 Daily High: 0`;
             }
         }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
-        // menu button stuff
-        // Menu toggle logic with guaranteed Phaser canvas fix:
         document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOMContentLoaded fully initialized.");
+
             const menuButton = document.getElementById('menuButton');
             const sideMenu = document.getElementById('sideMenu');
 
@@ -457,9 +457,20 @@
             document.addEventListener('click', (e) => {
                 if (!sideMenu.contains(e.target) && e.target !== menuButton) {
                     sideMenu.classList.remove('open');
-                    console.log("Clicked outside menu, closed menu.");
+                    console.log("Menu closed (click outside).");
                 }
             });
+
+            // Phaser canvas pointer-events handling
+            const observer = new MutationObserver(() => {
+                const canvas = document.querySelector('#game canvas');
+                if (canvas) {
+                    canvas.style.pointerEvents = 'none';
+                    console.log("Canvas pointer-events disabled.");
+                    observer.disconnect();
+                }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
         });
     </script>
 </body>
