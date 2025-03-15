@@ -13,12 +13,7 @@
         body {
             background-color: #08233e;
         }
-        @font-face {
-            font-family: 'font';
-            src: url('./assets/font/square-deal.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
-        }
+
         .fontload {
             visibility: hidden;
             position: absolute;
@@ -37,7 +32,7 @@
             right: 20px; /* Fixed offset for desktop menu image */
             text-align: center;
             color: white;
-            font-family: 'font', sans-serif;
+            font-family: 'Original Surfer', sans-serif;
             z-index: 10;
         }
         #connectWallet, #practiceButton, #practiceOkButton, #playButton, #practicePlayButton, #leaderboardButton {
@@ -48,7 +43,7 @@
             border-radius: 10px;
             cursor: pointer;
             font-size: 17px; /* Adjusted: between 16px and 18px */
-            font-family: 'font', sans-serif;
+            font-family: 'Original Surfer', sans-serif;
             color: white;
             text-shadow: 2px 2px 3px #000;
             display: block;
@@ -75,7 +70,7 @@
             border: 2px solid gold; /* Gold outline */
             text-align: left;
             color: white;
-            font-family: 'font', sans-serif;
+            font-family: 'Original Surfer', sans-serif;
             font-size: 16px;
             margin-bottom: 10px; /* Space between status box and buttons */
             display: inline-block; /* Ensures it fits content width */
@@ -94,7 +89,7 @@
             border-radius: 10px;
             text-align: center;
             color: white;
-            font-family: 'font', sans-serif;
+            font-family: 'Original Surfer', sans-serif;
             font-size: 20px;
             line-height: 1.5;
             z-index: 15; /* Above Phaser canvas and wallet UI */
@@ -146,7 +141,7 @@
         }
         #sideMenu h3 {
             color: gold;
-            font-family: 'font', sans-serif;
+            font-family: 'Original Surfer', sans-serif;
             font-size: 24px;
             margin: 0 0 30px 0; /* Space below header */
             text-align: center;
@@ -179,7 +174,7 @@
 
         #instructionsModal h4 {
             color: #3EDCD7; /* Cyan for consistency */
-            font-family: 'font', sans-serif;
+            font-family: 'Original Surfer', sans-serif;
             font-size: 18px;
             margin: 15px 0 5px 0;
             text-shadow: 1px 1px 2px #000;
@@ -187,7 +182,7 @@
 
         #instructionsModal p {
             color: white;
-            font-family: 'font', sans-serif;
+            font-family: 'Original Surfer', sans-serif;
             font-size: 14px;
             line-height: 1.5;
             margin: 0 0 10px 0;
@@ -209,7 +204,7 @@
             border: 2px solid #C0C0C0;
             border-radius: 10px;
             cursor: pointer;
-            font-family: 'font', sans-serif;
+            font-family: 'Original Surfer', sans-serif;
             color: white;
             font-size: 16px;
             text-shadow: 1px 1px 2px #000;
@@ -225,7 +220,7 @@
         #sideMenu a {
             display: block;
             color: white;
-            font-family: 'font', sans-serif;
+            font-family: 'Original Surfer', sans-serif;
             font-size: 16px; /* Reduced from 18px for better fit */
             text-decoration: none;
             margin: 15px 0; /* Reduced from 20px for tighter spacing */
@@ -247,7 +242,7 @@
             border: 2px solid #C0C0C0;
             border-radius: 10px;
             cursor: pointer;
-            font-family: 'font', sans-serif;
+            font-family: 'Original Surfer', sans-serif;
             color: white;
             font-size: 16px;
             text-shadow: 1px 1px 2px #000;    
@@ -350,9 +345,9 @@
     </style>
     <script src="https://unpkg.com/@solana/web3.js@1.98.0/lib/min/index.iife.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Original+Surfer&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="fontload" style="font-family: 'font';">.</div>
     <div id="game"></div>
     <div id="menuButton">
         <div class="line"></div>
