@@ -152,6 +152,76 @@
             text-align: center;
             text-shadow: 1px 1px 2px #000;
         }
+        #instructionsModal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8); /* Semi-transparent overlay */
+            z-index: 10000; /* Above #sideMenu (9999) */
+            justify-content: center;
+            align-items: center;
+        }
+
+        #instructionsModal #modalContent {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(20, 20, 20, 0.95)); /* Matches #sideMenu */
+            border: 2px solid gold;
+            border-radius: 15px;
+            padding: 20px;
+            width: 400px; /* Fixed width for readability */
+            max-height: 80vh; /* Prevents overflow on large screens */
+            overflow-y: auto; /* Scroll if content exceeds height */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        #instructionsModal h4 {
+            color: #3EDCD7; /* Cyan for consistency */
+            font-family: 'font', sans-serif;
+            font-size: 18px;
+            margin: 15px 0 5px 0;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        #instructionsModal p {
+            color: white;
+            font-family: 'font', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0 0 10px 0;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        #instructionsModal p.summary {
+            color: gold; /* Matches menu header */
+            font-size: 14px;
+            font-style: italic;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        #instructionsModal #closeModal {
+            margin: 20px auto 0;
+            padding: 10px 20px;
+            background: rgba(251, 37, 244, 0.8); /* Matches wallet buttons */
+            border: 2px solid #C0C0C0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'font', sans-serif;
+            color: white;
+            font-size: 16px;
+            text-shadow: 1px 1px 2px #000;
+            display: block;
+            width: 120px;
+            text-align: center;
+            transition: background 0.3s ease;
+        }
+
+        #instructionsModal #closeModal:hover {
+            background: rgba(251, 37, 244, 1);
+        }
         #sideMenu a {
             display: block;
             color: white;
@@ -234,6 +304,35 @@
                 font-size: 20px; /* Reduced for mobile */
                 margin-bottom: 20px;
             }
+            #instructionsModal #modalContent {
+                width: 90%; /* Full width minus margins */
+                padding: 15px;
+                max-height: 85vh;
+                border-radius: 10px;
+            }
+
+            #instructionsModal h4 {
+                font-size: 16px;
+                margin: 10px 0 5px 0;
+            }
+
+            #instructionsModal p {
+                font-size: 12px;
+                line-height: 1.4;
+                margin-bottom: 8px;
+            }
+
+            #instructionsModal p.summary {
+                font-size: 12px;
+                margin-top: 10px;
+            }
+
+            #instructionsModal #closeModal {
+                margin: 15px auto 0;
+                padding: 8px 15px;
+                font-size: 14px;
+                width: 100px;
+            }
 
             #sideMenu a {
                 font-size: 14px; /* Reduced from 16px */
@@ -262,14 +361,14 @@
     </div>
     <div id="sideMenu">
         <h3>Menu</h3>
-        <a href="#" onclick="alert('Game Instructions coming soon!')">Game Instructions</a>
+        <a href="#" id="showInstructions">Game Instructions</a>
         <a href="https://x.com/TrenchMonster_G" target="_blank">Follow on X</a>
         <a href="#" onclick="alert('Discord Server coming soon!')">Join our Discord</a>
         <button id="closeMenu">Close</button>
     </div>
     <div id="walletUI">
         <div id="statusBox">
-            <div id="pot">🏆 Pot: 0 SOL</div>
+            <div id="pot">🏆 WIN: 0 SOL</div>
             <div id="highScore">🎯 High Score: 0</div>
         </div>
         <button id="connectWallet">Connect Wallet</button>
@@ -283,6 +382,27 @@
         Tap the ‘PLAY’ button to sharpen your skills<br>
         before entering the SOL tournament.<br>
         <button id="practiceOkButton">Ok</button>
+    </div>
+    <div id="instructionsModal" style="display: none;">
+        <div id="modalContent">
+            <h4>1. Load Up & Choose Mode</h4>
+            <p>Practice Offline if you just wanna perfect your moves, no wallet needed.<br>Connect Wallet if you’re ready for the real stage—entry fees, big rewards, the whole show.</p>
+        
+            <h4>2. Aim & Release</h4>
+            <p>Click or tap that ball, pull back for power like you’re droppin’ a legendary verse, then let it fly toward the hoop.</p>
+        
+            <h4>3. Scoreboard Hype</h4>
+            <p>Every made basket pumps up your score—rack it up like you’re collectin’ trophies.</p>
+        
+            <h4>4. Beat the Timer</h4>
+            <p>A countdown’s on—once it hits zero, your final score’s locked in. Don’t waste a second; greatness doesn’t wait.</p>
+        
+            <h4>5. Check the Leaderboard</h4>
+            <p>See your rank, challenge the best, or hop right back into the action to climb even higher.</p>
+        
+            <p class="summary">That’s Billion Dollar Ballin’—bold shots, big wins, no excuses. Bring your A-game!</p>
+            <button id="closeModal">Close</button>
+        </div>
     </div>
     <script type="text/javascript" src="vendors~main.ab86658d639dc7e586ec.js"></script>
     <script src="https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js"></script>
@@ -421,6 +541,38 @@
             sideMenu.classList.remove('open');
             console.log("Close button clicked => sideMenu closed");
         });
+        
+        // instructionsModal listeners
+        const showInstructions = document.getElementById('showInstructions');
+        const instructionsModal = document.getElementById('instructionsModal');
+        const closeModal = document.getElementById('closeModal');
+
+        showInstructions.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            instructionsModal.style.display = 'block';
+            console.log("Game Instructions link clicked => Modal opened");
+        });
+
+        closeModal.addEventListener('click', (e) => {
+            e.stopPropagation();
+            instructionsModal.style.display = 'none';
+            console.log("Close Modal button clicked => Modal closed");
+        });
+
+        // Close modal if clicking outside
+        document.addEventListener('click', (e) => {
+            if (instructionsModal.style.display === 'block' && !instructionsModal.contains(e.target) && e.target !== showInstructions) {
+                instructionsModal.style.display = 'none';
+                console.log("Outside click => Modal closed");
+            }
+        });
+        document.addEventListener('touchend', (e) => {
+            if (instructionsModal.style.display === 'block' && !instructionsModal.contains(e.target) && e.target !== showInstructions) {
+                instructionsModal.style.display = 'none';
+                console.log("Outside tap => Modal closed");
+            }
+        });
 
         async function chargeFee() {
             console.log("Charging fee");
@@ -529,4 +681,6 @@
         }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
     </script>
 </body>
-</html>
+</html> 
+
+
