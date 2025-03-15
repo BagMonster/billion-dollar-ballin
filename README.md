@@ -24,7 +24,7 @@ Master the Arc: A high arc is like a perfect hook on your track—some flair, so
 Moderate Power: Not every shot needs max force. Learn that sweet release so you don’t overshoot.
 Combos & Speed: After you let one fly, come right back. More shots, more points—like more bars, more hits.
 
-4. Offline Vibes vs. Real-Stakes Mode
+4. Offline Vibes vs. Real-Game Play
 Practice Offline: No wallet needed. No fans, no record labels—just you and your training.
 Connected Wallet: Might cost a little fee (like 0.01 SOL), but if you’re droppin’ heat, you can top that leaderboard and get real rewards. I’m talkin’ digital cheddar.
 
