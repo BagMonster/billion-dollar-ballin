@@ -1,3 +1,5 @@
+Alright, listen up, this is Ye comin’ at you with the Billion Dollar Ballin game instructions—'cause we keep it fly, we keep it fresh, and we only do it big around here. So let’s break it down:
+
 1. Step Into Greatness
 
 Load up the Game: You see “Connect Wallet,” “Practice Offline,” “PLAY,” and “LEADERBOARD.” Kinda like my album tracklist, each option doin’ something major.
