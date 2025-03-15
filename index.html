@@ -346,12 +346,16 @@
         });
 
         // Close sideMenu if user clicks outside
-        document.addEventListener('click', (e) => {
-            if (!sideMenu.contains(e.target) && e.target !== menuButton) {
-                sideMenu.classList.remove('open');
-                console.log("Clicked outside, sideMenu closed");
-            }
-        });
+        function closeMenuIfOutside(e) {
+          if (!sideMenu.contains(e.target) && e.target !== menuButton) {
+            sideMenu.classList.remove('open');
+            console.log("Outside click/tap => sideMenu closed");
+          }
+        }
+
+        // Add BOTH event listeners
+        document.addEventListener('click', closeMenuIfOutside);
+        document.addEventListener('touchend', closeMenuIfOutside);
 
         async function chargeFee() {
             console.log("Charging fee");
