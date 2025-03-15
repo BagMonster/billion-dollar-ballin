@@ -41,20 +41,20 @@
             z-index: 10;
         }
         #connectWallet, #practiceButton, #practiceOkButton, #playButton, #practicePlayButton, #leaderboardButton {
-            padding: 15px 30px;
-            margin: 10px;
+            padding: 14px 25px; /* Adjusted: between 12px 20px and 15px 30px */
+            margin: 8px; /* Kept from last proposal for tighter spacing */
             background: linear-gradient(to right, rgba(251, 37, 244, 0.8), rgba(62, 220, 215, 0.8));
             border: 2px solid #C0C0C0;
             border-radius: 10px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 17px; /* Adjusted: between 16px and 18px */
             font-family: 'font', sans-serif;
             color: white;
             text-shadow: 2px 2px 3px #000;
             display: block;
-            width: 200px;
+            width: 190px; /* Adjusted: between 180px and 200px */
             box-sizing: border-box;
-            transition: border 0.3s ease; /* Smooth transition for border change */
+            transition: border 0.3s ease;
         }
         #playButton, #practicePlayButton {
             opacity: 0.4; /* Greyed out initially */
@@ -107,11 +107,11 @@
             position: fixed;
             top: 20px;
             left: 20px;
-            width: 50px;
-            height: 50px;
-            background: rgba(0, 0, 0, 0.8); /* Matches statusBox */
+            width: 45px; /* Adjusted: between 40px and 50px */
+            height: 45px; /* Adjusted: between 40px and 50px */        
+            background: rgba(0, 0, 0, 0.8);
             border: 2px solid gold;
-            border-radius: 10px;
+            border-radius: 9px; /* Adjusted from 8px to match new size */
             cursor: pointer;
             z-index: 9999;
             display: flex;
@@ -119,11 +119,12 @@
             justify-content: center;
             align-items: center;
         }
+
         #menuButton .line {
-            width: 30px;
-            height: 4px;
+            width: 27px; /* Adjusted: between 24px and 30px */
+            height: 3.5px; /* Adjusted: between 3px and 4px */
             background-color: white;
-            margin: 3px 0;
+            margin: 2px 0; /* Kept for consistent spacing */
             border-radius: 2px;
         }
         #sideMenu {
@@ -170,20 +171,22 @@
                 font-size: 24px;
             }
             #connectWallet, #practiceButton, #practiceOkButton, #playButton, #practicePlayButton, #leaderboardButton {
-                width: 190px;
-                padding: 15px 30px;
-                font-size: 20px;
+                width: 180px;
+                padding: 14px 25px;
+                font-size: 19px;
+                margin: 8px;
             }
             #menuButton {
-                width: 45px;
-                height: 45px;
+                width: 40px;
+                height: 40px;
                 top: 15px;
                 left: 15px;
+                border-radius: 7px; /* Adjusted from 6px to match new size */
             }
             #menuButton .line {
-                width: 28px;
-                height: 3px;
-                margin: 3px 0;
+                width: 24px;
+                height: 2.5px;
+                margin: 2px 0;
             }
             #sideMenu {
                 width: 200px;
