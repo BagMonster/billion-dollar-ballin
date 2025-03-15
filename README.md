@@ -1,4 +1,5 @@
 1. Step Into Greatness
+
 Load up the Game: You see “Connect Wallet,” “Practice Offline,” “PLAY,” and “LEADERBOARD.” Kinda like my album tracklist, each option doin’ something major.
 Choose Your Path and PLAY THE GAME:
 
@@ -8,6 +9,7 @@ Practice Offline if you just wanna perfect your shot. No wallet, no pressure—j
 Connect Wallet if you’re ready to roll with the real players. I’m talkin’ about glory, top scores, maybe even that pot of gold.
 
 2. Get That Shot Right
+
 Aim & Release
 
 On desktop, hold that mouse button like you’re holdin’ the mic—then pull back and let it go. On mobile, you tap and drag that ball. Put your finesse into it.
@@ -20,15 +22,18 @@ Raw baby!
 Watch the clock. It’s counting down your prime time. Once it hits zero, that’s a wrap, and your final score is locked. Be bold; greatness doesn’t wait.
 
 3. Strategy Like a Genius
+
 Master the Arc: A high arc is like a perfect hook on your track—some flair, some style, unstoppable.
 Moderate Power: Not every shot needs max force. Learn that sweet release so you don’t overshoot.
 Combos & Speed: After you let one fly, come right back. More shots, more points—like more bars, more hits.
 
 4. Offline Vibes vs. Real-Game Play
+
 Practice Offline: No wallet needed. No fans, no record labels—just you and your training.
 Connected Wallet: Might cost a little fee (like 0.01 SOL), but if you’re droppin’ heat, you can top that leaderboard and get real rewards. I’m talkin’ digital cheddar.
 
 5. Game End & Leaderboard Glory
+
 Time’s Up
 When the clock says “done,” that’s your final. Take it or leave it, but hopefully you soared like Yeezus.
 Check the Board
@@ -37,6 +42,7 @@ Reset Cycles
 Some modes might restart every 36 hours or so. That means brand-new competition, brand-new shot at stardom.
 
 6. If Something Ain’t Right
+
 Shot Won’t Release?
 Make sure you drag enough distance. Give the ball some space—like I need creative space.
 Score Freeze?
@@ -47,6 +53,7 @@ Game Lag?
 Sometimes the spotlight’s too bright for older devices. Close unnecessary apps and let your phone breathe.
 
 7. Rise & Shine
+
 Practice.
 Compete.
 Dominate.
