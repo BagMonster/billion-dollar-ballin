@@ -71,12 +71,21 @@
             text-align: left;
             color: white;
             font-family: 'Original Surfer', sans-serif;
-            font-size: 16px;
+            font-size: 22px;
             margin-bottom: 10px; /* Space between status box and buttons */
             display: inline-block; /* Ensures it fits content width */
             width: 200px; /* Matches button width */
             box-sizing: border-box; /* Ensures padding doesn't affect width */
-            line-height: 1.5;
+            line-height: 1.2;
+        }
+        .status-label {
+            text-align: left; /* Rows 1 and 3 (labels) aligned left */
+            margin-bottom: 2px; /* Minimal spacing between label and value */
+        }
+
+        .status-value {
+            text-align: center; /* Rows 2 and 4 (values) centered */
+            margin-bottom: 5px; /* Spacing between value and next label */
         }
         #practiceMessage {
             display: none; /* Hidden by default */
@@ -266,8 +275,15 @@
             }
             #statusBox {
                 width: 180px;
-                padding: 15px;
-                font-size: 18px;
+                padding: 8px;
+                font-size: 22px;
+                line-height: 1.2;
+            }
+            .status-label, .status-value {
+                 margin-bottom: 2px; /* Adjusted spacing for mobile */
+            }
+            .status-value {
+                margin-bottom: 4px; /* Adjusted for mobile row spacing */
             }
             #connectWallet, #practiceButton, #practiceOkButton, #playButton, #practicePlayButton, #leaderboardButton {
                 width: 180px;
@@ -363,8 +379,10 @@
     </div>
     <div id="walletUI">
         <div id="statusBox">
-            <div id="pot">🏆 WIN: 0 SOL</div>
-            <div id="highScore">🎯 High Score: 0</div>
+            <div id="potLabel" class="status-label">🏆 Win:</div>
+            <div id="potValue" class="status-value">0 SOL</div>
+            <div id="highScoreLabel" class="status-label">🎯 High Score:</div>
+            <div id="highScoreValue" class="status-value">0</div>
         </div>
         <button id="connectWallet">Connect Wallet</button>
         <button id="practiceButton">Practice Offline</button>
@@ -430,6 +448,10 @@
             connectButton, playButton, practiceButton, practicePlayButton,
             leaderboardButton, menuButton, sideMenu
         });
+        
+        // Initialize #statusBox values
+        potValue.textContent = `${pot.toFixed(3)} SOL`;
+        highScoreValue.textContent = `${dailyHighScore}`;
 
         leaderboardButton.style.opacity = '1';
         leaderboardButton.style.pointerEvents = 'auto';
@@ -653,13 +675,13 @@
                     console.error("Marketing transaction setup failed:", err);
                 }
 
-                // Check if pot after marketing cut is greater than 2.5 SOL
-                if (potAfterMarketing > 2.5) {
+                // Check if pot after marketing cut is greater than 3 SOL
+                if (potAfterMarketing > 3) {
                     // Top 3 split: 70% to 1st, 20% to 2nd, 10% to 3rd
                     const firstPlace = potAfterMarketing * 0.7;
                     const secondPlace = potAfterMarketing * 0.2;
                     const thirdPlace = potAfterMarketing * 0.1;
-                    console.log(`Payout (36 hours, pot > 2.5 SOL): 1st: ${firstPlace.toFixed(5)} SOL (70%), 2nd: ${secondPlace.toFixed(5)} SOL (20%), 3rd: ${thirdPlace.toFixed(5)} SOL (10%)`);
+                    console.log(`Payout (36 hours, pot > 3 SOL): 1st: ${firstPlace.toFixed(5)} SOL (70%), 2nd: ${secondPlace.toFixed(5)} SOL (20%), 3rd: ${thirdPlace.toFixed(5)} SOL (10%)`);
                     // Backend will handle sending these payouts from potPublicKey
                 } else {
                     // Single winner takes all after marketing cut
@@ -670,12 +692,11 @@
                 // Reset pot and high score
                 pot = 0;
                 dailyHighScore = 0;
-                potDisplay.textContent = `🏆 Pot: 0 SOL`;
-                highScoreDisplay.textContent = `🎯 Daily High: 0`;
+                potValue.textContent = `${pot.toFixed(5)} SOL`; // Update Row 2
+                highScoreValue.textContent = `${dailyHighScore}`; // Update Row 4
             }
         }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
     </script>
 </body>
 </html> 
-
 
