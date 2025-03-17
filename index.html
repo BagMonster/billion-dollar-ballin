@@ -76,13 +76,12 @@
             display: inline-block; /* Ensures it fits content width */
             width: 200px; /* Matches button width */
             box-sizing: border-box; /* Ensures padding doesn't affect width */
-            line-height: 1.2;
+            line-height: 1.5;
         }
         .status-label {
             text-align: left; /* Rows 1 and 3 (labels) aligned left */
             margin-bottom: 2px; /* Minimal spacing between label and value */
         }
-
         .status-value {
             text-align: center; /* Rows 2 and 4 (values) centered */
             margin-bottom: 5px; /* Spacing between value and next label */
@@ -144,8 +143,11 @@
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
             z-index: 9999;
             transition: left 0.3s ease;
-            padding: 30px 20px; /* Increased padding for better spacing */
+            padding: 30px 20px 50px; /* Increased bottom padding to fit brand section */
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Pushes brand section to bottom */
         }
         #sideMenu.open {
             left: 0; /* Slide in */
@@ -266,6 +268,26 @@
         #sideMenu #closeMenu:hover {
             background: rgba(251, 37, 244, 1);
         }
+        #sideMenu #brandSection {
+            text-align: center;
+            margin-top: 20px; /* Space above brand section */
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 215, 0, 0.3); /* Subtle gold divider */
+        }
+
+        #sideMenu #sideMenuLogo {
+            width: 120px; /* Adjustable based on logo size */
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        #sideMenu #brandText {
+            color: gold;
+            font-family: 'font', sans-serif;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px #000;
+            margin: 0;
+        }
          
         /* Media query for mobile (e.g., screens < 768px) */
         @media only screen and (max-width: 767px) {
@@ -279,7 +301,7 @@
                 width: 180px;
                 padding: 8px;
                 font-size: 22px;
-                line-height: 1.2;
+                line-height: 1.5;
             }
             .status-label, .status-value {
                  margin-bottom: 2px; /* Adjusted spacing for mobile */
@@ -359,6 +381,24 @@
                 font-size: 14px;
                 width: 100px;
             }
+            #sideMenu {
+                width: 200px;
+                left: -200px;
+                padding: 20px 15px 40px; /* Adjusted bottom padding for mobile */
+            }
+
+            #sideMenu #brandSection {
+                margin-top: 15px;
+                padding-top: 15px;
+            }
+
+            #sideMenu #sideMenuLogo {
+                width: 100px; /* Reduced for mobile */
+            }
+
+            #sideMenu #brandText {
+                font-size: 12px;
+            }
         }
     </style>
     <script src="https://unpkg.com/@solana/web3.js@1.98.0/lib/min/index.iife.min.js"></script>
@@ -380,6 +420,10 @@
         <a href="#" onclick="alert('Discord Server coming soon!')">Join our Discord</a>
         <a href="#" onclick="alert('Website coming soon!')">Visit our website</a>
         <button id="closeMenu">Close</button>
+        <div id="brandSection">
+            <img src="./assets/trenchmonster-logo.png" alt="TrenchMonster Gaming Logo" id="sideMenuLogo">
+            <p id="brandText">TrenchMonster Gaming</p>
+        </div>
     </div>
     <div id="walletUI">
         <div id="statusBox">
