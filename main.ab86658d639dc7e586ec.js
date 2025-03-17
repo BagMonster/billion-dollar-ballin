@@ -493,11 +493,12 @@
         value: function() {
             var t = this;
             this.add.image(n(this), r(this), "bg-1"); // Background
-            this.add.text(n(this), 100, "🏆 Top Players", { fontSize: "40px", fontFamily: "Original Surfer", color: "#FB25F4", textShadow: "2px 2px 3px #000" }).setOrigin(0.5); // Title, moved up
+            this.add.text(n(this), 100, "🏆 Top Players", { fontSize: "40px", fontFamily: "Original Surfer", color: "#FB25F4", textShadow: "2px 2px 3px #000" }).setOrigin(0.5); // Title
             this.add.image(70, 100, "backBtn").setScale(0.1).setInteractive({ cursor: "pointer" }).on("pointerup", () => {
-                console.log("Back button clicked, isMobileView:", o.isMobileView); // Debug
-                t.scene.start(o.isMobileView ? "MenuSceneMobile" : "MenuScene");
-            }); // Back button, aligned with title
+                console.log("Back button clicked, isMobileView:", o?.isMobileView); // Debug with safe access
+                const targetScene = (typeof o?.isMobileView !== "undefined" && o.isMobileView) ? "MenuSceneMobile" : "MenuScene";
+                t.scene.start(targetScene);
+            }); // Back button with fallback
 
             // Mock data—4 players, mix of wallets and practice
             const mockData = {
@@ -510,20 +511,20 @@
             };
             const sortedData = mockData.user.sort((a, b) => b.score - a.score).slice(0, 11);
 
-            this.add.rectangle(n(this), 187, 950, 60, 0x3B599880); // Header bar, moved up, transparent dark blue
-            this.add.text(n(this) - 280, 175, "R A N K", { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }).setOrigin(0.5); // Rank header, adjusted
+            this.add.rectangle(n(this), 187, 950, 60, 0x3B599880); // Header bar, transparent dark blue
+            this.add.text(n(this) - 280, 175, "R A N K", { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }).setOrigin(0.5); // Rank header
             this.add.text(n(this), 175, "NAME", { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }).setOrigin(0.5); // Name header
             this.add.text(n(this) + 280, 175, "S C O R E", { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }).setOrigin(0.5); // Score header
 
             sortedData.forEach((player, index) => {
-                const yPos = 220 + 60 * (index + 1); // Tighter spacing (60px), starts higher
+                const yPos = 220 + 60 * (index + 1); // Tighter spacing
                 const isTop3 = index < 3;
                 const style = isTop3 
-                    ? { fontSize: "30px", fontFamily: "Original Surfer", color: "#3EDCD7", textShadow: "1px 1px 3px #FFD700" } // Top 3 flair with glow
+                    ? { fontSize: "30px", fontFamily: "Original Surfer", color: "#3EDCD7", textShadow: "1px 1px 3px #FFD700" } // Top 3 flair
                     : { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }; // Rest in white
                 const formattedName = formatWalletAddress(player.name);
 
-                this.add.rectangle(n(this), yPos, 950, 60, isTop3 ? 0xFFD70080 : 0xFFFFFF40); // Transparent gold/white
+                this.add.rectangle(n(this), yPos, 950, 60, isTop3 ? 0xFFD70080 : 0x9C80E580); // Gold for top 3, gradient avg for rest
                 this.add.text(n(this) - 280, yPos, `${index + 1}`, style).setOrigin(0.5); // Rank
                 this.add.text(n(this), yPos, formattedName, style).setOrigin(0.5); // Formatted name
                 this.add.text(n(this) + 280, yPos, `${player.score}`, style).setOrigin(0.5); // Score
@@ -546,7 +547,7 @@
                         : { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" };
                     const formattedName = formatWalletAddress(player.name);
 
-                    t.add.rectangle(n(t), yPos, 950, 60, isTop3 ? 0xFFD70080 : 0xFFFFFF40);
+                    t.add.rectangle(n(t), yPos, 950, 60, isTop3 ? 0xFFD70080 : 0x9C80E580);
                     t.add.text(n(t) - 280, yPos, `${index + 1}`, style).setOrigin(0.5);
                     t.add.text(n(t), yPos, formattedName, style).setOrigin(0.5);
                     t.add.text(n(t) + 280, yPos, `${player.score}`, style).setOrigin(0.5);
