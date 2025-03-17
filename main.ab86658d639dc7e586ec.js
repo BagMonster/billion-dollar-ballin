@@ -471,94 +471,90 @@
 
         // LeaderboardScene—Displays top scores
         var H = function(t) {
-            !function(t, e) { 
-                if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function"); 
-                t.prototype = Object.create(e && e.prototype, { constructor: { value: t, writable: !0, configurable: !0 } }), 
-                e && F(t, e) 
-            }(s, Phaser.Scene);
-            var e, i, o, a = V(s);
-            function s() { // Constructor—sets up leaderboard
-                var t, e, i, o;
-                return function(t, e) { 
-                    if (!(t instanceof e)) throw new TypeError("Cannot call a class as a function") 
-                }(this, s),
-                    t = a.call(this, "LeaderboardScene"), 
-                    e = C(t), 
-                    o = void 0, 
-                    (i = "exitingData") in e ? Object.defineProperty(e, i, { value: o, enumerable: !0, configurable: !0, writable: !0 }) : e[i] = o, 
-                    t
-            }
-            return e = s, (i = [{
-                key: "create", // Sets up leaderboard UI with mock data
-                value: function() {
-                    var t = this;
-                    this.add.image(n(this), r(this), "bg-1"); // Background
-                    this.add.text(n(this), 80, "🏆 Top Players", { fontSize: "40px", fontFamily: "Original Surfer", color: "#FB25F4", textShadow: "2px 2px 3px #000" }).setOrigin(0.5); // Title
-                    this.add.image(70, 80, "backBtn").setScale(0.1).setInteractive({ cursor: "pointer" }).on("pointerup", () => this.scene.start(o.isMobileView ? "MenuSceneMobile" : "MenuScene")); // Back button
+    !function(t, e) { 
+        if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function"); 
+        t.prototype = Object.create(e && e.prototype, { constructor: { value: t, writable: !0, configurable: !0 } }), 
+        e && F(t, e) 
+    }(s, Phaser.Scene);
+    var e, i, o, a = V(s);
+    function s() { // Constructor—sets up leaderboard
+        var t, e, i, o;
+        return function(t, e) { 
+            if (!(t instanceof e)) throw new TypeError("Cannot call a class as a function") 
+        }(this, s),
+            t = a.call(this, "LeaderboardScene"), 
+            e = C(t), 
+            o = void 0, 
+            (i = "exitingData") in e ? Object.defineProperty(e, i, { value: o, enumerable: !0, configurable: !0, writable: !0 }) : e[i] = o, 
+            t
+    }
+    return e = s, (i = [{
+        key: "create",
+        value: function() {
+            var t = this;
+            this.add.image(n(this), r(this), "bg-1"); // Background
+            this.add.text(n(this), 100, "🏆 Top Players", { fontSize: "40px", fontFamily: "Original Surfer", color: "#FB25F4", textShadow: "2px 2px 3px #000" }).setOrigin(0.5); // Title, moved up
+            this.add.image(70, 100, "backBtn").setScale(0.1).setInteractive({ cursor: "pointer" }).on("pointerup", () => {
+                console.log("Back button clicked, isMobileView:", o.isMobileView); // Debug
+                t.scene.start(o.isMobileView ? "MenuSceneMobile" : "MenuScene");
+            }); // Back button, aligned with title
 
-                    // Mock data for now—replace with this.getData() when GR1’s backend is live
-                    const mockData = {
-                        user: [
-                            { name: "4e3f9k2m7p8q1r5t2u9v", score: 1000 }, // Mock wallet IDs (20 chars)
-                            { name: "x7k9p2m4q8r1t5u9v3e6", score: 800 },
-                            { name: "j2m5u8r1t4e7v9k3p6q9", score: 600 },
-                            { name: "PlayerD", score: 500 }, // Mix of wallets and non-wallets
-                            { name: "q9r2t5u8v1e4k7m3p6j9", score: 400 },
-                            { name: "PlayerF", score: 350 },
-                            { name: "t5u8v1e4k7m3p6j9r2q5", score: 300 },
-                            { name: "PlayerH", score: 250 },
-                            { name: "v1e4k7m3p6j9r2q5t8u9", score: 200 },
-                            { name: "PlayerJ", score: 150 },
-                            { name: "PlayerK", score: 100 }
-                        ]
-                    };
-                    const sortedData = mockData.user.sort((a, b) => b.score - a.score).slice(0, 11);
+            // Mock data—4 players, mix of wallets and practice
+            const mockData = {
+                user: [
+                    { name: "4e3f9k2m7p8q1r5t2u9v", score: 20 }, // Wallet player
+                    { name: "x7k9p2m4q8r1t5u9v3e6", score: 15 }, // Wallet player
+                    { name: "Player1", score: 10 }, // Practice player
+                    { name: "Player2", score: 5 }  // Practice player
+                ]
+            };
+            const sortedData = mockData.user.sort((a, b) => b.score - a.score).slice(0, 11);
 
-                    this.add.rectangle(n(this), 167, 950, 80, 608897); // Header bar
-                    this.add.text(n(this) - 280, 155, "R A N K", { fontSize: "30px", fontFamily: "optima" }).setOrigin(0.5); // Rank header
-                    this.add.text(n(this), 155, "NAME", { fontSize: "30px", fontFamily: "optima" }).setOrigin(0.5); // Name header
-                    this.add.text(n(this) + 280, 155, "S C O R E", { fontSize: "30px", fontFamily: "optima" }).setOrigin(0.5); // Score header
+            this.add.rectangle(n(this), 187, 950, 60, 0x3B599880); // Header bar, moved up, transparent dark blue
+            this.add.text(n(this) - 280, 175, "R A N K", { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }).setOrigin(0.5); // Rank header, adjusted
+            this.add.text(n(this), 175, "NAME", { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }).setOrigin(0.5); // Name header
+            this.add.text(n(this) + 280, 175, "S C O R E", { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }).setOrigin(0.5); // Score header
 
-                    sortedData.forEach((player, index) => {
-                        const yPos = 160 + 90 * (index + 1);
-                        const isTop3 = index < 3;
-                        const style = isTop3 
-                            ? { fontSize: "34px", fontFamily: "Original Surfer", color: "#3EDCD7", textShadow: "1px 1px 2px #000" } // Top 3 flair
-                            : { fontSize: "30px", fontFamily: "optima", color: "black" }; // Rest
-                        const formattedName = formatWalletAddress(player.name); // Format wallet
+            sortedData.forEach((player, index) => {
+                const yPos = 220 + 60 * (index + 1); // Tighter spacing (60px), starts higher
+                const isTop3 = index < 3;
+                const style = isTop3 
+                    ? { fontSize: "30px", fontFamily: "Original Surfer", color: "#3EDCD7", textShadow: "1px 1px 3px #FFD700" } // Top 3 flair with glow
+                    : { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }; // Rest in white
+                const formattedName = formatWalletAddress(player.name);
 
-                        this.add.rectangle(n(this), yPos, 950, 80, isTop3 ? 0xFFD700 : 16777215); // Gold for top 3, white for rest
-                        this.add.text(n(this) - 280, yPos, `${index + 1}`, style).setOrigin(0.5); // Rank
-                        this.add.text(n(this), yPos, formattedName, style).setOrigin(0.5); // Formatted name
-                        this.add.text(n(this) + 280, yPos, `${player.score}`, style).setOrigin(0.5); // Score
-                    });
+                this.add.rectangle(n(this), yPos, 950, 60, isTop3 ? 0xFFD70080 : 0xFFFFFF40); // Transparent gold/white
+                this.add.text(n(this) - 280, yPos, `${index + 1}`, style).setOrigin(0.5); // Rank
+                this.add.text(n(this), yPos, formattedName, style).setOrigin(0.5); // Formatted name
+                this.add.text(n(this) + 280, yPos, `${player.score}`, style).setOrigin(0.5); // Score
+            });
 
-                    this.add.text(n(this), 160 + 90 * 12, "Payout Split: 70% / 20% / 10%", { fontSize: "20px", fontFamily: "Original Surfer", color: "#FFD700" }).setOrigin(0.5); // Payout tease
-                }
-            }, {
-                key: "getData", // Fetches and displays leaderboard (for GR1 integration)
-                value: function() {
-                    var t = this;
-                    fetch("https://toolkitweb.xyz/toolkit/basket-leaderboard.json").then(res => res.json()).then(data => {
-                        t.exitingData = data;
-                        var i = data.user.sort((a, b) => b.score - a.score).slice(0, 11);
-                        i.forEach((player, index) => {
-                            const yPos = 160 + 90 * (index + 1);
-                            const isTop3 = index < 3;
-                            const style = isTop3 
-                                ? { fontSize: "34px", fontFamily: "Original Surfer", color: "#3EDCD7", textShadow: "1px 1px 2px #000" }
-                                : { fontSize: "30px", fontFamily: "optima", color: "black" };
-                            const formattedName = formatWalletAddress(player.name);
+            this.add.text(n(this), 220 + 60 * 5, "Payout Split: 70% / 20% / 10%", { fontSize: "20px", fontFamily: "Original Surfer", color: "#FFD700" }).setOrigin(0.5); // Payout tease
+        }
+    }, {
+        key: "getData",
+        value: function() {
+            var t = this;
+            fetch("https://toolkitweb.xyz/toolkit/basket-leaderboard.json").then(res => res.json()).then(data => {
+                t.exitingData = data;
+                var i = data.user.sort((a, b) => b.score - a.score).slice(0, 11);
+                i.forEach((player, index) => {
+                    const yPos = 220 + 60 * (index + 1);
+                    const isTop3 = index < 3;
+                    const style = isTop3 
+                        ? { fontSize: "30px", fontFamily: "Original Surfer", color: "#3EDCD7", textShadow: "1px 1px 3px #FFD700" }
+                        : { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" };
+                    const formattedName = formatWalletAddress(player.name);
 
-                            t.add.rectangle(n(t), yPos, 950, 80, isTop3 ? 0xFFD700 : 16777215);
-                            t.add.text(n(t) - 280, yPos, `${index + 1}`, style).setOrigin(0.5);
-                            t.add.text(n(t), yPos, formattedName, style).setOrigin(0.5);
-                            t.add.text(n(t) + 280, yPos, `${player.score}`, style).setOrigin(0.5);
-                        });
-                    }).catch(err => console.log("Leaderboard fetch failed:", err));
-                }
-            }]) && I(e.prototype, i), o && I(e, o), s
-        }();
+                    t.add.rectangle(n(t), yPos, 950, 60, isTop3 ? 0xFFD70080 : 0xFFFFFF40);
+                    t.add.text(n(t) - 280, yPos, `${index + 1}`, style).setOrigin(0.5);
+                    t.add.text(n(t), yPos, formattedName, style).setOrigin(0.5);
+                    t.add.text(n(t) + 280, yPos, `${player.score}`, style).setOrigin(0.5);
+                });
+            }).catch(err => console.log("Leaderboard fetch failed:", err));
+        }
+    }]) && I(e.prototype, i), o && I(e, o), s
+}();
 
         /* Utility Functions—Class setup for MenuScene */
         function Y(t) { return (Y = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(t) { return typeof t } : function(t) { return t && "function" == typeof Symbol && t.constructor === Symbol && t !== Symbol.prototype ? "symbol" : typeof t })(t) }
