@@ -471,40 +471,91 @@
 
         // LeaderboardScene—Displays top scores
         var H = function(t) {
-            !function(t, e) { if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function"); t.prototype = Object.create(e && e.prototype, { constructor: { value: t, writable: !0, configurable: !0 } }), e && F(t, e) }(s, Phaser.Scene);
+            !function(t, e) { 
+                if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function"); 
+                t.prototype = Object.create(e && e.prototype, { constructor: { value: t, writable: !0, configurable: !0 } }), 
+                e && F(t, e) 
+            }(s, Phaser.Scene);
             var e, i, o, a = V(s);
             function s() { // Constructor—sets up leaderboard
                 var t, e, i, o;
-                return function(t, e) { if (!(t instanceof e)) throw new TypeError("Cannot call a class as a function") }(this, s),
-                    t = a.call(this, "LeaderboardScene"), e = C(t), o = void 0, (i = "exitingData") in e ? Object.defineProperty(e, i, { value: o, enumerable: !0, configurable: !0, writable: !0 }) : e[i] = o, t
+                return function(t, e) { 
+                    if (!(t instanceof e)) throw new TypeError("Cannot call a class as a function") 
+                }(this, s),
+                    t = a.call(this, "LeaderboardScene"), 
+                    e = C(t), 
+                    o = void 0, 
+                    (i = "exitingData") in e ? Object.defineProperty(e, i, { value: o, enumerable: !0, configurable: !0, writable: !0 }) : e[i] = o, 
+                    t
             }
             return e = s, (i = [{
-                key: "create", // Sets up leaderboard UI
+                key: "create", // Sets up leaderboard UI with mock data
                 value: function() {
                     var t = this;
-                    this.add.image(n(this), r(this), "bg-".concat(1)), // Background
-                        this.getData(), // Fetches leaderboard data
-                        this.add.text(n(this), 80, "LEADER BOARD", { fontSize: "40px", fontFamily: "ARIAL" }).setOrigin(.5), // Title
-                        this.add.image(70, 80, "backBtn").setScale(.1).setInteractive({ cursor: "pointer" }).on("pointerup", (function() { t.scene.start("MenuScene") })), // Back button
-                        this.add.rectangle(n(this), 167, 950, 80, 608897), // Header bar
-                        this.add.text(n(this), 155, "NAME", { fontSize: "30px", fontFamily: "optima" }).setOrigin(.5), // Name header
-                        this.add.text(n(this) - 280, 155, "R A N K", { fontSize: "30px", fontFamily: "optima" }).setOrigin(.5), // Rank header
-                        this.add.text(n(this) + 280, 155, "S C O R E", { fontSize: "30px", fontFamily: "optima" }).setOrigin(.5) // Score header
+                    this.add.image(n(this), r(this), "bg-1"); // Background
+                    this.add.text(n(this), 80, "🏆 Top Players", { fontSize: "40px", fontFamily: "Original Surfer", color: "#FB25F4", textShadow: "2px 2px 3px #000" }).setOrigin(0.5); // Title
+                    this.add.image(70, 80, "backBtn").setScale(0.1).setInteractive({ cursor: "pointer" }).on("pointerup", () => this.scene.start(o.isMobileView ? "MenuSceneMobile" : "MenuScene")); // Back button
+
+                    // Mock data for now—replace with this.getData() when GR1’s backend is live
+                    const mockData = {
+                        user: [
+                            { name: "4e3f9k2m7p8q1r5t2u9v", score: 1000 }, // Mock wallet IDs (20 chars)
+                            { name: "x7k9p2m4q8r1t5u9v3e6", score: 800 },
+                            { name: "j2m5u8r1t4e7v9k3p6q9", score: 600 },
+                            { name: "PlayerD", score: 500 }, // Mix of wallets and non-wallets
+                            { name: "q9r2t5u8v1e4k7m3p6j9", score: 400 },
+                            { name: "PlayerF", score: 350 },
+                            { name: "t5u8v1e4k7m3p6j9r2q5", score: 300 },
+                            { name: "PlayerH", score: 250 },
+                            { name: "v1e4k7m3p6j9r2q5t8u9", score: 200 },
+                            { name: "PlayerJ", score: 150 },
+                            { name: "PlayerK", score: 100 }
+                        ]
+                    };
+                    const sortedData = mockData.user.sort((a, b) => b.score - a.score).slice(0, 11);
+
+                    this.add.rectangle(n(this), 167, 950, 80, 608897); // Header bar
+                    this.add.text(n(this) - 280, 155, "R A N K", { fontSize: "30px", fontFamily: "optima" }).setOrigin(0.5); // Rank header
+                    this.add.text(n(this), 155, "NAME", { fontSize: "30px", fontFamily: "optima" }).setOrigin(0.5); // Name header
+                    this.add.text(n(this) + 280, 155, "S C O R E", { fontSize: "30px", fontFamily: "optima" }).setOrigin(0.5); // Score header
+
+                    sortedData.forEach((player, index) => {
+                        const yPos = 160 + 90 * (index + 1);
+                        const isTop3 = index < 3;
+                        const style = isTop3 
+                            ? { fontSize: "34px", fontFamily: "Original Surfer", color: "#3EDCD7", textShadow: "1px 1px 2px #000" } // Top 3 flair
+                            : { fontSize: "30px", fontFamily: "optima", color: "black" }; // Rest
+                        const formattedName = formatWalletAddress(player.name); // Format wallet
+
+                        this.add.rectangle(n(this), yPos, 950, 80, isTop3 ? 0xFFD700 : 16777215); // Gold for top 3, white for rest
+                        this.add.text(n(this) - 280, yPos, `${index + 1}`, style).setOrigin(0.5); // Rank
+                        this.add.text(n(this), yPos, formattedName, style).setOrigin(0.5); // Formatted name
+                        this.add.text(n(this) + 280, yPos, `${player.score}`, style).setOrigin(0.5); // Score
+                    });
+
+                    this.add.text(n(this), 160 + 90 * 12, "Payout Split: 70% / 20% / 10%", { fontSize: "20px", fontFamily: "Original Surfer", color: "#FFD700" }).setOrigin(0.5); // Payout tease
                 }
             }, {
-                key: "getData", // Fetches and displays leaderboard
+                key: "getData", // Fetches and displays leaderboard (for GR1 integration)
                 value: function() {
                     var t = this;
-                    fetch("https://toolkitweb.xyz/toolkit/basket-leaderboard.json").then((function(t) { if (!t.ok) throw new Error("Network response was not ok " + t.statusText); return t.json() })).then((function(e) {
-                        t.exitingData = e, console.log(e);
-                        var i = e.user.sort((function(t, e) { return e.score - t.score })).slice(0, 11); // Sorts top 11 scores
-                        i.forEach((function(t) { console.log("Name: ".concat(t.name, ", Score: ").concat(t.score)) }));
-                        for (var o = 1; o <= i.length; o++) // Displays each entry
-                            t.add.rectangle(n(t), 160 + 90 * o, 950, 80, 16777215), // Row background
-                            t.add.text(n(t) - 280, 160 + 90 * o, "".concat(o), { fontSize: "30px", fontFamily: "optima", color: "black" }).setOrigin(.5), // Rank
-                            t.add.text(n(t), 160 + 90 * o, "".concat(i[o - 1].name), { fontSize: "30px", fontFamily: "optima", color: "black" }).setOrigin(.5), // Name
-                            t.add.text(n(t) + 280, 160 + 90 * o, "".concat(i[o - 1].score), { fontSize: "30px", fontFamily: "optima", color: "black" }).setOrigin(.5) // Score
-                    }))
+                    fetch("https://toolkitweb.xyz/toolkit/basket-leaderboard.json").then(res => res.json()).then(data => {
+                        t.exitingData = data;
+                        var i = data.user.sort((a, b) => b.score - a.score).slice(0, 11);
+                        i.forEach((player, index) => {
+                            const yPos = 160 + 90 * (index + 1);
+                            const isTop3 = index < 3;
+                            const style = isTop3 
+                                ? { fontSize: "34px", fontFamily: "Original Surfer", color: "#3EDCD7", textShadow: "1px 1px 2px #000" }
+                                : { fontSize: "30px", fontFamily: "optima", color: "black" };
+                            const formattedName = formatWalletAddress(player.name);
+
+                            t.add.rectangle(n(t), yPos, 950, 80, isTop3 ? 0xFFD700 : 16777215);
+                            t.add.text(n(t) - 280, yPos, `${index + 1}`, style).setOrigin(0.5);
+                            t.add.text(n(t), yPos, formattedName, style).setOrigin(0.5);
+                            t.add.text(n(t) + 280, yPos, `${player.score}`, style).setOrigin(0.5);
+                        });
+                    }).catch(err => console.log("Leaderboard fetch failed:", err));
                 }
             }]) && I(e.prototype, i), o && I(e, o), s
         }();
