@@ -495,10 +495,33 @@
             this.add.image(n(this), r(this), "bg-1"); // Background
             this.add.text(n(this), 100, "🏆 Top Players", { fontSize: "40px", fontFamily: "Original Surfer", color: "#FB25F4", textShadow: "2px 2px 3px #000" }).setOrigin(0.5); // Title
             this.add.image(70, 100, "backBtn").setScale(0.1).setInteractive({ cursor: "pointer" }).on("pointerup", () => {
-                console.log("Back button clicked, isMobileView:", o?.isMobileView); // Debug with safe access
+                console.log("Back button clicked, isMobileView:", o?.isMobileView);
                 const targetScene = (typeof o?.isMobileView !== "undefined" && o.isMobileView) ? "MenuSceneMobile" : "MenuScene";
                 t.scene.start(targetScene);
-            }); // Back button with fallback
+            }); // Back button
+
+            // Create gradient texture for non-top-3 rows
+            const gradientTexture = this.textures.generate("gradientRow", {
+                width: 950,
+                height: 60,
+                callback: function(canvas, context) {
+                    const gradient = context.createLinearGradient(0, 0, 950, 0); // Left to right
+                    gradient.addColorStop(0, "rgba(251, 37, 244, 0.7)"); // #FB25F4 @ 0.7
+                    gradient.addColorStop(1, "rgba(62, 220, 215, 0.8)"); // #3EDCD7 @ 0.8
+                    context.fillStyle = gradient;
+                    context.fillRect(0, 0, 950, 60);
+                }
+            });
+
+            // Create solid gold texture for top-3 rows
+            const goldTexture = this.textures.generate("goldRow", {
+                width: 950,
+                height: 60,
+                callback: function(canvas, context) {
+                    context.fillStyle = "rgba(255, 215, 0, 0.25)"; // #FFD700 @ 0.25 (0.075 was too faint)
+                    context.fillRect(0, 0, 950, 60);
+                }
+            });
 
             // Mock data—4 players, mix of wallets and practice
             const mockData = {
@@ -524,7 +547,8 @@
                     : { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }; // Rest in white
                 const formattedName = formatWalletAddress(player.name);
 
-                this.add.rectangle(n(this), yPos, 950, 60, isTop3 ? 0xFFD70013 : 0x9C80E5BF); // Top 3: gold @ 0.075, others: gradient approx @ 0.75
+                // Use gradient texture for non-top-3, gold texture for top-3
+                this.add.image(n(this), yPos, isTop3 ? "goldRow" : "gradientRow").setDisplaySize(950, 60);
                 this.add.text(n(this) - 280, yPos, `${index + 1}`, style).setOrigin(0.5); // Rank
                 this.add.text(n(this), yPos, formattedName, style).setOrigin(0.5); // Formatted name
                 this.add.text(n(this) + 280, yPos, `${player.score}`, style).setOrigin(0.5); // Score
@@ -536,6 +560,28 @@
         key: "getData",
         value: function() {
             var t = this;
+            // Create textures for getData (same as create)
+            this.textures.generate("gradientRow", {
+                width: 950,
+                height: 60,
+                callback: function(canvas, context) {
+                    const gradient = context.createLinearGradient(0, 0, 950, 0);
+                    gradient.addColorStop(0, "rgba(251, 37, 244, 0.7)");
+                    gradient.addColorStop(1, "rgba(62, 220, 215, 0.8)");
+                    context.fillStyle = gradient;
+                    context.fillRect(0, 0, 950, 60);
+                }
+            });
+
+            this.textures.generate("goldRow", {
+                width: 950,
+                height: 60,
+                callback: function(canvas, context) {
+                    context.fillStyle = "rgba(255, 215, 0, 0.25)";
+                    context.fillRect(0, 0, 950, 60);
+                }
+            });
+
             fetch("https://toolkitweb.xyz/toolkit/basket-leaderboard.json").then(res => res.json()).then(data => {
                 t.exitingData = data;
                 var i = data.user.sort((a, b) => b.score - a.score).slice(0, 11);
@@ -547,7 +593,7 @@
                         : { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" };
                     const formattedName = formatWalletAddress(player.name);
 
-                    t.add.rectangle(n(t), yPos, 950, 60, isTop3 ? 0xFFD70013 : 0x9C80E5BF);
+                    t.add.image(n(t), yPos, isTop3 ? "goldRow" : "gradientRow").setDisplaySize(950, 60);
                     t.add.text(n(t) - 280, yPos, `${index + 1}`, style).setOrigin(0.5);
                     t.add.text(n(t), yPos, formattedName, style).setOrigin(0.5);
                     t.add.text(n(t) + 280, yPos, `${player.score}`, style).setOrigin(0.5);
