@@ -12,6 +12,7 @@
         }
         body {
             background-color: #08233e;
+            overflow: auto; /* Allow scrolling if content overflows */
         }
 
         .fontload {
@@ -143,14 +144,17 @@
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
             z-index: 9999;
             transition: left 0.3s ease;
-            padding: 30px 20px 50px; /* Increased bottom padding to fit brand section */
+            padding: 40px 20px 30px; /* Increased top padding, reduced bottom */
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Pushes brand section to bottom */
+            overflow-y: auto; /* Allow scrolling within #sideMenu if needed */
         }
         #sideMenu.open {
             left: 0; /* Slide in */
+        }
+        #sideMenu .menu-content {
+           flex: 1; /* Take available space */
         }
         #sideMenu h3 {
             color: gold;
@@ -237,7 +241,7 @@
             font-size: 16px; /* Reduced from 18px for better fit */
             text-decoration: none;
             margin: 15px 0; /* Reduced from 20px for tighter spacing */
-            padding: 8px 10px; /* Added padding for hover effect */
+            padding: 10px 10px; /* Added padding for hover effect */
             border-radius: 5px;
             text-shadow: 1px 1px 2px #000;
             transition: background 0.3s ease, color 0.3s ease;
@@ -249,7 +253,7 @@
         }
 
         #sideMenu #closeMenu {
-            margin: 30px auto 0; /* Centered with spacing above */
+            margin: 20px auto; /* Adjusted spacing, removed top-only margin */
             padding: 10px 20px;
             background: rgba(251, 37, 244, 0.8); /* Matches wallet button gradient */
             border: 2px solid #C0C0C0;
@@ -329,8 +333,10 @@
             }
             #sideMenu {
                 width: 200px;
-                left: -200px; /* Adjusted for smaller width */
-                padding: 20px 15px; /* Reduced padding for mobile */
+                left: -200px;
+                padding: 30px 15px 20px; /* Adjusted for mobile */
+                min-height: 100%;
+                overflow-y: auto;
             }
             #sideMenu.open {
                 left: 0;
@@ -373,10 +379,11 @@
                 font-size: 17px; /* Reduced from 16px */
                 margin: 10px 0; /* Reduced from 15px */
                 padding: 6px 8px;
+                line-height: 1.5;
             }
 
             #sideMenu #closeMenu {
-                margin: 20px auto 0;
+                margin: 15px auto;
                 padding: 8px 15px;
                 font-size: 14px;
                 width: 100px;
@@ -413,12 +420,14 @@
         <div class="line"></div>
     </div>
     <div id="sideMenu">
-        <h3>Menu</h3>
-        <a href="#" id="showInstructions">Game Instructions</a>
-        <a href="https://x.com/TrenchMonster_G" target="_blank">Follow us on X</a>
-        <a href="#" onclick="alert('Telegram Channel coming soon!')">Join our Telegram</a>
-        <a href="#" onclick="alert('Discord Server coming soon!')">Join our Discord</a>
-        <a href="#" onclick="alert('Website coming soon!')">Visit our website</a>
+        <div class="menu-content">
+            <h3>Menu</h3>
+            <a href="#" id="showInstructions">Game Instructions</a>
+            <a href="https://x.com/TrenchMonster_G" target="_blank">Follow us on X</a>
+            <a href="#" onclick="alert('Telegram Channel coming soon!')">Join our Telegram</a>
+            <a href="#" onclick="alert('Discord Server coming soon!')">Join our Discord</a>
+            <a href="#" onclick="alert('Website coming soon!')">Visit our website</a>
+        </div>
         <button id="closeMenu">Close</button>
         <div id="brandSection">
             <img src="./assets/trenchmonster-logo.png" alt="TrenchMonster Gaming Logo" id="sideMenuLogo">
