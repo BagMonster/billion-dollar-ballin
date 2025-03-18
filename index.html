@@ -14,7 +14,6 @@
             background-color: #08233e;
             overflow: auto; /* Allow scrolling if content overflows */
         }
-
         .fontload {
             visibility: hidden;
             position: absolute;
@@ -125,7 +124,6 @@
             justify-content: center;
             align-items: center;
         }
-
         #menuButton .line {
             width: 27px; /* Adjusted: between 24px and 30px */
             height: 3.5px; /* Adjusted: between 3px and 4px */
@@ -177,7 +175,6 @@
             justify-content: center;
             align-items: center;
         }
-
         #instructionsModal #modalContent {
             background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(20, 20, 20, 0.95)); /* Matches #sideMenu */
             border: 2px solid gold;
@@ -189,7 +186,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
             position: relative;
         }
-
         #instructionsModal h4 {
             color: #3EDCD7; /* Cyan for consistency */
             font-family: 'Original Surfer', sans-serif;
@@ -197,7 +193,6 @@
             margin: 15px 0 5px 0;
             text-shadow: 1px 1px 2px #000;
         }
-
         #instructionsModal p {
             color: white;
             font-family: 'Original Surfer', sans-serif;
@@ -206,7 +201,6 @@
             margin: 0 0 10px 0;
             text-shadow: 1px 1px 2px #000;
         }
-
         #instructionsModal p.summary {
             color: gold; /* Matches menu header */
             font-size: 14px;
@@ -214,7 +208,6 @@
             margin-top: 15px;
             text-align: center;
         }
-
         #instructionsModal #closeModal {
             margin: 20px auto 0;
             padding: 10px 20px;
@@ -231,7 +224,6 @@
             text-align: center;
             transition: background 0.3s ease;
         }
-
         #instructionsModal #closeModal:hover {
             background: rgba(251, 37, 244, 1);
         }
@@ -247,7 +239,6 @@
             justify-content: center;
             align-items: center;
         }
-
         #walletGuideModal #walletGuideContent {
             background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(20, 20, 20, 0.95));
             border: 2px solid gold;
@@ -259,7 +250,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
             position: relative;
         }
-
         #walletGuideModal h4 {
             color: #3EDCD7;
             font-family: 'Original Surfer', sans-serif;
@@ -267,7 +257,6 @@
             margin: 15px 0 5px 0;
             text-shadow: 1px 1px 2px #000;
         }
-
         #walletGuideModal p {
             color: white;
             font-family: 'Original Surfer', sans-serif;
@@ -276,7 +265,6 @@
             margin: 0 0 10px 0;
             text-shadow: 1px 1px 2px #000;
         }
-
         #walletGuideModal p.summary {
             color: gold;
             font-size: 14px;
@@ -284,7 +272,6 @@
             margin-top: 15px;
             text-align: center;
         }
-
         #walletGuideModal #closeWalletModal {
             margin: 20px auto 0;
             padding: 10px 20px;
@@ -301,11 +288,9 @@
             text-align: center;
             transition: background 0.3s ease;
         }
-
         #walletGuideModal #closeWalletModal:hover {
             background: rgba(251, 37, 244, 1);
         }
-        
         #sideMenu a {
             display: block;
             color: white;
@@ -318,12 +303,10 @@
             text-shadow: 1px 1px 2px #000;
             transition: background 0.3s ease, color 0.3s ease;
         }
-
         #sideMenu a:hover {
             background: rgba(62, 220, 215, 0.2); /* Cyan background on hover */
             color: #3EDCD7; /* Cyan text on hover */
         }
-
         #sideMenu #closeMenu {
             margin: 20px auto; /* Adjusted spacing, removed top-only margin */
             padding: 10px 20px;
@@ -340,7 +323,6 @@
             text-align: center;
             transition: background 0.3s ease;
         }
-
         #sideMenu #closeMenu:hover {
             background: rgba(251, 37, 244, 1);
         }
@@ -350,13 +332,11 @@
             padding-top: 20px;
             border-top: 1px solid rgba(255, 215, 0, 0.3); /* Subtle gold divider */
         }
-
         #sideMenu #sideMenuLogo {
             width: 120px; /* Adjustable based on logo size */
             height: auto;
             margin-bottom: 10px;
         }
-
         #sideMenu #brandText {
             color: gold;
             font-family: 'font', sans-serif;
@@ -367,6 +347,63 @@
         #payoutTimerLabel {
             color: #3EDCD7; /* Cyan for pop */
             text-shadow: 2px 2px 3px #000; /* Matches buttons */
+        }
+        #leaderboardContainer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);        
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid gold;
+            border-radius: 15px;
+            padding: 20px;
+            width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        #leaderboardTitle {
+            color: #FB25F4;
+            font-family: 'Original Surfer', sans-serif;
+            font-size: 40px;
+            text-align: center;
+            text-shadow: 2px 2px 3px #000;
+            margin: 0 0 10px 0;
+        }
+        #leaderboardTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #leaderboardTable th {
+            color: #FFFFFF;
+            font-family: 'Original Surfer', sans-serif;
+            font-size: 26px;
+            padding: 10px;
+            background: rgba(59, 89, 152, 0.5); /* Matches header bar */
+        }
+        #leaderboardTable td {
+            font-family: 'Original Surfer', sans-serif;
+            padding: 10px;
+            text-align: center;
+        }
+        #leaderboardTable tbody tr:nth-child(-n+3) {
+            background: rgba(255, 215, 0, 0.25); /* Solid gold, 0.25 opacity */
+            color: #3EDCD7; /* Cyan text for top 3 */
+            font-size: 30px;
+            text-shadow: 1px 1px 3px #FFD700; /* Gold glow */
+        }
+        #leaderboardTable tbody tr:not(:nth-child(-n+3)) {
+            background: linear-gradient(to right, rgba(251, 37, 244, 0.7), rgba(62, 220, 215, 0.8)); /* Gradient for non-top-3 */
+            color: #FFFFFF;
+            font-size: 26px;
+        }    
+        #payoutSplit {
+            color: #FFD700;
+            font-family: 'Original Surfer', sans-serif;
+            font-size: 20px;
+            text-align: center;
+            margin: 10px 0 0 0;
         }
          
         /* Media query for mobile (e.g., screens < 768px) */
@@ -427,67 +464,56 @@
                 max-height: 85vh;
                 border-radius: 10px;
             }
-
             #instructionsModal h4 {
                 font-size: 18px;
                 margin: 10px 0 5px 0;
             }
-
             #instructionsModal p {
                 font-size: 14px;
                 line-height: 1.4;
                 margin-bottom: 8px;
             }
-
             #instructionsModal p.summary {
                 font-size: 13px;
                 margin-top: 10px;
             }
-
             #instructionsModal #closeModal {
                 margin: 15px auto 0;
                 padding: 8px 15px;
                 font-size: 14px;
                 width: 100px;
             }
-            
             #walletGuideModal #walletGuideContent {
                width: 90%;
                padding: 15px;
                max-height: 85vh;
                border-radius: 10px;
             }
-
             #walletGuideModal h4 {
                 font-size: 18px;
                 margin: 10px 0 5px 0;
             }
-
             #walletGuideModal p {
                 font-size: 14px;
                 line-height: 1.4;
                 margin-bottom: 8px;
             }
-
             #walletGuideModal p.summary {
                 font-size: 13px;
                 margin-top: 10px;
             }
-
             #walletGuideModal #closeWalletModal {
                 margin: 15px auto 0;
                 padding: 8px 15px;
                 font-size: 14px;
                 width: 100px;
             }
-
             #sideMenu a {
                 font-size: 17px; /* Reduced from 16px */
                 margin: 10px 0; /* Reduced from 15px */
                 padding: 6px 8px;
                 line-height: 1.5;
             }
-
             #sideMenu #closeMenu {
                 margin: 15px auto;
                 padding: 8px 15px;
@@ -499,21 +525,41 @@
                 left: -200px;
                 padding: 20px 15px 40px; /* Adjusted bottom padding for mobile */
             }
-
             #sideMenu #brandSection {
                 margin-top: 15px;
                 padding-top: 15px;
             }
-
             #sideMenu #sideMenuLogo {
                 width: 100px; /* Reduced for mobile */
             }
-
             #sideMenu #brandText {
                 font-size: 12px;
             }
             #payoutTimerLabel {
                font-size: 20px; /* Slightly smaller for mobile */
+            }
+            #leaderboardContainer {
+                width: 90%;
+                padding: 15px;
+            }
+            #leaderboardTitle {
+                font-size: 30px;
+            }
+            #leaderboardTable th {
+                font-size: 20px;
+                padding: 8px;
+            }
+            #leaderboardTable td {
+                padding: 8px;
+            }
+            #leaderboardTable tbody tr:nth-child(-n+3) {
+                font-size: 24px;
+            }
+            #leaderboardTable tbody tr:not(:nth-child(-n+3)) {
+                font-size: 20px;
+            }
+            #payoutSplit {
+                font-size: 16px;
             }
         }
     </style>
