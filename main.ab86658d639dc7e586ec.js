@@ -471,137 +471,71 @@
 
         // LeaderboardScene—Displays top scores
         var H = function(t) {
-    !function(t, e) { 
-        if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function"); 
-        t.prototype = Object.create(e && e.prototype, { constructor: { value: t, writable: !0, configurable: !0 } }), 
-        e && F(t, e) 
-    }(s, Phaser.Scene);
-    var e, i, o, a = V(s);
-    function s() { // Constructor—sets up leaderboard
-        var t, e, i, o;
-        return function(t, e) { 
-            if (!(t instanceof e)) throw new TypeError("Cannot call a class as a function") 
-        }(this, s),
-            t = a.call(this, "LeaderboardScene"), 
-            e = C(t), 
-            o = void 0, 
-            (i = "exitingData") in e ? Object.defineProperty(e, i, { value: o, enumerable: !0, configurable: !0, writable: !0 }) : e[i] = o, 
-            t
-    }
-    return e = s, (i = [{
-        key: "create",
-        value: function() {
-            var t = this;
-            this.add.image(n(this), r(this), "bg-1"); // Background
-            this.add.text(n(this), 100, "🏆 Top Players", { fontSize: "40px", fontFamily: "Original Surfer", color: "#FB25F4", textShadow: "2px 2px 3px #000" }).setOrigin(0.5); // Title
-            this.add.image(70, 100, "backBtn").setScale(0.1).setInteractive({ cursor: "pointer" }).on("pointerup", () => {
-                console.log("Back button clicked, isMobileView:", o?.isMobileView);
-                const targetScene = (typeof o?.isMobileView !== "undefined" && o.isMobileView) ? "MenuSceneMobile" : "MenuScene";
-                t.scene.start(targetScene);
-            }); // Back button
+            !function(t, e) { 
+                if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function"); 
+                t.prototype = Object.create(e && e.prototype, { constructor: { value: t, writable: !0, configurable: !0 } }), 
+                e && F(t, e) 
+            }(s, Phaser.Scene);
+            var e, i, o, a = V(s);
+            function s() {
+                var t, e, i, o;
+                return function(t, e) { 
+                    if (!(t instanceof e)) throw new TypeError("Cannot call a class as a function") 
+                }(this, s),
+                    t = a.call(this, "LeaderboardScene"), 
+                    e = C(t), 
+                    o = void 0, 
+                    (i = "exitingData") in e ? Object.defineProperty(e, i, { value: o, enumerable: !0, configurable: !0, writable: !0 }) : e[i] = o, 
+                    t
+            }
+            return e = s, (i = [{
+                key: "create",
+                value: function() {
+                    var t = this;
+                    this.add.image(n(this), r(this), "bg-1"); // Background
+                    this.add.image(70, 100, "backBtn").setScale(0.1).setInteractive({ cursor: "pointer" }).on("pointerup", () => {
+                        console.log("Back button clicked, isMobileView:", o?.isMobileView);
+                        const targetScene = (typeof o?.isMobileView !== "undefined" && o.isMobileView) ? "MenuSceneMobile" : "MenuScene";
+                        t.scene.start(targetScene);
+                    }); // Back button
 
-            // Create gradient texture for non-top-3 rows
-            const gradientTexture = this.textures.generate("gradientRow", {
-                width: 950,
-                height: 60,
-                callback: function(canvas, context) {
-                    const gradient = context.createLinearGradient(0, 0, 950, 0); // Left to right
-                    gradient.addColorStop(0, "rgba(251, 37, 244, 0.7)"); // #FB25F4 @ 0.7
-                    gradient.addColorStop(1, "rgba(62, 220, 215, 0.8)"); // #3EDCD7 @ 0.8
-                    context.fillStyle = gradient;
-                    context.fillRect(0, 0, 950, 60);
+                    // Mock data—replace with this.getData() when GR1’s backend is live
+                    const mockData = {
+                        user: [
+                            { name: "4e3f9k2m7p8q1r5t2u9v", score: 20 },
+                            { name: "x7k9p2m4q8r1t5u9v3e6", score: 15 },
+                            { name: "Player1", score: 10 },
+                            { name: "Player2", score: 5 }
+                        ]
+                    };
+                    const sortedData = mockData.user.sort((a, b) => b.score - a.score).slice(0, 11);
+        
+                    // Format names and dispatch to index.html
+                    const leaderboardData = sortedData.map(player => ({
+                        name: formatWalletAddress(player.name),
+                        score: player.score
+                    }));
+                    window.dispatchEvent(new CustomEvent('updateLeaderboard', { detail: leaderboardData }));
                 }
-            });
-
-            // Create solid gold texture for top-3 rows
-            const goldTexture = this.textures.generate("goldRow", {
-                width: 950,
-                height: 60,
-                callback: function(canvas, context) {
-                    context.fillStyle = "rgba(255, 215, 0, 0.25)"; // #FFD700 @ 0.25 (0.075 was too faint)
-                    context.fillRect(0, 0, 950, 60);
+            }, {
+                key: "getData",
+                value: function() {
+                    var t = this;
+                    fetch("https://toolkitweb.xyz/toolkit/basket-leaderboard.json")
+                        .then(res => res.json())
+                        .then(data => {
+                            t.exitingData = data;
+                            const sortedData = data.user.sort((a, b) => b.score - a.score).slice(0, 11);
+                            const leaderboardData = sortedData.map(player => ({
+                                name: formatWalletAddress(player.name),
+                                score: player.score
+                            }));
+                            window.dispatchEvent(new CustomEvent('updateLeaderboard', { detail: leaderboardData }));
+                        })
+                        .catch(err => console.log("Leaderboard fetch failed:", err));
                 }
-            });
-
-            // Mock data—4 players, mix of wallets and practice
-            const mockData = {
-                user: [
-                    { name: "4e3f9k2m7p8q1r5t2u9v", score: 20 }, // Wallet player
-                    { name: "x7k9p2m4q8r1t5u9v3e6", score: 15 }, // Wallet player
-                    { name: "Player1", score: 10 }, // Practice player
-                    { name: "Player2", score: 5 }  // Practice player
-                ]
-            };
-            const sortedData = mockData.user.sort((a, b) => b.score - a.score).slice(0, 11);
-
-            this.add.rectangle(n(this), 187, 950, 60, 0x3B599880); // Header bar, transparent dark blue
-            this.add.text(n(this) - 280, 175, "R A N K", { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }).setOrigin(0.5); // Rank header
-            this.add.text(n(this), 175, "NAME", { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }).setOrigin(0.5); // Name header
-            this.add.text(n(this) + 280, 175, "S C O R E", { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }).setOrigin(0.5); // Score header
-
-            sortedData.forEach((player, index) => {
-                const yPos = 220 + 60 * (index + 1); // Tighter spacing
-                const isTop3 = index < 3;
-                const style = isTop3 
-                    ? { fontSize: "30px", fontFamily: "Original Surfer", color: "#3EDCD7", textShadow: "1px 1px 3px #FFD700" } // Top 3 flair with glow
-                    : { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" }; // Rest in white
-                const formattedName = formatWalletAddress(player.name);
-
-                // Use gradient texture for non-top-3, gold texture for top-3
-                this.add.image(n(this), yPos, isTop3 ? "goldRow" : "gradientRow").setDisplaySize(950, 60);
-                this.add.text(n(this) - 280, yPos, `${index + 1}`, style).setOrigin(0.5); // Rank
-                this.add.text(n(this), yPos, formattedName, style).setOrigin(0.5); // Formatted name
-                this.add.text(n(this) + 280, yPos, `${player.score}`, style).setOrigin(0.5); // Score
-            });
-
-            this.add.text(n(this), 220 + 60 * 5, "Payout Split: 70% / 20% / 10%", { fontSize: "20px", fontFamily: "Original Surfer", color: "#FFD700" }).setOrigin(0.5); // Payout tease
-        }
-    }, {
-        key: "getData",
-        value: function() {
-            var t = this;
-            // Create textures for getData (same as create)
-            this.textures.generate("gradientRow", {
-                width: 950,
-                height: 60,
-                callback: function(canvas, context) {
-                    const gradient = context.createLinearGradient(0, 0, 950, 0);
-                    gradient.addColorStop(0, "rgba(251, 37, 244, 0.7)");
-                    gradient.addColorStop(1, "rgba(62, 220, 215, 0.8)");
-                    context.fillStyle = gradient;
-                    context.fillRect(0, 0, 950, 60);
-                }
-            });
-
-            this.textures.generate("goldRow", {
-                width: 950,
-                height: 60,
-                callback: function(canvas, context) {
-                    context.fillStyle = "rgba(255, 215, 0, 0.25)";
-                    context.fillRect(0, 0, 950, 60);
-                }
-            });
-
-            fetch("https://toolkitweb.xyz/toolkit/basket-leaderboard.json").then(res => res.json()).then(data => {
-                t.exitingData = data;
-                var i = data.user.sort((a, b) => b.score - a.score).slice(0, 11);
-                i.forEach((player, index) => {
-                    const yPos = 220 + 60 * (index + 1);
-                    const isTop3 = index < 3;
-                    const style = isTop3 
-                        ? { fontSize: "30px", fontFamily: "Original Surfer", color: "#3EDCD7", textShadow: "1px 1px 3px #FFD700" }
-                        : { fontSize: "26px", fontFamily: "Original Surfer", color: "#FFFFFF" };
-                    const formattedName = formatWalletAddress(player.name);
-
-                    t.add.image(n(t), yPos, isTop3 ? "goldRow" : "gradientRow").setDisplaySize(950, 60);
-                    t.add.text(n(t) - 280, yPos, `${index + 1}`, style).setOrigin(0.5);
-                    t.add.text(n(t), yPos, formattedName, style).setOrigin(0.5);
-                    t.add.text(n(t) + 280, yPos, `${player.score}`, style).setOrigin(0.5);
-                });
-            }).catch(err => console.log("Leaderboard fetch failed:", err));
-        }
-    }]) && I(e.prototype, i), o && I(e, o), s
-}();
+            }]) && I(e.prototype, i), o && I(e, o), s
+        }();
 
         /* Utility Functions—Class setup for MenuScene */
         function Y(t) { return (Y = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(t) { return typeof t } : function(t) { return t && "function" == typeof Symbol && t.constructor === Symbol && t !== Symbol.prototype ? "symbol" : typeof t })(t) }
