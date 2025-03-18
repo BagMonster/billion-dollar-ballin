@@ -151,29 +151,6 @@
             flex-direction: column;
             overflow-y: auto; /* Allow scrolling within #sideMenu if needed */
         }
-        #sideMenu::-webkit-scrollbar {
-            width: 8px; /* Slim scrollbar */
-        }
-
-        #sideMenu::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.5); /* Dark track */
-            border-radius: 4px;
-        }
-
-        #sideMenu::-webkit-scrollbar-thumb {
-            background: gold; /* Gold thumb to match theme */
-            border-radius: 4px;
-        }
-
-        #sideMenu::-webkit-scrollbar-thumb:hover {
-            background: #FFD700; /* Slightly lighter gold on hover */
-        }
-
-        /* Custom Scrollbar Styling for Firefox */
-        #sideMenu {
-            scrollbar-width: thin; /* Slim scrollbar */
-            scrollbar-color: gold rgba(0, 0, 0, 0.5); /* Gold thumb, dark track */
-        }
         #sideMenu.open {
             left: 0; /* Slide in */
         }
@@ -396,14 +373,14 @@
         @media only screen and (max-width: 767px) {
             #walletUI {
                 top: auto;
-                bottom: 10%;
+                bottom: 5%;
                 right: auto;
                 left: 2%;
             }
             #statusBox {
                 width: 180px;
                 padding: 8px;
-                font-size: 22px;
+                font-size: 19px;
                 line-height: 1.5;
             }
             .status-label, .status-value {
@@ -439,28 +416,6 @@
             }
             #sideMenu.open {
                 left: 0;
-            }
-            #sideMenu::-webkit-scrollbar {
-                width: 6px; /* Slightly slimmer for mobile */
-            }
-
-            #sideMenu::-webkit-scrollbar-track {
-                background: rgba(0, 0, 0, 0.5);
-                border-radius: 3px;
-            }
-
-            #sideMenu::-webkit-scrollbar-thumb {
-                background: gold;
-                border-radius: 3px;
-            }
-
-            #sideMenu::-webkit-scrollbar-thumb:hover {
-                background: #FFD700;
-            }
-
-            #sideMenu {
-                scrollbar-width: thin;
-                scrollbar-color: gold rgba(0, 0, 0, 0.5);
             }
             #sideMenu h3 {
                 font-size: 26px; /* Reduced for mobile */
