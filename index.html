@@ -801,6 +801,33 @@
             console.log("startGame event => Hiding the menu button");
             menuButton.style.display = 'none';
             sideMenu.classList.remove('open'); // closes the side menu if open
+            document.getElementById('leaderboardContainer').style.display = 'none'; // Hide leaderboard
+        });
+
+        // Leaderboard event listeners
+        window.addEventListener('startLeaderboard', () => {
+            console.log("startLeaderboard event => Showing leaderboard");
+            document.getElementById('walletUI').style.display = 'none';
+            document.getElementById('leaderboardContainer').style.display = 'block';
+            menuButton.style.display = 'none';
+            sideMenu.classList.remove('open');
+        });
+
+        window.addEventListener('updateLeaderboard', (event) => {
+            const leaderboardData = event.detail;
+            console.log("Leaderboard data received:", leaderboardData);
+            const tbody = document.getElementById('leaderboardBody');
+            tbody.innerHTML = ''; // Clear existing rows
+
+            leaderboardData.forEach((player, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${player.name}</td>
+                    <td>${player.score}</td>
+                `;
+                tbody.appendChild(row);
+            });
         });
 
         // Close sideMenu if user clicks outside
