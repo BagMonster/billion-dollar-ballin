@@ -496,6 +496,7 @@
                     this.add.image(70, 100, "backBtn").setScale(0.1).setInteractive({ cursor: "pointer" }).on("pointerup", () => {
                         console.log("Back button clicked, isMobileView:", o?.isMobileView);
                         const targetScene = (typeof o?.isMobileView !== "undefined" && o.isMobileView) ? "MenuSceneMobile" : "MenuScene";
+                        window.dispatchEvent(new CustomEvent('hideLeaderboard')); // Dispatch event to hide leaderboard
                         t.scene.start(targetScene);
                     }); // Back button
 
