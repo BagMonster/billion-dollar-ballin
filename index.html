@@ -387,16 +387,18 @@
             padding: 10px;
             text-align: center;
         }
-        #leaderboardTable tbody tr:nth-child(-n+3) {
-            background: rgba(255, 215, 0, 0.25); /* Solid gold, 0.25 opacity */
-            color: #3EDCD7; /* Cyan text for top 3 */
-            font-size: 30px;
-            text-shadow: 1px 1px 3px #FFD700; /* Gold glow */
-        }
-        #leaderboardTable tbody tr:not(:nth-child(-n+3)) {
-            background: linear-gradient(to right, rgba(251, 37, 244, 0.7), rgba(62, 220, 215, 0.8)); /* Gradient for non-top-3 */
+
+        #leaderboardTable tbody tr {
+            background: linear-gradient(to right, rgba(251, 37, 244, 0.7), rgba(62, 220, 215, 0.8)); /* All rows same gradient */
             color: #FFFFFF;
             font-size: 26px;
+        }
+
+        #leaderboardTable tbody tr:nth-child(-n+3) {
+            background: #FFD700; /* Solid gold for top 3 */
+            color: #3EDCD7; /* Cyan text for top 3 */
+            font-size: 30px;
+            text-shadow: 1px 1px 3px #000; /* Subtle shadow for pop */
         }    
         #payoutSplit {
             color: #FFD700;
@@ -617,7 +619,7 @@
             </thead>
             <tbody id="leaderboardBody"></tbody>
         </table>
-        <p id="payoutSplit">Payout Split (Pot > 3 SOL) = 1st place 70% / 2nd place 20% / 3rd place 10%</p>
+        <p id="payoutSplit">Payout Split (Pot > 3 SOL) = 1st place 70% of the pot / 2nd place 20% of the pot / 3rd place 10% of the pot</p>
     </div>
     <div id="practiceMessage">
         You’re in Practice Mode!<br>
