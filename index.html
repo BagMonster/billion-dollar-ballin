@@ -612,13 +612,13 @@
             <thead>
                 <tr>
                     <th>RANK</th>
-                    <th>NAME</th>
+                    <th>WALLET</th>
                     <th>SCORE</th>
                 </tr>
             </thead>
             <tbody id="leaderboardBody"></tbody>
         </table>
-        <p id="payoutSplit">Payout Split (Pot > 3 SOL) = 1st place 70% of the pot / 2nd place 20% of the pot / 3rd place 10% of the pot</p>
+        <p id="payoutSplit">When the Winner's pot grows to more than 3 SOL, the total winnings are split as follows: 1st place 70% of the pot / 2nd place 20% of the pot / 3rd place 10% of the pot</p>
     </div>
     <div id="practiceMessage">
         You’re in Practice Mode!<br>
@@ -829,6 +829,11 @@
                 `;
                 tbody.appendChild(row);
             });
+        });
+
+        window.addEventListener('hideLeaderboard', () => {
+            console.log("hideLeaderboard event => Hiding leaderboard");
+            document.getElementById('leaderboardContainer').style.display = 'none';
         });
 
         // Close sideMenu if user clicks outside
