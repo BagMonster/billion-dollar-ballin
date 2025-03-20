@@ -122,20 +122,21 @@
             z-index: 9999;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Center vertically */
-            align-items: center; /* Center horizontally */
+            justify-content: center;
+            align-items: center;
             box-sizing: border-box;
-            gap: 4px; /* Space between lines */
         }
 
         #menuButton .line {
-            width: 28px; /* Slightly reduced to ensure even padding */
-            height: 4px;
+            display: block; /* Ensure the line renders as a block element */
+            width: 28px; /* Adjusted for even padding */
+            height: 4px; /* Consistent height */
             background-color: white;
             border-radius: 2px;
-            margin: 0; /* Remove margin to rely on flex gap */
-            align-self: center; /* Ensure each line is centered */
+            margin: 3px auto; /* Use margin for spacing and centering */
+            align-self: center; /* Flexbox centering */
         }
+        
         #sideMenu {
             position: fixed;
             top: 0;
@@ -446,16 +447,18 @@
                 height: 40px;
                 top: 15px;
                 left: 15px;
-                border-radius: 7px; /* Adjusted from 6px to match new size */
-                box-sizing: border-box; /* Ensure border is included */
-                gap: 3px; /* Slightly smaller gap for mobile */
+                border-radius: 7px;
+                box-sizing: border-box;
             }
+
             #menuButton .line {
+                display: block;
                 width: 24px; /* Adjusted for smaller button */
                 height: 3px;
-                margin: 0;
+                margin: 2.5px auto;
                 align-self: center;
             }
+            
             #sideMenu {
                 width: 200px;
                 left: -200px;
