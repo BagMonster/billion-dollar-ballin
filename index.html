@@ -110,32 +110,34 @@
             margin: 20px auto 0; /* Center and space above */
         }
         #menuButton {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            width: 45px;
-            height: 45px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid gold;
-            border-radius: 9px;
-            cursor: pointer;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            box-sizing: border-box;
-        }
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 45px;
+    height: 45px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid gold;
+    border-radius: 9px;
+    cursor: pointer;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 8px 0; /* Add padding to control vertical space */
+    gap: 3px; /* Use gap for spacing between lines */
+}
 
-        #menuButton .line {
-            display: block; /* Ensure the line renders as a block element */
-            width: 28px; /* Adjusted for even padding */
-            height: 4px; /* Consistent height */
-            background-color: white;
-            border-radius: 2px;
-            margin: 3px auto; /* Use margin for spacing and centering */
-            align-self: center; /* Flexbox centering */
-        }
+#menuButton .line {
+    display: block;
+    width: 28px;
+    height: 4px;
+    background-color: white;
+    border-radius: 2px;
+    margin: 0; /* Remove margin, rely on gap */
+    align-self: center;
+}
         
         #sideMenu {
             position: fixed;
@@ -443,21 +445,23 @@
                 margin: 8px;
             }
             #menuButton {
-                width: 40px;
-                height: 40px;
-                top: 15px;
-                left: 15px;
-                border-radius: 7px;
-                box-sizing: border-box;
-            }
+        width: 40px;
+        height: 40px;
+        top: 15px;
+        left: 15px;
+        border-radius: 7px;
+        box-sizing: border-box;
+        padding: 7px 0; /* Adjusted padding for mobile */
+        gap: 2.5px; /* Adjusted gap for mobile */
+    }
 
-            #menuButton .line {
-                display: block;
-                width: 24px; /* Adjusted for smaller button */
-                height: 3px;
-                margin: 2.5px auto;
-                align-self: center;
-            }
+    #menuButton .line {
+        display: block;
+        width: 24px;
+        height: 3px;
+        margin: 0;
+        align-self: center;
+    }
             
             #sideMenu {
                 width: 200px;
