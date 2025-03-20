@@ -22,6 +22,7 @@
         #game {
             position: relative;
         }
+        
         #menuButton, #sideMenu {
             pointer-events: auto; /* Ensure menu button is clickable */
             z-index: 9999;
@@ -326,6 +327,7 @@
         #sideMenu #closeMenu:hover {
             background: rgba(251, 37, 244, 1);
         }
+        
         #sideMenu #brandSection {
             text-align: center;
             margin-top: 20px; /* Space above brand section */
@@ -344,10 +346,12 @@
             text-shadow: 1px 1px 2px #000;
             margin: 0;
         }
+        
         #payoutTimerLabel {
             color: #3EDCD7; /* Cyan for pop */
             text-shadow: 2px 2px 3px #000; /* Matches buttons */
         }
+        
         #leaderboardContainer {
             position: fixed;
             top: 50%;
@@ -402,7 +406,7 @@
         #payoutSplit {
             color: #FFD700;
             font-family: 'Original Surfer', sans-serif;
-            font-size: 16px;
+            font-size: 14px;
             text-align: center;
             margin: 10px 0 0 0;
         }
@@ -560,7 +564,7 @@
                 font-size: 20px;
             }
             #payoutSplit {
-                font-size: 16px;
+                font-size: 14px;
             }
         }
     </style>
@@ -618,7 +622,7 @@
             </thead>
             <tbody id="leaderboardBody"></tbody>
         </table>
-        <p id="payoutSplit">When the Winner's pot grows to more than 3 SOL, the total winnings are split as follows: 1st place 70% of the pot / 2nd place 20% of the pot / 3rd place 10% of the pot</p>
+        <p id="payoutSplit">If Winner's Pot holds more than 3 SOL, Total Winnings are split between the top 3 wallets as follows: 1st place 70% of the pot / 2nd place 20% of the pot / 3rd place 10% of the pot</p>
     </div>
     <div id="practiceMessage">
         You’re in Practice Mode!<br>
@@ -835,6 +839,13 @@
             console.log("hideLeaderboard event => Hiding leaderboard");
             document.getElementById('leaderboardContainer').style.display = 'none';
         });
+        
+        window.addEventListener('showMenu', () => {
+            console.log("showMenu event => Showing main menu UI");
+            document.getElementById('walletUI').style.display = 'block';
+            document.getElementById('leaderboardContainer').style.display = 'none'; // Ensure leaderboard stays hidden
+            menuButton.style.display = 'block';
+        });
 
         // Close sideMenu if user clicks outside
         function closeMenuIfOutside(e) {
@@ -1017,3 +1028,4 @@
     </script>
 </body>
 </html> 
+
