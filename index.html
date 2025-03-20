@@ -110,33 +110,39 @@
             margin: 20px auto 0; /* Center and space above */
         }
         #menuButton {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    width: 45px;            /* Overall button size */
-    height: 45px;           /* Adjust as needed */
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid gold;
-    border-radius: 9px;
-    box-sizing: border-box;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  
+  width: 45px;        /* overall button size */
+  height: 45px;       
+  
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid gold;
+  border-radius: 9px;
+  box-sizing: border-box;
 
-    /* Center contents horizontally + vertically */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  /* The key: center contents in both directions */
+  display: flex;      
+  flex-direction: column;  /* stack lines vertically */
+  align-items: center;     
+  justify-content: center; 
 
-    cursor: pointer;
-    z-index: 9999;
+  cursor: pointer;
+  z-index: 9999;
 }
 
+/* Each bar is stacked within that 45x45 container */
 #menuButton .line {
-    /* Each horizontal bar: let the container handle spacing */
-    width: 28px;            /* Bar width */
-    height: 4px;            /* Bar thickness */
-    background-color: white;
-    border-radius: 2px;
-    margin: 3px 0;          /* Space between lines */
+  width: 28px;        /* bar width */
+  height: 4px;        /* bar thickness */
+  background-color: white;
+  border-radius: 2px;
+  
+  /* simple vertical spacing: top & bottom margin */
+  margin: 2px 0;      
 }
+
  
         #sideMenu {
             position: fixed;
@@ -444,14 +450,31 @@
                 margin: 8px;
             }
             #menuButton {
-        width: 40px;
-        height: 40px;
-        border-radius: 7px;
+        position: fixed;       /* same position logic */
+        top: 15px;             /* or what you need */
+        left: 15px;           
+        width: 40px;           /* smaller size */
+        height: 40px;          
+        border-radius: 7px;    /* slightly smaller radius */
+        
+        /* The key: keep the flex centering! */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        
+        cursor: pointer;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.8);
+        border: 2px solid gold;
+        box-sizing: border-box;
     }
     #menuButton .line {
-        width: 24px;
-        height: 3px;
-        margin: 2px 0;
+        width: 24px;           /* narrower lines for mobile */
+        height: 3px;           
+        margin: 2px 0;         /* smaller vertical spacing */
+        background-color: white;
+        border-radius: 2px;
     }
             
             #sideMenu {
