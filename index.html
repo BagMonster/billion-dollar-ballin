@@ -698,6 +698,8 @@
         let pot = 0;
         let dailyHighScore = 0;
         let timeLeft = 36 * 60 * 60 * 1000;
+        
+        const BACKEND_URL = 'http://137.184.207.40:3000';
 
         const connectButton = document.getElementById('connectWallet');
         const playButton = document.getElementById('playButton');
@@ -948,54 +950,48 @@
         });
 
         async function chargeFee() {
-            console.log("Charging fee");
-            const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
-            const ownerPublicKey = new solanaWeb3.PublicKey('YOUR_OWNER_WALLET_PUBLIC_KEY');
-            const potPublicKey = new solanaWeb3.PublicKey('YOUR_POT_WALLET_PUBLIC_KEY');
+          console.log("Charging fee");
+          const connection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+          const tx = new solanaWeb3.Transaction().add(
+            solanaWeb3.SystemProgram.transfer({
+              fromPubkey: new solanaWeb3.PublicKey(walletPublicKey),
+              toPubkey: new solanaWeb3.PublicKey('F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd'), // Owner
+              lamports: 750000 // 0.00075 SOL
+            }),
+            solanaWeb3.SystemProgram.transfer({
+              fromPubkey: new solanaWeb3.PublicKey(walletPublicKey),
+              toPubkey: new solanaWeb3.PublicKey('Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK'), // Pot
+              lamports: 9250000 // 0.00925 SOL
+            })
+          );
 
-            const totalFee = 0.01 * solanaWeb3.LAMPORTS_PER_SOL; // 0.01 SOL
-            const ownerCut = 0.00075 * solanaWeb3.LAMPORTS_PER_SOL; // 7.5% of 0.01 SOL
-            const potAmount = 0.00925 * solanaWeb3.LAMPORTS_PER_SOL; // 92.5% of 0.01 SOL
+          try {
+            const { blockhash } = await connection.getLatestBlockhash();
+            tx.recentBlockhash = blockhash;
+            tx.feePayer = new solanaWeb3.PublicKey(walletPublicKey);
 
-            const ownerTx = new solanaWeb3.Transaction().add(
-                solanaWeb3.SystemProgram.transfer({
-                    fromPubkey: new solanaWeb3.PublicKey(walletPublicKey),
-                    toPubkey: ownerPublicKey,
-                    lamports: ownerCut,
-                })
-            );
+            const signedTx = await window.solana.signTransaction(tx);
+            const signature = signedTx.signature.toString('base64');
 
-            const potTx = new solanaWeb3.Transaction().add(
-                solanaWeb3.SystemProgram.transfer({
-                    fromPubkey: new solanaWeb3.PublicKey(walletPublicKey),
-                    toPubkey: potPublicKey,
-                    lamports: potAmount,
-                })
-            );
+            const response = await fetch(`${BACKEND_URL}/play`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ playerKey: walletPublicKey, signature })
+            });
+            const data = await response.json();
 
-            try {
-                const { blockhash } = await connection.getLatestBlockhash();
-                ownerTx.recentBlockhash = blockhash;
-                ownerTx.feePayer = new solanaWeb3.PublicKey(walletPublicKey);
-                potTx.recentBlockhash = blockhash;
-                potTx.feePayer = new solanaWeb3.PublicKey(walletPublicKey);
-
-                const signedOwner = await window.solana.signTransaction(ownerTx);
-                const signedPot = await window.solana.signTransaction(potTx);
-
-                await connection.sendRawTransaction(signedOwner.serialize());
-                const potSignature = await connection.sendRawTransaction(signedPot.serialize());
-                await connection.confirmTransaction(potSignature);
-
-                pot += 0.00925; // Add to pot (92.5% of 0.01 SOL)
-                potDisplay.textContent = `🏆 Pot: ${pot.toFixed(5)} SOL`;
-                document.getElementById('walletUI').style.display = 'none';
-                alert('Fee paid! Game starting...');
-                window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
-            } catch (err) {
-                console.error('Fee payment failed:', err);
-                alert('Fee payment failed!');
+            if (data.success) {
+              console.log("Fee paid, tx ID:", data.txId);
+              document.getElementById('walletUI').style.display = 'none';
+              window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
+            } else {
+              console.error('Fee payment failed:', data.error);
+              alert('Fee payment failed!');
             }
+          } catch (err) {
+            console.error('Fee payment failed:', err);
+            alert('Fee payment failed!');
+          }
         }
 
         // Placeholder for marketing wallet (to be replaced by GR1 with actual devnet address)
@@ -1055,4 +1051,3 @@
     </script>
 </body>
 </html> 
-
