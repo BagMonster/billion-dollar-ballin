@@ -113,25 +113,28 @@
             position: fixed;
             top: 20px;
             left: 20px;
-            width: 45px; /* Adjusted: between 40px and 50px */
-            height: 45px; /* Adjusted: between 40px and 50px */        
+            width: 45px;
+            height: 45px;
             background: rgba(0, 0, 0, 0.8);
             border: 2px solid gold;
-            border-radius: 9px; /* Adjusted from 8px to match new size */
+            border-radius: 9px;
             cursor: pointer;
             z-index: 9999;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            box-sizing: border-box; /* Ensure border is included in width/height */
+            justify-content: center; /* Center vertically */
+            align-items: center; /* Center horizontally */
+            box-sizing: border-box;
+            gap: 4px; /* Space between lines */
         }
+
         #menuButton .line {
-            width: 30px; /* Adjusted: between 24px and 30px */
-            height: 4px; /* Adjusted: between 3px and 4px */
+            width: 28px; /* Slightly reduced to ensure even padding */
+            height: 4px;
             background-color: white;
-            margin: 3px 0; /* Kept for consistent spacing */
             border-radius: 2px;
+            margin: 0; /* Remove margin to rely on flex gap */
+            align-self: center; /* Ensure each line is centered */
         }
         #sideMenu {
             position: fixed;
@@ -445,11 +448,13 @@
                 left: 15px;
                 border-radius: 7px; /* Adjusted from 6px to match new size */
                 box-sizing: border-box; /* Ensure border is included */
+                gap: 3px; /* Slightly smaller gap for mobile */
             }
             #menuButton .line {
-                width: 26px;
+                width: 24px; /* Adjusted for smaller button */
                 height: 3px;
-                margin: 2.5px 0;
+                margin: 0;
+                align-self: center;
             }
             #sideMenu {
                 width: 200px;
