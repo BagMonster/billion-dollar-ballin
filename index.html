@@ -124,12 +124,13 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            box-sizing: border-box; /* Ensure border is included in width/height */
         }
         #menuButton .line {
-            width: 27px; /* Adjusted: between 24px and 30px */
-            height: 3.5px; /* Adjusted: between 3px and 4px */
+            width: 30px; /* Adjusted: between 24px and 30px */
+            height: 4px; /* Adjusted: between 3px and 4px */
             background-color: white;
-            margin: 2px 0; /* Kept for consistent spacing */
+            margin: 3px 0; /* Kept for consistent spacing */
             border-radius: 2px;
         }
         #sideMenu {
@@ -443,11 +444,12 @@
                 top: 15px;
                 left: 15px;
                 border-radius: 7px; /* Adjusted from 6px to match new size */
+                box-sizing: border-box; /* Ensure border is included */
             }
             #menuButton .line {
-                width: 24px;
-                height: 2.5px;
-                margin: 2px 0;
+                width: 26px;
+                height: 3px;
+                margin: 2.5px 0;
             }
             #sideMenu {
                 width: 200px;
