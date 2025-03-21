@@ -727,23 +727,22 @@
         potValue.textContent = `${pot.toFixed(3)} SOL`;
         highScoreValue.textContent = `${dailyHighScore}`;
         
+        // Timer update function
         function updateTimer() {
             const hours = Math.floor(timeLeft / (1000 * 60 * 60));
             const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
             payoutTimerValue.textContent = `${hours}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
-            timeLeft -= 1000;
-            if (timeLeft < 0) timeLeft = 36 * 60 * 60 * 1000;
         }
 
-        updateTimer();
-        setInterval(updateTimer, 1000);
-
+        // Fetch status every 5 seconds from backend
         setInterval(() => {
-            fetch('/status')
+            fetch(`${BACKEND_URL}/status`)
                 .then(res => res.json())
                 .then(data => {
                     timeLeft = data.nextPayoutTimestamp - Date.now();
+                    potValue.textContent = `${data.potBalance.toFixed(5)} SOL`; // Backend pot
+                    highScoreValue.textContent = data.highScores[0]?.score || 0; // Backend high score
                     updateTimer();
                 })
                 .catch(() => console.log("Using mock timer until backend’s live"));
@@ -993,61 +992,6 @@
             alert('Fee payment failed!');
           }
         }
-
-        // Placeholder for marketing wallet (to be replaced by GR1 with actual devnet address)
-        const marketingPublicKey = new solanaWeb3.PublicKey('YOUR_MARKETING_WALLET_PUBLIC_KEY');
-
-        setInterval(async () => {
-            if (pot > 0) {
-                const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
-
-                // Calculate marketing cut (2.5% of pot)
-                const marketingCut = pot * 0.025;
-                const potAfterMarketing = pot - marketingCut;
-
-                console.log(`Marketing cut: ${marketingCut.toFixed(5)} SOL (2.5% of pot)`);
-
-                // Create transaction for marketing cut (to be implemented by GR1 backend)
-                const marketingTx = new solanaWeb3.Transaction().add(
-                    solanaWeb3.SystemProgram.transfer({
-                        fromPubkey: potPublicKey, // Assuming pot wallet sends marketing cut
-                        toPubkey: marketingPublicKey,
-                        lamports: Math.floor(marketingCut * solanaWeb3.LAMPORTS_PER_SOL), // Convert to lamports
-                    })
-                );
-
-                // Simulate sending marketing cut (replace with backend logic)
-                try {
-                    const { blockhash } = await connection.getLatestBlockhash();
-                    marketingTx.recentBlockhash = blockhash;
-                    marketingTx.feePayer = potPublicKey; // Note: This needs backend signing
-                    console.log("Marketing transaction prepared:", marketingTx);
-                    // Backend will need to sign and send this transaction
-                } catch (err) {
-                    console.error("Marketing transaction setup failed:", err);
-                }
-
-                // Check if pot after marketing cut is greater than 3 SOL
-                if (potAfterMarketing > 3) {
-                    // Top 3 split: 70% to 1st, 20% to 2nd, 10% to 3rd
-                    const firstPlace = potAfterMarketing * 0.7;
-                    const secondPlace = potAfterMarketing * 0.2;
-                    const thirdPlace = potAfterMarketing * 0.1;
-                    console.log(`Payout (36 hours, pot > 3 SOL): 1st: ${firstPlace.toFixed(5)} SOL (70%), 2nd: ${secondPlace.toFixed(5)} SOL (20%), 3rd: ${thirdPlace.toFixed(5)} SOL (10%)`);
-                    // Backend will handle sending these payouts from potPublicKey
-                } else {
-                    // Single winner takes all after marketing cut
-                    console.log(`Payout (36 hours): Winner: ${potAfterMarketing.toFixed(5)} SOL (100% after marketing cut)`);
-                    // Backend will handle sending this payout from potPublicKey
-                }
-
-                // Reset pot and high score
-                pot = 0;
-                dailyHighScore = 0;
-                potValue.textContent = `${pot.toFixed(5)} SOL`; // Update Row 2
-                highScoreValue.textContent = `${dailyHighScore}`; // Update Row 4
-            }
-        }, 36 * 60 * 60 * 1000); // 36 hours in milliseconds
     </script>
 </body>
 </html> 
