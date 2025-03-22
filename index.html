@@ -735,7 +735,7 @@
             payoutTimerValue.textContent = `${hours}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
         }
 
-        // Fetch status every 5 seconds from backend
+        // Fetch status every 2.5 seconds from backend
         setInterval(() => {
             fetch(`${BACKEND_URL}/status`)
                 .then(res => res.json())
@@ -746,7 +746,7 @@
                     updateTimer();
                 })
                 .catch(() => console.log("Using mock timer until backend’s live"));
-        }, 250);
+        }, 2500);
 
         leaderboardButton.style.opacity = '1';
         leaderboardButton.style.pointerEvents = 'auto';
