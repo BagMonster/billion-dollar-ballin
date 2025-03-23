@@ -875,6 +875,35 @@
             menuButton.style.display = 'flex';
         });
 
+        window.addEventListener('gameOver', async (event) => {
+            console.log("gameOver event received:", event.detail);
+            const { wallet, score } = event.detail;
+
+            // Only submit score if wallet exists and not in practice mode
+            if (wallet && wallet !== "Player") {
+                try {
+                    const response = await fetch(`${BACKEND_URL}/submit-score`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ wallet, score })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        console.log('Score submitted successfully:', { wallet, score });
+                    } else {
+                        console.error('Score submission failed:', data.error);
+                    }
+                } catch (err) {
+                    console.error('Score submission error:', err);
+                }
+            } else {
+                console.log("Practice mode or no wallet - skipping score submission");
+            }
+
+            // Return to menu regardless of submission
+            window.dispatchEvent(new CustomEvent('showMenu'));
+        });
+
         // Close sideMenu if user clicks outside
         function closeMenuIfOutside(e) {
           if (!sideMenu.contains(e.target) && e.target !== menuButton) {
