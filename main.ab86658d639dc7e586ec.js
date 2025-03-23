@@ -327,20 +327,28 @@
                     this.hoop.setPosition(t, e)
                 }
             }, {
-                key: "addGameOver", // Displays game over screen
+                key: "addGameOver",
                 value: function() {
                     var t = this;
-                    this.dataPost(); // Sends score to leaderboard
-                    var e = this.add.container(n(this), r(this)).setDepth(10), // Container for game over UI
-                        i = this.add.image(0, 0, "popup"), // Popup background
-                        a = this.add.text(0, -300, "GAME OVER", { fontSize: "60px", fontFamily: "font", color: "red" }).setOrigin(.5), // Title
-                        s = this.add.text(0, -50, "SCORE\n".concat(o.score), { fontSize: "90px", fontFamily: "font", color: "black", align: "center" }).setOrigin(.5), // Score
-                        l = this.add.image(0, -7, "score-fill").setScale(1.3), // Score background
-                        c = this.add.image(-130, 160, "btn-home").setInteractive({ cursor: "pointer" }).on("pointerup", (function() { o.score = 0, o.levelNumber = 1, t.scene.start("MenuScene") })), // Home button
+                    var e = this.add.container(n(this), r(this)).setDepth(10),
+                        i = this.add.image(0, 0, "popup"),
+                        a = this.add.text(0, -300, "GAME OVER", { fontSize: "60px", fontFamily: "font", color: "red" }).setOrigin(.5),
+                        s = this.add.text(0, -50, "SCORE\n".concat(o.score), { fontSize: "90px", fontFamily: "font", color: "black", align: "center" }).setOrigin(.5),
+                        l = this.add.image(0, -7, "score-fill").setScale(1.3),
+                        c = this.add.image(-130, 160, "btn-home").setInteractive({ cursor: "pointer" }).on("pointerup", (function() { 
+                            o.score = 0; 
+                            o.levelNumber = 1; 
+                            t.scene.start(o.isMobileView ? "MenuSceneMobile" : "MenuScene"); 
+                        })),
                         u = this.add.image(130, 160, "btn-replay").setInteractive({ cursor: "pointer" }).on("pointerup", (function() { 
-                            o.score = 0, o.levelNumber = 1, t.maxLife = 3, t.lifeArr.forEach(ball => ball.setVisible(true)), t.scene.start("GameScene") // Resets lives
-                        })); // Replay button
-                    e.add([i, a, l, s, c, u])
+                            o.score = 0; 
+                            o.levelNumber = 1; 
+                            t.maxLife = 3; 
+                            t.lifeArr.forEach(ball => ball.setVisible(true)); 
+                            t.scene.start(o.isMobileView ? "GameSceneMobile" : "GameScene"); 
+                        }));
+                    e.add([i, a, l, s, c, u]);
+                    window.dispatchEvent(new CustomEvent('gameOver', { detail: { wallet: o.userName, score: o.score } }));
                 }
             }, {
                 key: "addSlash", // Adds level transition effect
@@ -439,17 +447,25 @@
                 key: "addGameOver",
                 value: function() {
                     var t = this;
-                    this.dataPost();
                     var e = this.add.container(n(this), r(this)).setDepth(10),
                         i = this.add.image(0, 0, "popup"),
                         a = this.add.text(0, -300, "GAME OVER", { fontSize: "60px", fontFamily: "font", color: "red" }).setOrigin(.5),
                         s = this.add.text(0, -50, "SCORE\n".concat(o.score), { fontSize: "90px", fontFamily: "font", color: "black", align: "center" }).setOrigin(.5),
                         l = this.add.image(0, -7, "score-fill").setScale(1.3),
-                        c = this.add.image(-130, 160, "btn-home").setInteractive({ cursor: "pointer" }).on("pointerup", (function() { o.score = 0, o.levelNumber = 1, t.scene.start("MenuSceneMobile") })),
+                        c = this.add.image(-130, 160, "btn-home").setInteractive({ cursor: "pointer" }).on("pointerup", (function() { 
+                            o.score = 0; 
+                            o.levelNumber = 1; 
+                            t.scene.start(o.isMobileView ? "MenuSceneMobile" : "MenuScene"); 
+                        })),
                         u = this.add.image(130, 160, "btn-replay").setInteractive({ cursor: "pointer" }).on("pointerup", (function() { 
-                            o.score = 0, o.levelNumber = 1, t.maxLife = 3, t.lifeArr.forEach(ball => ball.setVisible(true)), t.scene.start("GameSceneMobile") // Resets lives
+                            o.score = 0; 
+                            o.levelNumber = 1; 
+                            t.maxLife = 3; 
+                            t.lifeArr.forEach(ball => ball.setVisible(true)); 
+                            t.scene.start(o.isMobileView ? "GameSceneMobile" : "GameScene"); 
                         }));
-                    e.add([i, a, l, s, c, u])
+                    e.add([i, a, l, s, c, u]);
+                    window.dispatchEvent(new CustomEvent('gameOver', { detail: { wallet: o.userName, score: o.score } }));
                 }
             }, {
                 key: "addSlash", value: function() { var t = this.add.image(n(this), r(this), "slash").setDepth(10); t.visible = !0, this.tweens.add({ targets: t, delay: 500, alpha: 0, onComplete: function() { t.visible = !1, t.alpha = 1 } }) }
