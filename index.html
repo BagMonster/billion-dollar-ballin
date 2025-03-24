@@ -978,48 +978,54 @@
         });
 
         async function chargeFee() {
-          console.log("Charging fee");
-          const connection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-          const tx = new solanaWeb3.Transaction().add(
-            solanaWeb3.SystemProgram.transfer({
-              fromPubkey: new solanaWeb3.PublicKey(walletPublicKey),
-              toPubkey: new solanaWeb3.PublicKey('F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd'), // Owner
-              lamports: 750000 // 0.00075 SOL
-            }),
-            solanaWeb3.SystemProgram.transfer({
-              fromPubkey: new solanaWeb3.PublicKey(walletPublicKey),
-              toPubkey: new solanaWeb3.PublicKey('Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK'), // Pot
-              lamports: 9250000 // 0.00925 SOL
-            })
-          );
-
-          try {
-            const { blockhash } = await connection.getLatestBlockhash();
-            tx.recentBlockhash = blockhash;
-            tx.feePayer = new solanaWeb3.PublicKey(walletPublicKey);
-
-            const signedTx = await window.solana.signTransaction(tx);
-            const signature = signedTx.signature.toString('base64');
-
-            const response = await fetch(`${BACKEND_URL}/play`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ playerKey: walletPublicKey, signature })
-            });
-            const data = await response.json();
-
-            if (data.success) {
-              console.log("Fee paid, tx ID:", data.txId);
-              document.getElementById('walletUI').style.display = 'none';
-              window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
-            } else {
-              console.error('Fee payment failed:', data.error);
-              alert('Fee payment failed!');
+            console.log("Charging fee");
+            if (!window.solanaWeb3) {
+                console.error("Solana Web3 library not loaded!");
+                alert("Solana Web3 library failed to load. Please refresh the page and try again.");
+                return;
             }
-          } catch (err) {
-            console.error('Fee payment failed:', err);
-            alert('Fee payment failed!');
-          }
+
+            try {
+                const connection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+                const tx = new solanaWeb3.Transaction().add(
+                    solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: new solanaWeb3.PublicKey(walletPublicKey),
+                        toPubkey: new solanaWeb3.PublicKey('F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd'), // Owner
+                        lamports: 750000 // 0.00075 SOL
+                    }),
+                    solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: new solanaWeb3.PublicKey(walletPublicKey),
+                        toPubkey: new solanaWeb3.PublicKey('Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK'), // Pot
+                        lamports: 9250000 // 0.00925 SOL
+                    })
+                );
+
+                const { blockhash } = await connection.getLatestBlockhash();
+                tx.recentBlockhash = blockhash;
+                tx.feePayer = new solanaWeb3.PublicKey(walletPublicKey);
+
+                const signedTx = await window.solana.signTransaction(tx);
+                const signature = signedTx.signature.toString('base64');
+
+                const response = await fetch(`${BACKEND_URL}/play`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ playerKey: walletPublicKey, signature })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log("Fee paid, tx ID:", data.txId);
+                    document.getElementById('walletUI').style.display = 'none';
+                    window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
+                } else {
+                    console.error('Fee payment failed:', data.error);
+                    alert('Fee payment failed: ' + data.error);
+                }
+            } catch (err) {
+                console.error('Fee payment error:', err);
+                alert('Fee payment failed: ' + err.message);
+            }
         }
     </script>
 </body>
