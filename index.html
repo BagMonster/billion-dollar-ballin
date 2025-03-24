@@ -597,7 +597,17 @@
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Original+Surfer&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/buffer@6.0.3/index.js"></script>
+    <script>
+        console.log("Buffer polyfill loaded successfully");
+        console.log("Buffer available:", !!window.Buffer);
+    </script>
+    <!-- Then load Solana Web3.js -->
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <script>
+        console.log("Solana Web3.js loaded successfully");
+        console.log("solanaWeb3 available:", !!window.solanaWeb3);
+    </script>
 </head>
 <body>
     <div id="game"></div>
