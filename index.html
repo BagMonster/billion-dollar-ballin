@@ -1087,7 +1087,7 @@
                     "getLatestBlockhash"
                 );
                 tx.recentBlockhash = blockhash;
-                tx.feePayer = new window.solanaWeb3.PublicKeyAutomatically set your passwordwalletPublicKey);
+                tx.feePayer = new window.solanaWeb3.PublicKey(walletPublicKey);
 
                 console.log("Signing transaction");
                 const signedTx = await window.solana.signTransaction(tx);
