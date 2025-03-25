@@ -1073,16 +1073,9 @@
             connection = await getConnection();
             console.log("Solana connection established with endpoint:", connection.rpcEndpoint);
 
-            // Check balance
-            const balance = await connection.getBalance(new window.solanaWeb3.PublicKey(walletPublicKey));
-            const totalLamportsNeeded = 750000 + 9250000 + 5000; // Transfers + fee
-            if (balance < totalLamportsNeeded) {
-              throw new Error(`Insufficient balance: ${balance / 1e9} SOL, need at least ${totalLamportsNeeded / 1e9} SOL`);
-            }
-
             // Build transaction
             const { ComputeBudgetProgram, SystemProgram, Transaction, PublicKey } = window.solanaWeb3;
-            const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ units: 60000 });
+            const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 });
             const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 });
 
             const tx = new Transaction()
