@@ -1082,7 +1082,7 @@
 
             // Build transaction
             const { ComputeBudgetProgram, SystemProgram, Transaction, PublicKey } = window.solanaWeb3;
-            const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ units: 300 });
+            const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 });
             const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 });
 
             const tx = new Transaction()
@@ -1117,6 +1117,7 @@
             const sendOptions = {
               skipPreflight: false,
               preflightCommitment: "confirmed"
+              maxRetries: 3
             };
             const txId = await connection.sendRawTransaction(signedTx.serialize(), sendOptions);
             console.log("Transaction sent, ID:", txId);
