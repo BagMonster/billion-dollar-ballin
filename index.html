@@ -1061,58 +1061,77 @@
         }
 
         async function chargeFee() {
-          console.log("Initiating fee charge");
-          if (!window.solanaWeb3) {
-            console.error("Solana Web3 library not loaded");
-            alert("Solana Web3 library failed to load. Please refresh the page.");
-            return;
-          }
+            console.log("Initiating fee charge");
+            if (!window.solanaWeb3) {
+                console.error("Solana Web3 library not loaded");
+                alert("Solana Web3 library failed to load. Please refresh the page.");
+                return;
+            }
 
-          let connection;
-          try {
-            // Get a working connection
-            connection = await getConnection();
-            console.log("Solana connection established");
+            let connection;
+            try {
+                connection = await getConnection(false, 3);
+                console.log("Solana connection established with endpoint:", connection.rpcEndpoint);
 
-            // Build the transaction (two transfers as per our game logic)
-            const tx = new window.solanaWeb3.Transaction().add(
-              window.solanaWeb3.SystemProgram.transfer({
-                fromPubkey: new window.solanaWeb3.PublicKey(walletPublicKey),
-                toPubkey: new window.solanaWeb3.PublicKey('F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd'),
-                lamports: 750000 // 0.00075 SOL
-              }),
-              window.solanaWeb3.SystemProgram.transfer({
-                fromPubkey: new window.solanaWeb3.PublicKey(walletPublicKey),
-                toPubkey: new window.solanaWeb3.PublicKey('Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK'),
-                lamports: 9250000 // 0.00925 SOL
-              })
-            );
+                // Check balance
+                const balance = await connection.getBalance(new window.solanaWeb3.PublicKey(walletPublicKey));
+                const totalLamportsNeeded = 750000 + 9250000 + 5000; // Transfers + fee
+                if (balance < totalLamportsNeeded) {
+                    throw new Error(`Insufficient balance: ${balance / 1e9} SOL, need at least ${totalLamportsNeeded / 1e9} SOL`);
+                }
 
-            // Set the fee payer and recent blockhash
-            tx.feePayer = new window.solanaWeb3.PublicKey(walletPublicKey);
-            const { blockhash } = await connection.getLatestBlockhash();
-            tx.recentBlockhash = blockhash;
-            console.log("Transaction built with blockhash:", blockhash);
+                // Build transaction with prioritization fees
+                const { ComputeBudgetProgram, SystemProgram, Transaction, PublicKey } = window.solanaWeb3;
+                const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ units: 300 });
+                const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 });
 
-            // Sign with Phantom
-            const signedTx = await window.solana.signTransaction(tx);
-            console.log("Transaction signed by Phantom");
+                const tx = new Transaction()
+                    .add(modifyComputeUnits)
+                    .add(addPriorityFee)
+                    .add(
+                        SystemProgram.transfer({
+                            fromPubkey: new PublicKey(walletPublicKey),
+                            toPubkey: new PublicKey('F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd'),
+                            lamports: 750000 // 0.00075 SOL
+                        })
+                    )
+                    .add(
+                        SystemProgram.transfer({
+                            fromPubkey: new PublicKey(walletPublicKey),
+                            toPubkey: new PublicKey('Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK'),
+                            lamports: 9250000 // 0.00925 SOL
+                        })
+                    );
 
-            // Send the transaction
-            const txId = await connection.sendRawTransaction(signedTx.serialize());
-            console.log("Transaction sent, ID:", txId);
+                // Set fee payer and recent blockhash
+                tx.feePayer = new PublicKey(walletPublicKey);
+                const { blockhash } = await connection.getLatestBlockhash();
+                tx.recentBlockhash = blockhash;
+                console.log("Transaction built with blockhash:", blockhash);
 
-            // Confirm the transaction
-            await connection.confirmTransaction(txId);
-            console.log("Transaction confirmed:", txId);
+                // Sign and send
+                const signedTx = await window.solana.signTransaction(tx);
+                console.log("Transaction signed by Phantom");
+                const txId = await connection.sendRawTransaction(signedTx.serialize());
+                console.log("Transaction sent, ID:", txId);
 
-            // Hide wallet UI and start the game
-            document.getElementById('walletUI').style.display = 'none';
-            window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
-          } catch (err) {
-            console.error("Fee payment error:", err);
-            alert("Fee payment failed: " + err.message);
-          }
+                // Confirm transaction
+                await connection.confirmTransaction(txId);
+                console.log("Transaction confirmed:", txId);
+
+                // Proceed with game
+                document.getElementById('walletUI').style.display = 'none';
+                window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
+            } catch (err) {
+                console.error("Fee payment error:", err);
+                if (err.message.includes("Insufficient balance")) {
+                    alert("Insufficient funds in your wallet. Please add SOL and try again.");
+                } else if (err.message.includes("All RPC endpoints failed")) {
+                    alert("Unable to connect to the Solana network. Please try again later.");
+                } else {
+                    alert("Fee payment failed: " + err.message);
+                }
+            }   
         }
     </script>
 </body>
