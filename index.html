@@ -994,7 +994,14 @@
         let rpcIndex = 0;
         const maxRequestsPerEndpoint = 6;
         let currentRpcUsage = 0;
-        const fallbackRpcEndpoint = "https://api.mainnet-beta.solana.com";
+        const fallbackRpcEndpoints = [
+            "https://api.mainnet-beta.solana.com",
+            "https://solana-mainnet.api.syndica.io/api-token/2vhLTvMdx53VJATGzJkFR6DjsEsLSMa7TsePJvjk4W6aFFLGh87sgdtyCf5JCQHWscCLVEWKH9SjoynHZUnN6DYq2j41ZtKMawTqEcnFexYtKToMsdF8DWskkegBDsq8g3MBZd7j9S4gWPSUtmXRUjmmK9E9jZkwzMCej26E8jZHDeEKaga78tVRgirHxMGp8MPQ1BNtypys7Baif8UtSSVV3rgWw",
+            "https://solana-mainnet.core.chainstack.com/b5b59f59662e132489b74f63d8b60695",
+            "https://mainnet.helius-rpc.com/?api-key=ecce92cb-3428-46a5-8e4a-283a2bf879fe",
+            "https://blue-hardworking-sailboat.solana-mainnet.quiknode.pro/5042e671702e7869e2fdf17daca9bdc007356399/",
+            "https://solana-mainnet.g.alchemy.com/v2/xD8Y_3KGu_8VqlqiyVmKoNS0E7vJ6tBd"
+        ];
 
         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -1021,9 +1028,9 @@
 
         async function getConnection(forceRotation = false) {
             console.log("🔄 Selecting RPC...");
-            let endpoints = window.rpcEndpoints || [fallbackRpcEndpoint];
+            let endpoints = window.rpcEndpoints || fallbackRpcEndpoints;
             if (!window.rpcEndpoints) {
-                console.warn("RPC endpoints not loaded from config.js, using fallback:", fallbackRpcEndpoint);
+                console.warn("RPC endpoints not loaded from config.js, using fallback endpoints");
             }
 
             if (forceRotation || currentRpcUsage >= maxRequestsPerEndpoint) {
@@ -1054,77 +1061,58 @@
         }
 
         async function chargeFee() {
-            console.log("Initiating fee charge");
-            if (!window.solanaWeb3) {
-                console.error("Solana Web3 library not loaded");
-                alert("Solana Web3 library failed to load. Please refresh the page and try again.");
-                return;
-            }
+          console.log("Initiating fee charge");
+          if (!window.solanaWeb3) {
+            console.error("Solana Web3 library not loaded");
+            alert("Solana Web3 library failed to load. Please refresh the page.");
+            return;
+          }
 
-            let connection;
-            try {
-                console.log("Creating Solana connection with retry logic");
-                connection = await getConnection();
+          let connection;
+          try {
+            // Get a working connection
+            connection = await getConnection();
+            console.log("Solana connection established");
 
-                console.log("Building transaction");
-                const tx = new window.solanaWeb3.Transaction().add(
-                    window.solanaWeb3.SystemProgram.transfer({
-                        fromPubkey: new window.solanaWeb3.PublicKey(walletPublicKey),
-                        toPubkey: new window.solanaWeb3.PublicKey('F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd'),
-                        lamports: 750000 // 0.00075 SOL
-                    }),
-                    window.solanaWeb3.SystemProgram.transfer({
-                        fromPubkey: new window.solanaWeb3.PublicKey(walletPublicKey),
-                        toPubkey: new window.solanaWeb3.PublicKey('Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK'),
-                        lamports: 9250000 // 0.00925 SOL
-                    })
-                );
+            // Build the transaction (two transfers as per our game logic)
+            const tx = new window.solanaWeb3.Transaction().add(
+              window.solanaWeb3.SystemProgram.transfer({
+                fromPubkey: new window.solanaWeb3.PublicKey(walletPublicKey),
+                toPubkey: new window.solanaWeb3.PublicKey('F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd'),
+                lamports: 750000 // 0.00075 SOL
+              }),
+              window.solanaWeb3.SystemProgram.transfer({
+                fromPubkey: new window.solanaWeb3.PublicKey(walletPublicKey),
+                toPubkey: new window.solanaWeb3.PublicKey('Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK'),
+                lamports: 9250000 // 0.00925 SOL
+              })
+            );
 
-                console.log("Getting latest blockhash with retry");
-                const { blockhash } = await withRetry(
-                    () => connection.getLatestBlockhash(),
-                    2,
-                    "getLatestBlockhash"
-                );
-                tx.recentBlockhash = blockhash;
-                tx.feePayer = new window.solanaWeb3.PublicKey(walletPublicKey);
+            // Set the fee payer and recent blockhash
+            tx.feePayer = new window.solanaWeb3.PublicKey(walletPublicKey);
+            const { blockhash } = await connection.getLatestBlockhash();
+            tx.recentBlockhash = blockhash;
+            console.log("Transaction built with blockhash:", blockhash);
 
-                console.log("Signing transaction");
-                const signedTx = await window.solana.signTransaction(tx);
-                console.log("Transaction signed:", signedTx);
+            // Sign with Phantom
+            const signedTx = await window.solana.signTransaction(tx);
+            console.log("Transaction signed by Phantom");
 
-                console.log("Sending transaction with retry");
-                const txId = await withRetry(
-                    () => connection.sendRawTransaction(signedTx.serialize()),
-                    2,
-                    "sendRawTransaction"
-                );
-                console.log("Transaction sent, ID:", txId);
+            // Send the transaction
+            const txId = await connection.sendRawTransaction(signedTx.serialize());
+            console.log("Transaction sent, ID:", txId);
 
-                const response = await fetch(`${BACKEND_URL}/play`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ playerKey: walletPublicKey, signature: txId })
-                });
-                const data = await response.json();
-    
-                if (data.success) {
-                    console.log("Fee paid, tx ID:", data.txId);
-                    document.getElementById('walletUI').style.display = 'none';
-                    window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
-                } else {
-                    console.error('Fee payment failed:', data.error);
-                    alert('Fee payment failed: ' + data.error);
-                }
-            } catch (err) {
-                console.error("Fee payment error:", err);
-                if (err.message.includes('403') || err.message.includes('429')) {
-                    console.warn("⚠️ RPC failure detected, rotating to next endpoint...");
-                    connection = await getConnection(true); // Force rotation
-                    return await chargeFee(); // Retry the entire process
-                }
-                alert("Fee payment failed: " + err.message);
-            }
+            // Confirm the transaction
+            await connection.confirmTransaction(txId);
+            console.log("Transaction confirmed:", txId);
+
+            // Hide wallet UI and start the game
+            document.getElementById('walletUI').style.display = 'none';
+            window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
+          } catch (err) {
+            console.error("Fee payment error:", err);
+            alert("Fee payment failed: " + err.message);
+          }
         }
     </script>
 </body>
