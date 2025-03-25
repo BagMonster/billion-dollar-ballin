@@ -1082,7 +1082,7 @@
 
             // Build transaction
             const { ComputeBudgetProgram, SystemProgram, Transaction, PublicKey } = window.solanaWeb3;
-            const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 });
+            const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ units: 6000 });
             const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 });
 
             const tx = new Transaction()
