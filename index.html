@@ -1117,7 +1117,6 @@
             const sendOptions = {
               skipPreflight: false,
               preflightCommitment: "confirmed"
-              maxRetries: 3
             };
             const txId = await connection.sendRawTransaction(signedTx.serialize(), sendOptions);
             console.log("Transaction sent, ID:", txId);
