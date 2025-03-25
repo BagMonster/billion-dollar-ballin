@@ -1073,6 +1073,13 @@
             connection = await getConnection();
             console.log("Solana connection established with endpoint:", connection.rpcEndpoint);
 
+            // Check balance
+            const balance = await connection.getBalance(new window.solanaWeb3.PublicKey(walletPublicKey));
+            const totalLamportsNeeded = 750000 + 9250000 + 5000; // Transfers + fee
+            if (balance < totalLamportsNeeded) {
+              throw new Error(`Insufficient balance: ${balance / 1e9} SOL, need at least ${totalLamportsNeeded / 1e9} SOL`);
+            }
+
             // Build transaction
             const { ComputeBudgetProgram, SystemProgram, Transaction, PublicKey } = window.solanaWeb3;
             const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 });
@@ -1085,14 +1092,14 @@
                 SystemProgram.transfer({
                   fromPubkey: new PublicKey(walletPublicKey),
                   toPubkey: new PublicKey('F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd'),
-                  lamports: 0.00075 * LAMPORTS_PER_SOL, // 0.00075 SOL
+                  lamports: 750000 // 0.00075 SOL
                 })
               )
               .add(
                 SystemProgram.transfer({
                   fromPubkey: new PublicKey(walletPublicKey),
                   toPubkey: new PublicKey('Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK'),
-                  lamports: 0.00925 * LAMPORTS_PER_SOL, // 0.00925 SOL
+                  lamports: 9250000 // 0.00925 SOL
                 })
               );
 
@@ -1110,6 +1117,7 @@
             const sendOptions = {
               skipPreflight: false,
               preflightCommitment: "confirmed"
+              maxRetries: 3
             };
             const txId = await connection.sendRawTransaction(signedTx.serialize(), sendOptions);
             console.log("Transaction sent, ID:", txId);
