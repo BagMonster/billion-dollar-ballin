@@ -1061,82 +1061,98 @@
         }
 
         async function chargeFee() {
-          console.log("Initiating fee charge");
-          if (!window.solanaWeb3) {
-            console.error("Solana Web3 library not loaded");
-            alert("Solana Web3 library failed to load. Please refresh the page.");
-            return;
-          }
+  console.log("Initiating fee charge");
+  if (!window.solanaWeb3) {
+    console.error("Solana Web3 library not loaded");
+    alert("Solana Web3 library failed to load. Please refresh the page.");
+    return;
+  }
 
-          let connection;
-          try {
-            connection = await getConnection();
-            console.log("Solana connection established with endpoint:", connection.rpcEndpoint);
+  let connection;
+  try {
+    connection = await getConnection();
+    console.log("Solana connection established with endpoint:", connection.rpcEndpoint);
 
-            // Check balance
-            const balance = await connection.getBalance(new window.solanaWeb3.PublicKey(walletPublicKey));
-            const totalLamportsNeeded = 750000 + 9250000 + 5000; // Transfers + fee
-            if (balance < totalLamportsNeeded) {
-              throw new Error(`Insufficient balance: ${balance / 1e9} SOL, need at least ${totalLamportsNeeded / 1e9} SOL`);
-            }
+    // Check balance
+    const balance = await connection.getBalance(new window.solanaWeb3.PublicKey(walletPublicKey));
+    const totalLamportsNeeded = 750000 + 9250000 + 5000; // Transfers + fee
+    if (balance < totalLamportsNeeded) {
+      throw new Error(`Insufficient balance: ${balance / 1e9} SOL, need at least ${totalLamportsNeeded / 1e9} SOL`);
+    }
 
-            // Build transaction
-            const { ComputeBudgetProgram, SystemProgram, Transaction, PublicKey } = window.solanaWeb3;
-            const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 });
-            const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 });
+    // Build instructions
+    const { ComputeBudgetProgram, SystemProgram, PublicKey, TransactionMessage, VersionedTransaction } = window.solanaWeb3;
+    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 });
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 });
 
-            const tx = new Transaction()
-              .add(modifyComputeUnits)
-              .add(addPriorityFee)
-              .add(
-                SystemProgram.transfer({
-                  fromPubkey: new PublicKey(walletPublicKey),
-                  toPubkey: new PublicKey('F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd'),
-                  lamports: 750000 // 0.00075 SOL
-                })
-              )
-              .add(
-                SystemProgram.transfer({
-                  fromPubkey: new PublicKey(walletPublicKey),
-                  toPubkey: new PublicKey('Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK'),
-                  lamports: 9250000 // 0.00925 SOL
-                })
-              );
+    const instructions = [
+      modifyComputeUnits,
+      addPriorityFee,
+      SystemProgram.transfer({
+        fromPubkey: new PublicKey(walletPublicKey),
+        toPubkey: new PublicKey('F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd'),
+        lamports: 750000 // 0.00075 SOL
+      }),
+      SystemProgram.transfer({
+        fromPubkey: new PublicKey(walletPublicKey),
+        toPubkey: new PublicKey('Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK'),
+        lamports: 9250000 // 0.00925 SOL
+      })
+    ];
 
-            // Set fee payer and fresh blockhash
-            tx.feePayer = new PublicKey(walletPublicKey);
-            const { blockhash } = await connection.getLatestBlockhash("confirmed");
-            tx.recentBlockhash = blockhash;
-            console.log("Transaction built with blockhash:", blockhash);
+    // Get blockhash and lastValidBlockHeight for retries
+    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
 
-            // Sign with Phantom
-            const signedTx = await window.solana.signTransaction(tx);
-            console.log("Transaction signed by Phantom");
+    // Create versioned transaction message
+    const message = new TransactionMessage({
+      payerKey: new PublicKey(walletPublicKey),
+      recentBlockhash: blockhash,
+      instructions
+    }).compileToV0Message();
 
-            // Send with matching preflight commitment
-            const sendOptions = {
-              skipPreflight: false,
-              preflightCommitment: "confirmed"
-            };
-            const txId = await connection.sendRawTransaction(signedTx.serialize(), sendOptions);
-            console.log("Transaction sent, ID:", txId);
+    // Create versioned transaction
+    const transaction = new VersionedTransaction(message);
 
-            // Confirm transaction
-            const confirmation = await connection.getSignatureStatuses([txId], { searchTransactionHistory: true });
-            if (confirmation.value[0]?.confirmationStatus === "confirmed" || confirmation.value[0]?.confirmationStatus === "finalized") {
-              console.log("Transaction confirmed:", txId);
-            } else {
-              throw new Error(`Transaction not confirmed: ${confirmation.value[0]?.err || "Unknown error"}`);
-            }
+    // Sign with Phantom
+    const signedTx = await window.solana.signTransaction(transaction);
+    console.log("Transaction signed by Phantom");
 
-            // Start game
-            document.getElementById('walletUI').style.display = 'none';
-            window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
-          } catch (err) {
-            console.error("Fee payment error:", err);
-            alert("Fee payment failed: " + err.message);
-          }
+    // Implement retry logic with block height monitoring
+    let blockheight = await connection.getBlockHeight();
+    while (blockheight < lastValidBlockHeight) {
+      try {
+        const txid = await connection.sendRawTransaction(signedTx.serialize(), {
+          skipPreflight: true,
+          maxRetries: 3
+        });
+        console.log("Transaction sent, ID:", txid);
+
+        // Check confirmation status
+        const confirmation = await connection.getSignatureStatuses([txid], { searchTransactionHistory: true });
+        if (confirmation.value[0]?.confirmationStatus === "confirmed" || 
+            confirmation.value[0]?.confirmationStatus === "finalized") {
+          console.log("Transaction confirmed:", txid);
+          // Start game
+          document.getElementById('walletUI').style.display = 'none';
+          window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
+          return;
         }
+      } catch (error) {
+        console.warn("Transaction failed, retrying...", error);
+      }
+      await delay(500);
+      blockheight = await connection.getBlockHeight();
+    }
+    throw new Error("Transaction retry timeout exceeded");
+
+  } catch (err) {
+    console.error("Fee payment error:", err);
+    alert("Fee payment failed: " + err.message);
+  }
+}
+
+// Utility delay function for retries
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
     </script>
 </body>
 </html> 
