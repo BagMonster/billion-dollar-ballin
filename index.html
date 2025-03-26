@@ -1068,26 +1068,30 @@
     return;
   }
 
+  // Ensure wallet is connected
+  if (!window.solana || !window.solana.isConnected) {
+    try {
+      const response = await window.solana.connect();
+      walletPublicKey = response.publicKey.toString();
+      console.log("Wallet connected:", walletPublicKey);
+    } catch (err) {
+      console.error("Wallet connection failed:", err);
+      alert("Failed to connect wallet: " + err.message);
+      return;
+    }
+  } else {
+    walletPublicKey = window.solana.publicKey.toString();
+    console.log("Wallet already connected:", walletPublicKey);
+  }
+
   let connection;
   try {
     connection = await getConnection();
     console.log("Solana connection established with endpoint:", connection.rpcEndpoint);
 
-    // Check balance
-    const balance = await connection.getBalance(new window.solanaWeb3.PublicKey(walletPublicKey));
-    const totalLamportsNeeded = 750000 + 9250000 + 5000; // Transfers + fee
-    if (balance < totalLamportsNeeded) {
-      throw new Error(`Insufficient balance: ${balance / 1e9} SOL, need at least ${totalLamportsNeeded / 1e9} SOL`);
-    }
-
-    // Build instructions
-    const { ComputeBudgetProgram, SystemProgram, PublicKey, TransactionMessage, VersionedTransaction } = window.solanaWeb3;
-    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 });
-    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 });
-
+    // Build instructions for VersionedTransaction
+    const { SystemProgram, PublicKey, TransactionMessage, VersionedTransaction } = window.solanaWeb3;
     const instructions = [
-      modifyComputeUnits,
-      addPriorityFee,
       SystemProgram.transfer({
         fromPubkey: new PublicKey(walletPublicKey),
         toPubkey: new PublicKey('F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd'),
@@ -1100,8 +1104,8 @@
       })
     ];
 
-    // Get blockhash and lastValidBlockHeight for retries
-    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
+    // Get latest blockhash
+    const { blockhash } = await connection.getLatestBlockhash("confirmed");
 
     // Create versioned transaction message
     const message = new TransactionMessage({
@@ -1113,38 +1117,30 @@
     // Create versioned transaction
     const transaction = new VersionedTransaction(message);
 
-    // Sign with Phantom
+    // Sign with Phantom (should prompt wallet UI)
     const signedTx = await window.solana.signTransaction(transaction);
-    console.log("Transaction signed by Phantom");
+    console.log("Transaction signed by wallet");
 
-    // Implement retry logic with block height monitoring
-    let blockheight = await connection.getBlockHeight();
-    while (blockheight < lastValidBlockHeight) {
-      try {
-        const txid = await connection.sendRawTransaction(signedTx.serialize(), {
-          skipPreflight: true,
-          maxRetries: 3
-        });
-        console.log("Transaction sent, ID:", txid);
+    // Send transaction
+    const txId = await connection.sendRawTransaction(signedTx.serialize());
+    console.log("Transaction sent, ID:", txId);
 
-        // Check confirmation status
-        const confirmation = await connection.getSignatureStatuses([txid], { searchTransactionHistory: true });
-        if (confirmation.value[0]?.confirmationStatus === "confirmed" || 
-            confirmation.value[0]?.confirmationStatus === "finalized") {
-          console.log("Transaction confirmed:", txid);
-          // Start game
-          document.getElementById('walletUI').style.display = 'none';
-          window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
-          return;
-        }
-      } catch (error) {
-        console.warn("Transaction failed, retrying...", error);
-      }
-      await delay(500);
-      blockheight = await connection.getBlockHeight();
+    // Notify backend and start game
+    const response = await fetch(`${BACKEND_URL}/play`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerKey: walletPublicKey, signature: txId })
+    });
+    const data = await response.json();
+
+    if (data.success) {
+      console.log("Fee paid, tx ID:", data.txId);
+      document.getElementById('walletUI').style.display = 'none';
+      window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
+    } else {
+      console.error('Fee payment failed:', data.error);
+      alert('Fee payment failed: ' + data.error);
     }
-    throw new Error("Transaction retry timeout exceeded");
-
   } catch (err) {
     console.error("Fee payment error:", err);
     alert("Fee payment failed: " + err.message);
