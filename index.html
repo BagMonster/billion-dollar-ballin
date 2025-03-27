@@ -52,6 +52,19 @@
             box-sizing: border-box;
             transition: border 0.3s ease;
         }
+        #connectWallet {
+            position: static; /* Keeps it in the natural flow within #walletUI */
+            margin: 8px;      /* Matches your other buttons' spacing */
+        }
+
+        /* Styling when wallet is connected (desktop) */
+        #connectWallet.connected {
+            position: absolute;
+            top: 10px;    /* Near the top of the screen */
+            right: 10px;  /* Near the right edge */
+            margin: 0;    /* Remove margin for precise positioning */
+            z-index: 11;  /* Above #statusBox (z-index: 10) */
+        }
         #playButton, #practicePlayButton {
             opacity: 0.4; /* Greyed out initially */
             pointer-events: none; /* Disabled until enabled */
@@ -448,6 +461,13 @@
                 font-size: 17px;
                 margin: 8px;
             }
+            #connectWallet.connected {
+                position: absolute;
+                bottom: 20%;  /* Above #statusBox at bottom: 5% */
+                left: 2%;     /* Aligned with #statusBox */
+                margin: 0;    /* Remove margin for precise positioning */
+                z-index: 11;  /* Above #statusBox */
+            }
             #menuButton {
                 position: fixed;       /* same position logic */
                 top: 15px;             /* or what you need */
@@ -764,24 +784,46 @@
         leaderboardButton.style.opacity = '1';
         leaderboardButton.style.pointerEvents = 'auto';
 
+        function updateWalletButton() {
+            if (window.solana && window.solana.isConnected) {
+                // Wallet is connected
+                walletPublicKey = window.solana.publicKey.toString();
+                const firstFour = walletPublicKey.slice(0, 4);
+                const lastFive = walletPublicKey.slice(-5);
+                connectButton.textContent = `${firstFour}...${lastFive}`; // e.g., abcd...xyz12
+                connectButton.classList.add('connected'); // Apply connected styling
+            } else {
+                // Wallet is disconnected
+                connectButton.textContent = 'Connect Wallet';
+                connectButton.classList.remove('connected'); // Revert to default state
+                walletPublicKey = null;
+            }
+        }
+
         connectButton.addEventListener('click', async () => {
             console.log("Connect Wallet clicked");
-            if (window.solana && window.solana.isPhantom) {
-                try {
-                    const response = await window.solana.connect();
-                    walletPublicKey = response.publicKey.toString();
-                    connectButton.style.display = 'none';
-                    practiceButton.style.display = 'none';
-                    practicePlayButton.style.display = 'none'; // Hide practice play button in wallet mode
-                    enablePlayButton();
-                    console.log("Wallet connected, play button enabled");
-                } catch (err) {
-                    console.error("Connection error:", err);
-                }
-            } else {
+            if (!window.solana || !window.solana.isPhantom) {
+                alert('Please install Phantom Wallet!');
                 console.log("Phantom Wallet not detected");
+                return;
+            }
+            try {
+                await window.solana.connect(); // Prompt wallet connection
+                updateWalletButton();          // Update button text and class
+                enablePlayButton();            // Enable tournament play
+                console.log("Wallet connected, play button enabled");
+            } catch (err) {
+                console.error("Connection error:", err);
+                alert('Failed to connect wallet: ' + err.message);
             }
         });
+
+        // **New: Initial check and wallet event listeners**
+        if (window.solana) {
+            window.solana.on('connect', updateWalletButton);    // Update on connect
+            window.solana.on('disconnect', updateWalletButton); // Update on disconnect
+            updateWalletButton();                               // Set initial state
+        }
 
         practiceButton.addEventListener('click', () => {
             console.log("Practice Offline clicked");
