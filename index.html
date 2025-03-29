@@ -793,11 +793,18 @@
                 const lastFive = walletPublicKey.slice(-5);
                 connectButton.textContent = `${firstFour}...${lastFive}`; // e.g., abcd...xyz12
                 connectButton.classList.add('connected'); // Apply connected styling
+                practiceButton.style.display = 'none';
+                practicePlayButton.style.display = 'none';
+                enablePlayButton();
             } else {
                 // Wallet is disconnected
                 connectButton.textContent = 'Connect Wallet';
                 connectButton.classList.remove('connected'); // Revert to default state
                 walletPublicKey = null;
+                practiceButton.style.display = 'block';
+                practicePlayButton.style.display = 'block';
+                playButton.style.opacity = '0.4';
+                playButton.style.pointerEvents = 'none';
             }
         }
 
@@ -822,7 +829,6 @@
                 try {
                     const response = await window.solana.connect();
                     walletPublicKey = response.publicKey.toString();
-                    connectButton.style.display = 'none';
                     practiceButton.style.display = 'none';
                     practicePlayButton.style.display = 'none';
                     enablePlayButton(); // Your existing function
@@ -836,15 +842,18 @@
             }
         });
 
-        // Optional: Refresh balance periodically
-        setInterval(fetchWalletBalance, 3000); // Every 3 seconds
-
         // **New: Initial check and wallet event listeners**
         if (window.solana) {
-            window.solana.on('connect', updateWalletButton);    // Update on connect
-            window.solana.on('disconnect', updateWalletButton); // Update on disconnect
-            updateWalletButton();                               // Set initial state
+            window.solana.on('connect', () => {
+                updateWalletButton();
+                fetchWalletBalance();
+            });
+            window.solana.on('disconnect', updateWalletButton);
+            updateWalletButton(); // Check initial state
         }
+
+        // Optional: Refresh balance periodically
+        setInterval(fetchWalletBalance, 30000); // Every 30 seconds while testing
 
         practiceButton.addEventListener('click', () => {
             console.log("Practice Offline clicked");
