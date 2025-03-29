@@ -800,23 +800,43 @@
             }
         }
 
+        // Fetch wallet balance every 3 seconds
+        async function fetchWalletBalance() {
+            if (walletPublicKey) {
+                try {
+                    const connection = await getConnection(); // Assumes getConnection() is defined
+                    const balance = await connection.getBalance(new solanaWeb3.PublicKey(walletPublicKey));
+                    const solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL; // Convert lamports to SOL
+                    document.getElementById('walletBalance').textContent = `${solBalance.toFixed(6)} SOL`;
+                } catch (err) {
+                    console.error("Failed to fetch wallet balance:", err);
+                }
+            }
+        }
+
+        // Update the connectButton event listener to fetch balance after connection
         connectButton.addEventListener('click', async () => {
             console.log("Connect Wallet clicked");
-            if (!window.solana || !window.solana.isPhantom) {
-                alert('Please install Phantom Wallet!');
+            if (window.solana && window.solana.isPhantom) {
+                try {
+                    const response = await window.solana.connect();
+                    walletPublicKey = response.publicKey.toString();
+                    connectButton.style.display = 'none';
+                    practiceButton.style.display = 'none';
+                    practicePlayButton.style.display = 'none';
+                    enablePlayButton(); // Your existing function
+                    console.log("Wallet connected, play button enabled");
+                    await fetchWalletBalance(); // Fetch and display balance
+                } catch (err) {
+                    console.error("Connection error:", err);
+                }
+            } else {
                 console.log("Phantom Wallet not detected");
-                return;
-            }
-            try {
-                await window.solana.connect(); // Prompt wallet connection
-                updateWalletButton();          // Update button text and class
-                enablePlayButton();            // Enable tournament play
-                console.log("Wallet connected, play button enabled");
-            } catch (err) {
-                console.error("Connection error:", err);
-                alert('Failed to connect wallet: ' + err.message);
             }
         });
+
+        // Optional: Refresh balance periodically
+        setInterval(fetchWalletBalance, 3000); // Every 3 seconds
 
         // **New: Initial check and wallet event listeners**
         if (window.solana) {
