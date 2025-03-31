@@ -617,6 +617,10 @@
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Original+Surfer&display=swap" rel="stylesheet">
+    <script src="/lib/phantom-wallet-sdk/index.js"></script>
+    <script>
+        console.log("Phantom SDK loaded:", !!window.phantom);
+    </script>
     <script type="module">
         import { Buffer } from 'https://cdn.skypack.dev/buffer@6.0.3';
         window.Buffer = Buffer;
@@ -726,6 +730,7 @@
     <script>
         console.log("Main script loaded.");
         console.log("solanaWeb3 available:", !!window.solanaWeb3); // Debug log
+        console.log("Phantom SDK available:", !!window.phantom);
 
         // Game state
         let walletPublicKey = null;
@@ -824,21 +829,29 @@
 
         // Update the connectButton event listener to fetch balance after connection
         connectButton.addEventListener('click', async () => {
-            console.log("Connect Wallet clicked");
-            if (window.solana && window.solana.isPhantom) {
+            if (window.phantom?.solana) { // Use SDK if available
+                try {
+                    const phantom = window.phantom.solana;
+                    const response = await phantom.connect();
+                    walletPublicKey = response.publicKey.toString();
+                    updateWalletButton();
+                    await fetchWalletBalance();
+                    console.log("Phantom SDK connected:", walletPublicKey);
+                } catch (err) {
+                    console.error("Phantom SDK connection error:", err);
+                }
+            } else if (window.solana) { // Fallback to basic Phantom
                 try {
                     const response = await window.solana.connect();
                     walletPublicKey = response.publicKey.toString();
-                    practiceButton.style.display = 'none';
-                    practicePlayButton.style.display = 'none';
-                    enablePlayButton(); // Your existing function
-                    console.log("Wallet connected, play button enabled");
-                    await fetchWalletBalance(); // Fetch and display balance
+                    updateWalletButton();
+                    await fetchWalletBalance();
+                    console.log("Basic Phantom connected:", walletPublicKey);
                 } catch (err) {
-                    console.error("Connection error:", err);
+                    console.error("Basic Phantom connection error:", err);
                 }
             } else {
-                console.log("Phantom Wallet not detected");
+                alert("Phantom Wallet not detected! Install it at phantom.app");
             }
         });
 
@@ -1133,95 +1146,86 @@
         }
 
         async function chargeFee() {
-  console.log("Initiating fee charge");
+        console.log("Initiating fee charge with Phantom SDK - Multiple Transactions");
+        if (!window.solanaWeb3 || (!window.phantom?.solana && !window.solana)) {
+            alert("Wallet or Solana Web3 not loaded. Please refresh and ensure Phantom is installed.");
+            return;
+        }
 
-  // Check if Solana Web3 library is available
-  if (!window.solanaWeb3) {
-    console.error("Solana Web3 library not loaded");
-    alert("Solana Web3 library failed to load. Please refresh the page.");
-    return;
-  }
+        const provider = window.phantom?.solana || window.solana; // Prefer SDK if available
+        if (!walletPublicKey) {
+            try {
+                const response = await provider.connect();
+                walletPublicKey = response.publicKey.toString();
+                updateWalletButton();
+                await fetchWalletBalance();
+            } catch (err) {
+                console.error("Wallet connection failed:", err);
+                alert("Failed to connect wallet: " + err.message);
+                return;
+            }
+        }
 
-  // Ensure walletPublicKey is set (indicating wallet is connected)
-  if (!walletPublicKey) {
-    console.log("No wallet connected, prompting connection");
-    try {
-      const response = await window.solana.connect();
-      walletPublicKey = response.publicKey.toString();
-      console.log("Wallet connected:", walletPublicKey);
-    } catch (err) {
-      console.error("Wallet connection failed:", err);
-      alert("Failed to connect wallet: " + err.message);
-      return;
+        try {
+            const connection = await getConnection();
+            const { blockhash } = await connection.getLatestBlockhash('confirmed');
+
+            // Create two separate transactions
+            const ownerTx = new window.solanaWeb3.Transaction({
+                recentBlockhash: blockhash,
+                feePayer: new window.solanaWeb3.PublicKey(walletPublicKey)
+            });
+            ownerTx.add(
+                window.solanaWeb3.SystemProgram.transfer({
+                    fromPubkey: new window.solanaWeb3.PublicKey(walletPublicKey),
+                    toPubkey: new window.solanaWeb3.PublicKey('F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd'),
+                    lamports: 750000 // 0.00075 SOL to owner
+                })
+            );
+
+            const potTx = new window.solanaWeb3.Transaction({
+                recentBlockhash: blockhash,
+                feePayer: new window.solanaWeb3.PublicKey(walletPublicKey)
+            });
+            potTx.add(
+                window.solanaWeb3.SystemProgram.transfer({
+                    fromPubkey: new window.solanaWeb3.PublicKey(walletPublicKey),
+                    toPubkey: new window.solanaWeb3.PublicKey('Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK'),
+                    lamports: 9250000 // 0.00925 SOL to pot
+                })
+            );
+
+            // Sign and send both transactions together
+            const { signatures } = await provider.signAndSendAllTransactions([ownerTx, potTx]);
+            console.log("Transactions signed and sent, signatures:", signatures);
+
+            // Confirm both transactions
+            const confirmations = await connection.getSignatureStatuses(signatures);
+            for (let i = 0; i < confirmations.value.length; i++) {
+                if (!confirmations.value[i]?.confirmationStatus || confirmations.value[i].err) {
+                    throw new Error(`Transaction ${i + 1} failed: ${confirmations.value[i]?.err || 'Not confirmed'}`);
+                }
+            }
+
+            // Notify backend with both signatures (we’ll pick one for simplicity)
+            const response = await fetch(`${BACKEND_URL}/play`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ playerKey: walletPublicKey, signature: signatures[0] }) // Use first signature
+            });
+            const data = await response.json();
+            if (data.success) {
+                console.log("Fee paid, tx ID:", data.txId);
+                document.getElementById('walletUI').style.display = 'none';
+                window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
+            } else {
+                throw new Error(data.error || "Backend rejected transaction");
+            }
+        } catch (err) {
+            console.error("Fee payment error:", err);
+            alert("Failed to process payment: " + err.message);
+        }
     }
-  } else {
-    console.log("Wallet already connected:", walletPublicKey);
-  }
-
-  let connection;
-  try {
-    // Assuming getConnection() is a function that returns a Solana connection
-    connection = await getConnection();
-    console.log("Solana connection established with endpoint:", connection.rpcEndpoint);
-
-    const { SystemProgram, PublicKey, TransactionMessage, VersionedTransaction } = window.solanaWeb3;
-
-    // Define transaction instructions (example fee amounts)
-    const instructions = [
-      SystemProgram.transfer({
-        fromPubkey: new PublicKey(walletPublicKey),
-        toPubkey: new PublicKey('F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd'),
-        lamports: 750000 // 0.00075 SOL
-      }),
-      SystemProgram.transfer({
-        fromPubkey: new PublicKey(walletPublicKey),
-        toPubkey: new PublicKey('Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK'),
-        lamports: 9250000 // 0.00925 SOL
-      })
-    ];
-
-    // Get the latest blockhash
-    const { blockhash } = await connection.getLatestBlockhash("confirmed");
-
-    // Create a versioned transaction message
-    const message = new TransactionMessage({
-      payerKey: new PublicKey(walletPublicKey),
-      recentBlockhash: blockhash,
-      instructions
-    }).compileToV0Message();
-
-    // Create the versioned transaction
-    const transaction = new VersionedTransaction(message);
-
-    // Sign the transaction with Phantom (should prompt wallet UI)
-    const signedTx = await window.solana.signTransaction(transaction);
-    console.log("Transaction signed by wallet");
-
-    // Send the transaction
-    const txId = await connection.sendRawTransaction(signedTx.serialize());
-    console.log("Transaction sent, ID:", txId);
-
-    // Notify backend (adjust BACKEND_URL as needed)
-    const response = await fetch(`${BACKEND_URL}/play`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerKey: walletPublicKey, signature: txId })
-    });
-    const data = await response.json();
-
-    if (data.success) {
-      console.log("Fee paid, tx ID:", data.txId);
-      document.getElementById('walletUI').style.display = 'none';
-      window.dispatchEvent(new CustomEvent('startGame', { detail: { wallet: walletPublicKey } }));
-    } else {
-      console.error("Fee payment failed:", data.error);
-      alert("Fee payment failed: " + data.error);
-    }
-  } catch (err) {
-    console.error("Fee payment error:", err);
-    alert("Fee payment failed: " + err.message);
-  }
-}
     </script>
 </body>
 </html> 
