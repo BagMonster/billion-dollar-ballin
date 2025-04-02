@@ -617,7 +617,7 @@
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Original+Surfer&display=swap" rel="stylesheet">
-    <script src="/lib/phantom-wallet-sdk/index.js"></script>
+    <script src="/billion-dollar-ballin/lib/phantom-wallet-sdk/index.js"></script>
     <script>
         console.log("Phantom SDK loaded:", !!window.phantom);
     </script>
@@ -1152,6 +1152,8 @@
             return;
         }
 
+        console.log("solanaWeb3 confirmed:", !!window.solanaWeb3);
+
         const provider = window.phantom?.solana || window.solana; // Prefer SDK if available
         if (!walletPublicKey) {
             try {
@@ -1196,6 +1198,7 @@
             );
 
             // Sign and send both transactions together
+            console.log("Sending transactions to wallets...");
             const { signatures } = await provider.signAndSendAllTransactions([ownerTx, potTx]);
             console.log("Transactions signed and sent, signatures:", signatures);
 
