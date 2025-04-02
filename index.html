@@ -1146,81 +1146,81 @@
         }
 
         async function chargeFee() {
-    console.log("Initiating fee charge with Phantom SDK - Sign All and Send Individually");
-    if (!window.solanaWeb3 || (!window.phantom?.solana && !window.solana)) {
-        alert("Wallet or Solana Web3 not loaded. Please refresh and ensure Phantom is installed.");
-        return;
-    }
+            console.log("Initiating fee charge with Phantom SDK - Sign All and Send Individually");
+            if (!window.solanaWeb3 || (!window.phantom?.solana && !window.solana)) {
+                alert("Wallet or Solana Web3 not loaded. Please refresh and ensure Phantom is installed.");
+                return;
+            }
 
-    const provider = window.phantom?.solana || window.solana;
-    let walletPublicKey = provider.publicKey?.toString();
-    if (!walletPublicKey) {
-        try {
-            const response = await provider.connect();
-            walletPublicKey = response.publicKey.toString();
-        } catch (err) {
-            console.error("Wallet connection failed:", err);
-            alert("Failed to connect wallet: " + err.message);
-            return;
+            const provider = window.phantom?.solana || window.solana;
+            let walletPublicKey = provider.publicKey?.toString();
+            if (!walletPublicKey) {
+                try {
+                    const response = await provider.connect();
+                    walletPublicKey = response.publicKey.toString();
+                } catch (err) {
+                    console.error("Wallet connection failed:", err);
+                    alert("Failed to connect wallet: " + err.message);
+                    return;
+                }
+            }
+
+            try {
+                const connection = new window.solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
+                const balance = await connection.getBalance(new window.solanaWeb3.PublicKey(walletPublicKey)) / window.solanaWeb3.LAMPORTS_PER_SOL;
+                console.log("Wallet balance:", balance, "SOL");
+                if (balance < 0.01031) {
+                    throw new Error(`Insufficient funds: ${balance} SOL available, need 0.01031 SOL`);
+                }
+
+                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
+
+                const ownerTx = new window.solanaWeb3.Transaction({
+                    recentBlockhash: blockhash,
+                    feePayer: new window.solanaWeb3.PublicKey(walletPublicKey),
+                }).add(
+                    window.solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: new window.solanaWeb3.PublicKey(walletPublicKey),
+                        toPubkey: new window.solanaWeb3.PublicKey("F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd"),
+                        lamports: 750000, // 0.00075 SOL
+                    })
+                );
+
+                const potTx = new window.solanaWeb3.Transaction({
+                    recentBlockhash: blockhash,
+                    feePayer: new window.solanaWeb3.PublicKey(walletPublicKey),
+                }).add(
+                    window.solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: new window.solanaWeb3.PublicKey(walletPublicKey),
+                        toPubkey: new window.solanaWeb3.PublicKey("Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK"),
+                        lamports: 9250000, // 0.00925 SOL
+                    })
+                );
+
+                console.log("Signing transactions...");
+                const signedTxs = await provider.signAllTransactions([ownerTx, potTx]);
+
+                const signatures = [];
+                for (const signedTx of signedTxs) {
+                    const signature = await connection.sendRawTransaction(signedTx.serialize(), {
+                        skipPreflight: false, // Enable preflight checks
+                        maxRetries: 5,        // Retry up to 5 times
+                    });
+                    signatures.push(signature);
+                    console.log("Transaction sent, signature:", signature);
+                    await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight });
+                    console.log("Transaction confirmed");
+                }
+
+                const newBalance = await connection.getBalance(new window.solanaWeb3.PublicKey(walletPublicKey)) / window.solanaWeb3.LAMPORTS_PER_SOL;
+                console.log("New balance:", newBalance, "SOL");
+
+                alert("Payment successful! Signatures: " + signatures.join(", "));
+            } catch (err) {
+                console.error("Error:", err);
+                alert("Failed to process payment: " + err.message);
+            }
         }
-    }
-
-    try {
-        const connection = new window.solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
-        const balance = await connection.getBalance(new window.solanaWeb3.PublicKey(walletPublicKey)) / window.solanaWeb3.LAMPORTS_PER_SOL;
-        console.log("Wallet balance:", balance, "SOL");
-        if (balance < 0.01031) {
-            throw new Error(`Insufficient funds: ${balance} SOL available, need 0.01031 SOL`);
-        }
-
-        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
-
-        const ownerTx = new window.solanaWeb3.Transaction({
-            recentBlockhash: blockhash,
-            feePayer: new window.solanaWeb3.PublicKey(walletPublicKey),
-        }).add(
-            window.solanaWeb3.SystemProgram.transfer({
-                fromPubkey: new window.solanaWeb3.PublicKey(walletPublicKey),
-                toPubkey: new window.solanaWeb3.PublicKey("F3eQrfZ3vJb6c7EQgPw3AnAZrbbV8RHuHE3S6Yni3ugd"),
-                lamports: 750000, // 0.00075 SOL
-            })
-        );
-
-        const potTx = new window.solanaWeb3.Transaction({
-            recentBlockhash: blockhash,
-            feePayer: new window.solanaWeb3.PublicKey(walletPublicKey),
-        }).add(
-            window.solanaWeb3.SystemProgram.transfer({
-                fromPubkey: new window.solanaWeb3.PublicKey(walletPublicKey),
-                toPubkey: new window.solanaWeb3.PublicKey("Fo19KcLB9ChcM9YWiKwdyVHnUdNt5gxh9BL2bw1NEyHK"),
-                lamports: 9250000, // 0.00925 SOL
-            })
-        );
-
-        console.log("Signing transactions...");
-        const signedTxs = await provider.signAllTransactions([ownerTx, potTx]);
-
-        const signatures = [];
-        for (const signedTx of signedTxs) {
-            const signature = await connection.sendRawTransaction(signedTx.serialize(), {
-                skipPreflight: false, // Enable preflight checks
-                maxRetries: 5,        // Retry up to 5 times
-            });
-            signatures.push(signature);
-            console.log("Transaction sent, signature:", signature);
-            await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight });
-            console.log("Transaction confirmed");
-        }
-
-        const newBalance = await connection.getBalance(new window.solanaWeb3.PublicKey(walletPublicKey)) / window.solanaWeb3.LAMPORTS_PER_SOL;
-        console.log("New balance:", newBalance, "SOL");
-
-        alert("Payment successful! Signatures: " + signatures.join(", "));
-    } catch (err) {
-        console.error("Error:", err);
-        alert("Failed to process payment: " + err.message);
-    }
-}
     </script>
 </body>
 </html> 
