@@ -358,13 +358,6 @@
                     t.visible = !0, this.tweens.add({ targets: t, delay: 500, alpha: 0, onComplete: function() { t.visible = !1, t.alpha = 1 } })
                 }
             }, {
-                key: "dataPost", // Sends score to leaderboard server
-                value: function() {
-                    var t = { name: o.userName, score: o.score };
-                    this.exitingData.user.push(t), console.log(this.exitingData),
-                        v.a.ajax({ type: "POST", url: "https://toolkitweb.xyz/toolkit/basket_leader.php", data: { data: this.exitingData }, beforeSend: function() { console.log("sending") }, success: function(t) { console.log(t) }, error: function(t, e, i) { console.log("error") } })
-                }
-            }, {
                 key: "getData", // Fetches leaderboard data
                 value: function() {
                     var t = this;
@@ -470,8 +463,6 @@
                 }
             }, {
                 key: "addSlash", value: function() { var t = this.add.image(n(this), r(this), "slash").setDepth(10); t.visible = !0, this.tweens.add({ targets: t, delay: 500, alpha: 0, onComplete: function() { t.visible = !1, t.alpha = 1 } }) }
-            }, {
-                key: "dataPost", value: function() { var t = { name: o.userName, score: o.score }; this.exitingData.user.push(t), console.log(this.exitingData), v.a.ajax({ type: "POST", url: "https://toolkitweb.xyz/toolkit/basket_leader.php", data: { data: this.exitingData }, beforeSend: function() { console.log("sending") }, success: function(t) { console.log(t) }, error: function(t, e, i) { console.log("error") } }) }
             }, {
                 key: "getData", value: function() { var t = this; fetch("https://toolkitweb.xyz/toolkit/basket-leaderboard.json").then((function(t) { if (!t.ok) throw new Error("Network response was not ok " + t.statusText); return t.json() })).then((function(e) { t.exitingData = e })).catch((function(t) { console.error("There was a problem with the fetch operation:", t) })) }
             }]) && _(e.prototype, i), c && _(e, c), h
