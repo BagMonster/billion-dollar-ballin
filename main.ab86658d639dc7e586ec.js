@@ -349,7 +349,7 @@
                             t.scene.start(o.isMobileView ? "GameSceneMobile" : "GameScene"); 
                         }));
                     e.add([i, a, l, s, c, u]);
-                    window.dispatchEvent(new CustomEvent('gameOver', { detail: { wallet: o.userName, score: o.score } }));
+                    window.dispatchEvent(new CustomEvent('gameOver', { detail: { wallet: o.fullWallet, score: o.score } })); // Updated to o.fullWallet
                 }
             }, {
                 key: "addSlash", // Adds level transition effect
@@ -466,7 +466,7 @@
                             t.scene.start(o.isMobileView ? "GameSceneMobile" : "GameScene"); 
                         }));
                     e.add([i, a, l, s, c, u]);
-                    window.dispatchEvent(new CustomEvent('gameOver', { detail: { wallet: o.userName, score: o.score } }));
+                    window.dispatchEvent(new CustomEvent('gameOver', { detail: { wallet: o.fullWallet, score: o.score } })); // Updated to o.fullWallet
                 }
             }, {
                 key: "addSlash", value: function() { var t = this.add.image(n(this), r(this), "slash").setDepth(10); t.visible = !0, this.tweens.add({ targets: t, delay: 500, alpha: 0, onComplete: function() { t.visible = !1, t.alpha = 1 } }) }
