@@ -86,6 +86,7 @@
             levelNumber: 1, // Current game level
             score: 0, // Player’s score
             userName: "", // Player’s name
+            fullWallet: null, // New: Full wallet address (e.g., Solana public key) or null
             isMobileView: !1, // Mobile vs. desktop mode
             canPlay: false
         };
@@ -660,12 +661,14 @@
         console.log("Game starting with default name:", o.userName, "canPlay:", o.canPlay);
         var game = new Phaser.Game(ct);
 
+        // Game Initialization startGame listener 
         window.addEventListener('startGame', function(event) {
             console.log("startGame event received from index.html");
             var wallet = event.detail && event.detail.wallet ? event.detail.wallet : null;
-            o.userName = wallet ? formatWalletAddress(wallet) : "Player";
+            o.fullWallet = wallet; // Store the full wallet address (or null if none)
+            o.userName = wallet ? formatWalletAddress(wallet) : "Player"; // Format for display
             o.canPlay = true;
-            console.log("Wallet updated:", o.userName, "canPlay:", o.canPlay);
+            console.log("Wallet updated:", o.userName, "Full Wallet:", o.fullWallet, "canPlay:", o.canPlay);
 
             // Stop the current menu scene
             if (game.scene.isActive("MenuScene")) {
@@ -678,16 +681,6 @@
 
             // Hide wallet UI
             document.getElementById('walletUI').style.display = 'none';
-
-            // Sync wallet text in active menu scene
-            if (game.scene.isActive("MenuScene") || game.scene.isActive("MenuSceneMobile")) {
-                var scene = game.scene.getScene(o.isMobileView ? "MenuSceneMobile" : "MenuScene");
-                scene.children.list.forEach(child => {
-                    if (child.text && child.text.startsWith("Wallet: ")) {
-                        child.setText("Wallet: " + o.userName);
-                    }
-                });
-            }
 
             // Start the appropriate game scene
             var targetScene = o.isMobileView ? "GameSceneMobile" : "GameScene";
@@ -713,4 +706,5 @@
         });
     } // Close 311: function(t, e, i)
 }); // Close !function(t) and pass module map
+
 
