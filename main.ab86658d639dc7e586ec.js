@@ -507,36 +507,18 @@
                         window.dispatchEvent(new CustomEvent('hideLeaderboard')); // Dispatch event to hide leaderboard
                         t.scene.start(targetScene);
                     }); // Back button
-
-                    // Mock data—replace with this.getData() when GR1’s backend is live
-                    const mockData = {
-                        user: [
-                            { name: "4e3f9k2m7p8q1r5t2u9v", score: 20 },
-                            { name: "x7k9p2m4q8r1t5u9v3e6", score: 15 },
-                            { name: "Player1", score: 10 },
-                            { name: "Player2", score: 5 }
-                        ]
-                    };
-                    const sortedData = mockData.user.sort((a, b) => b.score - a.score).slice(0, 11);
-        
-                    // Format names and dispatch to index.html
-                    const leaderboardData = sortedData.map(player => ({
-                        name: formatWalletAddress(player.name),
-                        score: player.score
-                    }));
-                    window.dispatchEvent(new CustomEvent('updateLeaderboard', { detail: leaderboardData }));
+                    this.getData(); // Fetch real leaderboard data from server.js
                 }
             }, {
                 key: "getData",
                 value: function() {
                     var t = this;
-                    fetch("https://toolkitweb.xyz/toolkit/basket-leaderboard.json")
+                    fetch("https://trench-monster.games/status")
                         .then(res => res.json())
                         .then(data => {
-                            t.exitingData = data;
-                            const sortedData = data.user.sort((a, b) => b.score - a.score).slice(0, 11);
+                            const sortedData = data.highScores.sort((a, b) => b.score - a.score).slice(0, 11);
                             const leaderboardData = sortedData.map(player => ({
-                                name: formatWalletAddress(player.name),
+                                name: formatWalletAddress(player.wallet),
                                 score: player.score
                             }));
                             window.dispatchEvent(new CustomEvent('updateLeaderboard', { detail: leaderboardData }));
@@ -697,5 +679,4 @@
         });
     } // Close 311: function(t, e, i)
 }); // Close !function(t) and pass module map
-
 
